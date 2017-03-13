@@ -42,15 +42,15 @@ import com.jme3.util.SkyFactory;
 
 public class GameRunningState extends AbstractAppState implements AnimEventListener {
 
-    private ViewPort viewPort;
+    private final ViewPort viewPort;
     private Node rootNode;
     private Node guiNode;
-    private AssetManager assetManager;
+    private final AssetManager assetManager;
     private Node localRootNode = new Node("Game Screen RootNode");
     private Node localGuiNode = new Node("Game Screen GuiNode");
     private ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
-    private InputManager inputManager;
-    private BulletAppState bulletAppState;
+    private final InputManager inputManager;
+    private final BulletAppState bulletAppState;
     private boolean isRunning = false;
     private Spatial model;
     private FilterPostProcessor processor;
@@ -85,7 +85,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         bulletAppState.setDebugEnabled(false);
 
 //==============================================================================
-//      TEST SKY
+//      SKYBOX
         Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
         Texture east = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_east.jpg");
         Texture north = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_north.jpg");
@@ -98,7 +98,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         localRootNode.attachChild(sky);
 
 //==============================================================================
-//      TEST MODEL
+//      PLAYER MODEL
         model = assetManager.loadModel("Models/girl/girl.j3o");
         model.setShadowMode(RenderQueue.ShadowMode.Cast);
         physicsCharacter = new CharacterControl(new CapsuleCollisionShape(0.5f, 1.8f), .1f);
@@ -111,12 +111,12 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         localRootNode.attachChild(characterNode);
         characterNode.attachChild(model);
 //==============================================================================
-//      TEST SUN
+//      SUN
         sun = new DirectionalLight();
         sun.setDirection(model.getWorldTranslation());
         localRootNode.addLight(sun);
 //==============================================================================        
-//      TEST TERRAIN
+//      TERRAIN
         terrain = assetManager.loadModel("Scenes/terrain.j3o");
         terrain.setLocalTranslation(0, 3, 0);
         terrain.addControl(new RigidBodyControl(0));
@@ -124,10 +124,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);
 //==============================================================================
-//      TEST CAMERA
-
-        viewPort.getCamera().setLocation(new Vector3f(0, 8f, 0f));
-        app.getFlyByCamera().setEnabled(false);
+//      ChaseCamera
 
         ChaseCamera chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
         chaseCam.setChasingSensitivity(1);

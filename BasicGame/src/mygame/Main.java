@@ -22,9 +22,9 @@ public class Main extends SimpleApplication {
     public static void main(String[] args) {
         Main app = new Main();
         AppSettings cfg = new AppSettings(true);
-        //cfg.setFrameRate(60);
+        cfg.setFrameRate(60);
         cfg.setVSync(false);
-        //cfg.setFrequency(60);
+        cfg.setFrequency(60);
         cfg.setResolution(1360, 768);
         cfg.setFullscreen(false);
         cfg.setSamples(0);
@@ -40,6 +40,7 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
 
         inputManager.setCursorVisible(false);
+        flyCam.setEnabled(false);
 
         videoRecorderAppState = new VideoRecorderAppState();
 
