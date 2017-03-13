@@ -11,9 +11,9 @@ import com.jme3.system.AppSettings;
 public class Main extends SimpleApplication {
 
     private VideoRecorderAppState videoRecorderAppState;
-    private Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
-    private Trigger save_trigger = new KeyTrigger(KeyInput.KEY_RETURN);
-    private Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
+    private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
+    private final Trigger save_trigger = new KeyTrigger(KeyInput.KEY_RETURN);
+    private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
     private boolean isRunning = false;
     private GameRunningState gameRunningState;
     private StartScreenState startScreenState;
@@ -60,7 +60,7 @@ public class Main extends SimpleApplication {
         inputManager.addMapping("record", record_trigger);
         inputManager.addListener(actionListener, new String[]{"record"});
     }
-    private ActionListener actionListener = new ActionListener() {
+    private final ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
 
