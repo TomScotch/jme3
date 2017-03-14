@@ -15,9 +15,9 @@ public class Main extends SimpleApplication {
     private final Trigger save_trigger = new KeyTrigger(KeyInput.KEY_RETURN);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
     private boolean isRunning = false;
-    private GameRunningState gameRunningState;
-    private StartScreenState startScreenState;
-    private SettingsScreenState settingsScreenState;
+    private static GameRunningState gameRunningState;
+    private static StartScreenState startScreenState;
+    private static SettingsScreenState settingsScreenState;
 
     public static void main(String[] args) {
         Main app = new Main();
