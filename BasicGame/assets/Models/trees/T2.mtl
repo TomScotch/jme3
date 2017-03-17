@@ -1,0 +1,46 @@
+newmtl Bark_Branch_1
+Kd 0.784314 0.784314 0.784314
+Ke 0 0 0
+Ka 1 1 1
+Ks 0 0 0
+Ns 400
+Tr 0
+d 1
+Ni 1
+Tf 1 1 1
+
+newmtl Bark_Branch_2
+Kd 0.784314 0.784314 0.784314
+Ke 0 0 0
+Ka 1 1 1
+Ks 0 0 0
+Ns 400
+Tr 0
+d 1
+Ni 1
+Tf 1 1 1
+
+newmtl Bark_Trunk
+Kd 0.784314 0.784314 0.784314
+Ke 0 0 0
+Ka 1 1 1
+Ks 0 0 0
+Ns 400
+Tr 0
+d 1
+Ni 1
+Tf 1 1 1
+
+newmtl Leaves
+Kd 0.784314 0.784314 0.784314
+Ke 0 0 0
+Ka 0.98 0.98 0.98
+Ks 0.16 0.16 0.16
+Ns 400
+Tr 0
+d 1
+Ni 1
+Tf 1 1 1
+map_Kd Desktop/New Rock Texture4-15/Leaves/Branches0035_1_L.png
+map_d Desktop/New Rock Texture4-15/Leaves/Branches0035_3_L.jpg
+

@@ -73,7 +73,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
         System.out.println("Game State is being constructed");
 
-//==============================================================================
 //      CONSTRUKTOR
         this.rootNode = app.getRootNode();
         this.viewPort = app.getViewPort();
@@ -81,13 +80,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         this.assetManager = app.getAssetManager();
         this.inputManager = app.getInputManager();
 
-//==============================================================================
 //      PHYSICS STATE
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setDebugEnabled(isDebugEnabled);
 
-//==============================================================================
 //      SKYBOX
         Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
         Texture east = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_east.jpg");
@@ -100,7 +97,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         sky.setLocalTranslation(0, -1000, 0);
         localRootNode.attachChild(sky);
 
-//==============================================================================
 //      PLAYER MODEL
         model = assetManager.loadModel("Models/girl/girl.j3o");
         model.setShadowMode(RenderQueue.ShadowMode.Cast);
@@ -114,12 +110,12 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
         localRootNode.attachChild(characterNode);
         characterNode.attachChild(model);
-//==============================================================================
+
 //      SUN
         sun = new DirectionalLight();
         sun.setDirection(model.getWorldTranslation());
         localRootNode.addLight(sun);
-//==============================================================================        
+
 //      TERRAIN
         terrain = assetManager.loadModel("Scenes/terrain.j3o");
         terrain.setLocalTranslation(0, 3, 0);
@@ -127,9 +123,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);
-//==============================================================================
-//      ChaseCamera
 
+//      ChaseCamera
         ChaseCamera chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
         chaseCam.setChasingSensitivity(1);
         chaseCam.setTrailingEnabled(false);
@@ -140,10 +135,9 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         chaseCam.setDragToRotate(false);
         chaseCam.setRotationSpeed(0.5f);
 
-//==============================================================================
 //      TEST GUI TEXT
         loadHintText("Game running", "gametext");
-//==============================================================================        
+
 //      LIGHT AND SHADOWS
         DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, 128, 4);
         dlsr.setLight(sun);
@@ -155,7 +149,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         fpp.addFilter(dlsf);
         viewPort.addProcessor(fpp);
 
-//==============================================================================
 //      ANISOTROPY        
         AssetEventListener asl = new AssetEventListener() {
             @Override
@@ -177,7 +170,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             }
         };
         assetManager.addAssetEventListener(asl);
-//==============================================================================
+
 //      ANIMATION CHANNEL AND CONTROL
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("player");
