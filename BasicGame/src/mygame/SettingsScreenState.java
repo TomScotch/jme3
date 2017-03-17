@@ -13,12 +13,12 @@ import com.jme3.scene.Node;
 
 public class SettingsScreenState extends AbstractAppState {
 
-    private ViewPort viewPort;
-    private Node rootNode;
-    private Node guiNode;
-    private AssetManager assetManager;
-    private Node localRootNode = new Node("Settings Screen RootNode");
-    private Node localGuiNode = new Node("Settings Screen GuiNode");
+    private final ViewPort viewPort;
+    private final Node rootNode;
+    private final Node guiNode;
+    private final AssetManager assetManager;
+    private final Node localRootNode = new Node("Settings Screen RootNode");
+    private final Node localGuiNode = new Node("Settings Screen GuiNode");
     private final ColorRGBA backgroundColor = ColorRGBA.Gray;
 
     public SettingsScreenState(SimpleApplication app) {

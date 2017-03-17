@@ -13,12 +13,12 @@ import com.jme3.scene.Node;
 
 public class StartScreenState extends AbstractAppState {
 
-    private ViewPort viewPort;
-    private Node rootNode;
-    private Node guiNode;
-    private AssetManager assetManager;
-    private Node localRootNode = new Node("Start Screen RootNode");
-    private Node localGuiNode = new Node("Start Screen GuiNode");
+    private final ViewPort viewPort;
+    private final Node rootNode;
+    private final Node guiNode;
+    private final AssetManager assetManager;
+    private final Node localRootNode = new Node("Start Screen RootNode");
+    private final Node localGuiNode = new Node("Start Screen GuiNode");
     private final ColorRGBA backgroundColor = ColorRGBA.Black;
 
     public StartScreenState(SimpleApplication app) {
