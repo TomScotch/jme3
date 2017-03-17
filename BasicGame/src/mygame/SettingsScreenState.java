@@ -35,6 +35,7 @@ public class SettingsScreenState extends AbstractAppState {
         displaytext.setText("Settings screen. Press RETURN to save "
                 + "and return to start screen.");
         localGuiNode.attachChild(displaytext);
+        app.getInputManager().setCursorVisible(false);
     }
 
     @Override
@@ -42,6 +43,7 @@ public class SettingsScreenState extends AbstractAppState {
 
         super.initialize(stateManager, app);
         viewPort.setBackgroundColor(backgroundColor);
+        app.getInputManager().setCursorVisible(false);
     }
 
     @Override

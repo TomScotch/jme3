@@ -35,12 +35,14 @@ public class StartScreenState extends AbstractAppState {
         displaytext.setText("Start screen. Press BACKSPACE to resume the game, "
                 + "press RETURN to edit Settings.");
         localGuiNode.attachChild(displaytext);
+        app.getInputManager().setCursorVisible(false);
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         viewPort.setBackgroundColor(backgroundColor);
+        app.getInputManager().setCursorVisible(false);
     }
 
     @Override

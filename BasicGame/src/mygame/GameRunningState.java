@@ -35,7 +35,6 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
-//import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
@@ -61,15 +60,19 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     private CharacterControl physicsCharacter;
     private final Node characterNode;
     boolean rotate = false;
+    private final ChaseCamera chaseCam;
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     boolean leftStrafe = false, rightStrafe = false, forward = false, backward = false;
-    private final float move_speed = 4;
-    private final float strafe_speed = 14;
+
     private final boolean isDebugEnabled = false;
-    private final float jump_Speed = 25f;
-    private int anisotrpy_samples = 6;
-    private final ChaseCamera chaseCam;
+
+    private final float move_speed = 3.5f;
+    private final float strafe_speed = 10f;
+    private final float jump_Speed = 30f;
+
+    private final int shadowmapSize = 512;
+    private final int anisotrpy_samples = 8;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -107,7 +110,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         physicsCharacter.setMaxSlope(0);
         model.setLocalTranslation(0, -0.5f, 0);
         characterNode = new Node("character node");
-        characterNode.setLocalTranslation(0, 6, 0);
+        characterNode.setLocalTranslation(0, 5, 0);
         characterNode.addControl(physicsCharacter);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
         localRootNode.attachChild(characterNode);
@@ -120,7 +123,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
 //      TERRAIN
         terrain = assetManager.loadModel("Scenes/terrain.j3o");
-        terrain.setLocalTranslation(0, 3, 0);
+        terrain.setLocalTranslation(0, 1.45f, 0);
         terrain.addControl(new RigidBodyControl(0));
         terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
         bulletAppState.getPhysicsSpace().addAll(terrain);
@@ -142,7 +145,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         loadHintText("Game running", "gametext");
 
 //      LIGHT AND SHADOWS
-        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, 512, 2);
+        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
         dlsr.setLight(sun);
         viewPort.addProcessor(dlsr);
 

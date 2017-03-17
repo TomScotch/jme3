@@ -19,18 +19,22 @@ public class Main extends SimpleApplication {
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
 
+    private final static int antiAlias = 4;
+    private final static int depthBit = 24;
+
     public static void main(String[] args) {
         Main app = new Main();
         AppSettings cfg = new AppSettings(true);
         cfg.setFrameRate(60);
         cfg.setVSync(false);
         cfg.setFrequency(60);
-        cfg.setResolution(1360, 768);
-        cfg.setFullscreen(false);
-        cfg.setSamples(0);
+        cfg.setResolution(1440, 900);
+        cfg.setSamples(antiAlias);
+        cfg.setDepthBits(depthBit);
+        cfg.setFullscreen(true);
+        cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
+        cfg.setTitle("Serenity");
         app.setPauseOnLostFocus(true);
-        cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
-        cfg.setTitle("Serenity 1.0");
         app.setShowSettings(false);
         app.setSettings(cfg);
         app.start();
@@ -82,15 +86,15 @@ public class Main extends SimpleApplication {
                 }
             }
 
-            if (name.equals("record") && !isPressed && !isRunning) {
+            if (name.equals("record") && !isPressed) {
+
                 if (stateManager.hasState(videoRecorderAppState)) {
                     stateManager.detach(videoRecorderAppState);
                     System.out.println("finished recording");
-                } else if (stateManager.hasState(videoRecorderAppState)) {
+                } else if (!stateManager.hasState(videoRecorderAppState)) {
                     stateManager.attach(videoRecorderAppState);
                     System.out.println("start record");
                 }
-                stateManager.attach(videoRecorderAppState);
             }
 
             if (name.equals("Toggle Settings") && !isPressed && !isRunning) {
@@ -109,5 +113,6 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
+        //super.update();
     }
 }
