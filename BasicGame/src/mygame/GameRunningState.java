@@ -63,8 +63,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     boolean rotate = false;
     private Vector3f walkDirection = new Vector3f(0, 0, 0);
     private Vector3f viewDirection = new Vector3f(0, 0, 0);
-    boolean leftStrafe = false, rightStrafe = false, forward = false, backward = false,
-            q = false, e = false;
+    boolean leftStrafe = false, rightStrafe = false, forward = false, backward = false, q = false, e = false;
+    private float move_speed = 4;
+    private float strafe_speed = 14;
+    private boolean isDebugEnabled = false;
+    private float jump_Speed = 25f;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -82,7 +85,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 //      PHYSICS STATE
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
-        bulletAppState.setDebugEnabled(false);
+        bulletAppState.setDebugEnabled(isDebugEnabled);
 
 //==============================================================================
 //      SKYBOX
@@ -101,7 +104,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 //      PLAYER MODEL
         model = assetManager.loadModel("Models/girl/girl.j3o");
         model.setShadowMode(RenderQueue.ShadowMode.Cast);
-        physicsCharacter = new CharacterControl(new CapsuleCollisionShape(0.5f, 1.8f), .1f);
+        physicsCharacter = new CharacterControl(new CapsuleCollisionShape(0.75f, 5f), 0.1f);//
+        physicsCharacter.setJumpSpeed(jump_Speed);
         physicsCharacter.setMaxSlope(0);
         physicsCharacter.setPhysicsLocation(new Vector3f(0, 10, 0));
         characterNode = new Node("character node");
@@ -130,7 +134,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         chaseCam.setChasingSensitivity(1);
         chaseCam.setTrailingEnabled(false);
         chaseCam.setSmoothMotion(false);
-        chaseCam.setDefaultDistance(5.0f);
+        chaseCam.setDefaultDistance(7.5f);
+        chaseCam.setLookAtOffset(new Vector3f(0, 3, 0));
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDragToRotate(false);
         chaseCam.setRotationSpeed(0.5f);
@@ -226,6 +231,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
         inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
         inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
+        inputManager.addListener(actionListener, "q", "e");
         inputManager.addListener(actionListener, "Jump", "Shoot");
     }
 
@@ -300,8 +306,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             pivot.rotate((FastMath.QUARTER_PI * tpf) / 15, 0, 0);
             sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-            Vector3f camDir = viewPort.getCamera().getDirection().divide(8);
-            Vector3f camLeft = viewPort.getCamera().getLeft().divide(16);
+            Vector3f camDir = viewPort.getCamera().getDirection().divide(move_speed);
+            Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
 
             camDir.y = 0;
             camLeft.y = 0;
@@ -316,10 +322,17 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             }
 
             if (q) {
-                viewDirection.addLocal(camLeft);
+
+                if (bulletAppState.isDebugEnabled()) {
+
+                    bulletAppState.setDebugEnabled(false);
+                } else {
+                    bulletAppState.setDebugEnabled(true);
+                }
             }
+
             if (e) {
-                viewDirection.addLocal(camLeft.negate());
+                //
             }
 
             if (forward) {
