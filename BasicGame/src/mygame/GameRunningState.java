@@ -112,6 +112,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         characterNode = new Node("character node");
         characterNode.setLocalTranslation(0, 5, 0);
         characterNode.addControl(physicsCharacter);
+        physicsCharacter.setSpatial(characterNode);
+        physicsCharacter.setUseViewDirection(true);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
         localRootNode.attachChild(characterNode);
         characterNode.attachChild(model);
@@ -139,7 +141,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDragToRotate(false);
         chaseCam.setRotationSpeed(0.5f);
-        chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
+        //chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
 
 //      TEST GUI TEXT
         loadHintText("Game running", "gametext");
@@ -310,13 +312,15 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             pivot.rotate((FastMath.QUARTER_PI * tpf) / 15, 0, 0);
             sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-            Vector3f camDir = viewPort.getCamera().getDirection().divide(move_speed);
+            Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
             Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
 
             camDir.y = 0;
             camLeft.y = 0;
 
             viewDirection.set(camDir);
+            physicsCharacter.setViewDirection(viewDirection);
+
             walkDirection.set(0, 0, 0);
 
             if (leftStrafe) {
@@ -326,13 +330,12 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             }
 
             if (forward) {
-                walkDirection.addLocal(camDir);
+                walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
             } else if (backward) {
-                walkDirection.addLocal(camDir.negate());
+                walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
             }
 
             physicsCharacter.setWalkDirection(walkDirection);
-            physicsCharacter.setViewDirection(viewDirection);
         }
     }
 
