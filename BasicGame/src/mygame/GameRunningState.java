@@ -65,7 +65,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     boolean leftStrafe = false, rightStrafe = false, forward = false, backward = false;
 
-    private final boolean isDebugEnabled = false;
+    private final boolean debugEnabled = false;
 
     private final float move_speed = 3.5f;
     private final float strafe_speed = 10f;
@@ -88,7 +88,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 //      PHYSICS STATE
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
-        bulletAppState.setDebugEnabled(isDebugEnabled);
+        bulletAppState.setDebugEnabled(debugEnabled);
 
 //      SKYBOX
         Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
@@ -255,17 +255,10 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                     break;
                 case "q":
                     if (value) {
-                        if (bulletAppState.isDebugEnabled()) {
-
-                            bulletAppState.setDebugEnabled(false);
-                        } else {
-                            bulletAppState.setDebugEnabled(true);
-                        }
+                        bulletAppState.setDebugEnabled(!bulletAppState.isDebugEnabled());
                     }
                     break;
-
                 case "Walk Forward":
-
                     if (value) {
                         channel.setAnim("cammina");
                         channel.setLoopMode(LoopMode.Loop);
