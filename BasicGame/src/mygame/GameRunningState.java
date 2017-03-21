@@ -141,7 +141,9 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDragToRotate(false);
         chaseCam.setRotationSpeed(0.5f);
-        //chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
+        chaseCam.setDownRotateOnCloseViewOnly(true);
+        chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
+        chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
 //      TEST GUI TEXT
         loadHintText("Game running", "gametext");
@@ -163,12 +165,12 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
             @Override
             public void assetLoaded(AssetKey key) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                //throw new UnsupportedOperationException("Not supported yet.");
             }
 
             @Override
             public void assetDependencyNotFound(AssetKey parentKey, AssetKey dependentAssetKey) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                //throw new UnsupportedOperationException("Not supported yet.");
             }
         };
         assetManager.addAssetEventListener(asl);
@@ -248,6 +250,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                 case "e":
                     if (value) {
                         chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
+                        physicsCharacter.setUseViewDirection(!chaseCam.isDragToRotate());
                     }
                     break;
                 case "q":
@@ -369,13 +372,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     @Override
     public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
         //control.getSkeleton().resetAndUpdate();
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
         //channel.reset(false);
-        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     SceneGraphVisitor visitor = (Spatial spat) -> {
