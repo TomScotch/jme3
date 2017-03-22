@@ -32,9 +32,11 @@ import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.CameraNode;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.CameraControl.ControlDirection;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
@@ -63,9 +65,9 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     private final ChaseCamera chaseCam;
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
-    boolean leftStrafe = false, rightStrafe = false, forward = false, backward = false;
+    boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
 
-    private final boolean debugEnabled = false;
+    private boolean chaseEnabled = true;
 
     private final float move_speed = 3.5f;
     private final float strafe_speed = 10f;
@@ -73,6 +75,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
     private final int shadowmapSize = 512;
     private final int anisotrpy_samples = 8;
+    private final float rotationSpeed = 2.5f;
+    private final CameraNode camNode;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -88,7 +92,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 //      PHYSICS STATE
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
-        bulletAppState.setDebugEnabled(debugEnabled);
+        bulletAppState.setDebugEnabled(false);
 
 //      SKYBOX
         Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
@@ -144,6 +148,13 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         chaseCam.setDownRotateOnCloseViewOnly(true);
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+
+        camNode = new CameraNode("Camera Node", app.getCamera());
+        camNode.setControlDir(ControlDirection.SpatialToCamera);
+        characterNode.attachChild(camNode);
+        camNode.setLocalTranslation(new Vector3f(0, 7.5f, -10));
+        camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
+        camNode.setEnabled(false);
 
 //      TEST GUI TEXT
         loadHintText("Game running", "gametext");
@@ -208,13 +219,17 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
     private void setupKeys() {
 
+        inputManager.addMapping("leftRotate",
+                new KeyTrigger(KeyInput.KEY_Y));
+        inputManager.addMapping("rightRotate",
+                new KeyTrigger(KeyInput.KEY_C));
         inputManager.addMapping("Strafe Left",
                 new KeyTrigger(KeyInput.KEY_A));
         inputManager.addMapping("Strafe Right",
                 new KeyTrigger(KeyInput.KEY_D));
-        inputManager.addMapping("q",
+        inputManager.addMapping("debug",
                 new KeyTrigger(KeyInput.KEY_Q));
-        inputManager.addMapping("e",
+        inputManager.addMapping("chase",
                 new KeyTrigger(KeyInput.KEY_E));
         inputManager.addMapping("Walk Forward",
                 new KeyTrigger(KeyInput.KEY_W));
@@ -225,10 +240,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         inputManager.addMapping("Shoot",
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 
+        inputManager.addListener(actionListener, "leftRotate", "rightRotate");
         inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
         inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
         inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
-        inputManager.addListener(actionListener, "q", "e");
+        inputManager.addListener(actionListener, "debug", "chase");
         inputManager.addListener(actionListener, "Jump", "Shoot");
     }
 
@@ -238,6 +254,12 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         public void onAction(String binding, boolean value, float tpf) {
 
             switch (binding) {
+                case "rightRotate":
+                    rightRotate = value;
+                    break;
+                case "leftRotate":
+                    leftRotate = value;
+                    break;
                 case "Shoot":
                     localRootNode.depthFirstTraversal(visitor);
                     break;
@@ -247,13 +269,15 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                 case "Strafe Right":
                     rightStrafe = value;
                     break;
-                case "e":
+                case "chase":
                     if (value) {
+                        camNode.setEnabled(!camNode.isEnabled());
+                        chaseCam.setEnabled(!chaseCam.isEnabled());
+                        chaseEnabled = !chaseEnabled;
                         chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
-                        physicsCharacter.setUseViewDirection(!chaseCam.isDragToRotate());
                     }
                     break;
-                case "q":
+                case "debug":
                     if (value) {
                         bulletAppState.setDebugEnabled(!bulletAppState.isDebugEnabled());
                     }
@@ -314,7 +338,17 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             camDir.y = 0;
             camLeft.y = 0;
 
-            viewDirection.set(camDir);
+            if (!chaseEnabled) {
+                if (rightRotate) {
+                    viewDirection.addLocal(camLeft.mult(rotationSpeed).negate());
+                }
+                if (leftRotate) {
+                    viewDirection.addLocal(camLeft.mult(rotationSpeed));
+                }
+            } else {
+                viewDirection.set(camDir);
+            }
+
             physicsCharacter.setViewDirection(viewDirection);
 
             walkDirection.set(0, 0, 0);
@@ -332,6 +366,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             }
 
             physicsCharacter.setWalkDirection(walkDirection);
+
         }
     }
 
