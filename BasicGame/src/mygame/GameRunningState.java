@@ -12,6 +12,7 @@ import com.jme3.asset.AssetEventListener;
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.control.CharacterControl;
@@ -135,6 +136,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);
 
+        Node bgmNode = (Node) terrain;
+        AudioNode bgm = (AudioNode) bgmNode.getChild("AudioNode");
+        bgm.setLooping(true);
+        bgm.play();
+
 //      ChaseCamera
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
         chaseCam.setChasingSensitivity(1);
@@ -189,7 +195,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 //      ANIMATION CHANNEL AND CONTROL
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("player");
-
         control = n1.getControl(AnimControl.class);
         control.addListener(this);
         channel = control.createChannel();
@@ -408,11 +413,16 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     }
 
     SceneGraphVisitor visitor = (Spatial spat) -> {
-        if (spat.getControl(AnimControl.class) != null) {
-            try {
-                loadHintText(spat.getName(), "visitor");
-            } catch (Exception err) {
-                System.err.println(err);
+        if (spat.getName().equals("priest")) {
+            Node n = (Node) spat;
+            Node n1 = (Node) n.getChild("Cube");
+            AnimControl aniCon = n1.getControl(AnimControl.class);
+            if (aniCon.getClass() != null) {
+                System.out.println(aniCon.getAnimationNames().toString());
+                aniCon.clearChannels();
+                aniCon.createChannel();
+                aniCon.getChannel(0).setAnim("Idle");
+                aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
             }
         }
     };
