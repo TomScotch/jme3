@@ -1,6 +1,6 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        LightMap : Flip Models/npc/Knight_1.png
+        LightMap : Flip Models/npc/priest_texture.png
     }
     AdditionalRenderState {
       PointSprite On

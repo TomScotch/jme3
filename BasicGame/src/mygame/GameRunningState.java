@@ -48,7 +48,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     private final Node rootNode;
     private final Node guiNode;
     private final AssetManager assetManager;
-    private Node localRootNode = new Node("Game Screen RootNode");
+    private final Node localRootNode = new Node("Game Screen RootNode");
     private final Node localGuiNode = new Node("Game Screen GuiNode");
     private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
     private final InputManager inputManager;
@@ -78,6 +78,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     private final int anisotrpy_samples = 8;
     private final float rotationSpeed = 2.5f;
     private final CameraNode camNode;
+    private final AudioNode bgm;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -109,7 +110,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
 //      PLAYER MODEL
         model = assetManager.loadModel("Models/girl/girl.j3o");
-        model.setShadowMode(RenderQueue.ShadowMode.Cast);
+        model.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         physicsCharacter = new CharacterControl(new CapsuleCollisionShape(0.75f, 3.5f), 0.1f);//
         physicsCharacter.setJumpSpeed(jump_Speed);
         physicsCharacter.setMaxSlope(0);
@@ -137,9 +138,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         localRootNode.attachChild(terrain);
 
         Node bgmNode = (Node) terrain;
-        AudioNode bgm = (AudioNode) bgmNode.getChild("AudioNode");
+        bgm = (AudioNode) bgmNode.getChild("AudioNode");
         bgm.setLooping(true);
-        bgm.play();
 
 //      ChaseCamera
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
@@ -198,6 +198,18 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         control = n1.getControl(AnimControl.class);
         control.addListener(this);
         channel = control.createChannel();
+
+//      NPCS
+        Spatial priest = assetManager.loadModel("Models/npc/priest_v002.j3o");
+        priest.setLocalTranslation(5, 7.5f, 5);
+        priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        priest.scale(0.35f);
+        RigidBodyControl priestControl = new RigidBodyControl(new CapsuleCollisionShape(1.75f, 3.5f), 0f);
+        priest.addControl(priestControl);
+        priestControl.setSpatial(priest);
+        bulletAppState.getPhysicsSpace().add(priestControl);
+        localRootNode.attachChild(priest);
+        priestControl.setPhysicsLocation(new Vector3f(5, 5, 5));
     }
 
     @Override
@@ -266,7 +278,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                     leftRotate = value;
                     break;
                 case "Shoot":
-                    localRootNode.depthFirstTraversal(visitor);
+                    doAnim("priest", "Idle");
                     break;
                 case "Strafe Left":
                     leftStrafe = value;
@@ -328,6 +340,10 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
             super.update(tpf);
 
+            if (model.getWorldTranslation().y < -35) {
+                physicsCharacter.setPhysicsLocation(new Vector3f(5, 5, 5));
+            }
+
             if (c++ >= 90) {
                 c = 0;
                 localGuiNode.detachChildNamed("gametext");
@@ -336,6 +352,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
             pivot.rotate((FastMath.QUARTER_PI * tpf) / 15, 0, 0);
             sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
+            System.out.println(pivot.getLocalRotation().toString());
 
             Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
             Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
@@ -378,6 +395,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     @Override
     public void stateAttached(AppStateManager stateManager) {
         System.out.println("Game State is being attached");
+        bgm.play();
         rootNode.attachChild(localRootNode);
         guiNode.attachChild(localGuiNode);
         setupKeys();
@@ -387,6 +405,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
+        bgm.stop();
         viewPort.removeProcessor(processor);
         inputManager.removeListener(actionListener);
         rootNode.detachChild(localRootNode);
@@ -412,18 +431,21 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         //channel.reset(false);
     }
 
-    SceneGraphVisitor visitor = (Spatial spat) -> {
-        if (spat.getName().equals("priest")) {
-            Node n = (Node) spat;
-            Node n1 = (Node) n.getChild("Cube");
-            AnimControl aniCon = n1.getControl(AnimControl.class);
-            if (aniCon.getClass() != null) {
-                System.out.println(aniCon.getAnimationNames().toString());
-                aniCon.clearChannels();
-                aniCon.createChannel();
-                aniCon.getChannel(0).setAnim("Idle");
-                aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
+    private void doAnim(String name, String animation) {
+
+        SceneGraphVisitor visitor = (Spatial spat) -> {
+            if (spat.getName().equals(name)) {
+                Node n = (Node) spat;
+                Node n1 = (Node) n.getChild("anim");
+                AnimControl aniCon = n1.getControl(AnimControl.class);
+                if (aniCon.getClass() != null) {
+                    aniCon.clearChannels();
+                    aniCon.createChannel();
+                    aniCon.getChannel(0).setAnim(animation);
+                    aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
+                }
             }
-        }
-    };
+        };
+        localRootNode.depthFirstTraversal(visitor);
+    }
 }
