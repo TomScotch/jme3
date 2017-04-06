@@ -1,8 +1,6 @@
 package mygame;
 
-import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
-import com.jme3.animation.AnimEventListener;
 import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -44,7 +42,7 @@ import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
-public class GameRunningState extends AbstractAppState implements AnimEventListener, PhysicsCollisionListener {
+public class GameRunningState extends AbstractAppState implements PhysicsCollisionListener {
 
     private final ViewPort viewPort;
     private final Node rootNode;
@@ -80,6 +78,12 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     private final CameraNode camNode;
     private final AudioNode bgm;
 
+    private boolean attacking = false;
+    private float attackTimer = 0f;
+    private final float attackTime = 1.5f;
+    private String collisionTarget;
+    private final float playerDmg = 30f;
+
     public GameRunningState(SimpleApplication app) {
 
         System.out.println("Game State is being constructed");
@@ -110,7 +114,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         localRootNode.attachChild(sky);
 
 //      PLAYER MODEL
-        characterNode = new Node("character node");
+        characterNode = new Node("player");
         model = assetManager.loadModel("Models/npc/knight.j3o");
         model.scale(0.45f);
         model.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
@@ -126,6 +130,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         physicsCharacter.setPhysicsLocation(new Vector3f(0, 5, 0));
         localRootNode.attachChild(characterNode);
         characterNode.attachChild(model);
+        doAnim("player", "Idle", LoopMode.Loop);
 
 //      SUN
         sun = new DirectionalLight();
@@ -197,7 +202,10 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
 //      NPCS
         Spatial priest = assetManager.loadModel("Models/npc/priest_v002.j3o");
-        priest.setLocalTranslation(5, 7.5f, 5);
+        npcControl npcCon = new npcControl();
+        npcCon.setTarget(model);
+        priest.addControl(npcCon);
+        //priest.setLocalTranslation(5, 7.5f, 5);
         priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         priest.scale(0.35f);
         CapsuleCollisionShape capsuleCollisionShape = new CapsuleCollisionShape(1.75f, 3.5f);
@@ -207,6 +215,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         bulletAppState.getPhysicsSpace().add(priestControl);
         localRootNode.attachChild(priest);
         priestControl.setPhysicsLocation(new Vector3f(5, 5, 5));
+        doAnim("priest", "Idle", LoopMode.Loop);
     }
 
     @Override
@@ -217,8 +226,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         processor = (FilterPostProcessor) assetManager.loadAsset("Filters/myFilter.j3f");
         viewPort.addProcessor(processor);
         inputManager.setCursorVisible(false);
-        doAnim("priest", "Idle");
-        doAnim("knight", "Idle");
     }
 
     private void loadHintText(String txt, String name) {
@@ -277,10 +284,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                     leftRotate = value;
                     break;
                 case "Shoot":
+                    attacking = value;
                     if (value) {
-                        doAnim("knight", "Attack");
+                        doAnim("player", "Attack", LoopMode.Loop);
                     } else {
-                        doAnim("knight", "Idle");
+                        doAnim("player", "Idle", LoopMode.Loop);
                     }
                     break;
                 case "Strafe Left":
@@ -304,17 +312,17 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                     break;
                 case "Walk Forward":
                     if (value) {
-                        doAnim("knight", "Walk");
+                        doAnim("player", "Walk", LoopMode.Loop);
                     } else {
-                        doAnim("knight", "Idle");
+                        doAnim("player", "Idle", LoopMode.Loop);
                     }
                     forward = value;
                     break;
                 case "Walk Backward":
                     if (value) {
-                        doAnim("player", "Walk");
+                        doAnim("player", "Walk", LoopMode.Loop);
                     } else {
-                        doAnim("priest", "Idle");
+                        doAnim("player", "Idle", LoopMode.Loop);
                     }
                     backward = value;
                     break;
@@ -330,12 +338,29 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     Node pivot = new Node();
     int c = 0;
 
+    private void attack() {
+        if (!collisionTarget.equals("")) {
+            if (attackTimer <= 0) {
+                attackTimer = attackTime;
+                hit(collisionTarget);
+            }
+        }
+    }
+
     @Override
     public void update(float tpf) {
 
         if (getIsRunning()) {
 
             super.update(tpf);
+
+            if (attacking) {
+                attack();
+            }
+
+            if (attackTimer > 0) {
+                attackTimer = attackTimer - 1 * tpf;
+            }
 
             if (model.getWorldTranslation().y < -35) {
                 physicsCharacter.setPhysicsLocation(new Vector3f(5, 5, 5));
@@ -417,17 +442,16 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         this.isRunning = isRunning;
     }
 
-    @Override
-    public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
-        //control.getSkeleton().resetAndUpdate();
+    private void hit(String name) {
+        SceneGraphVisitor visitor = (Spatial spat) -> {
+            if (spat.getName().equals(name)) {
+                spat.getControl(npcControl.class).hit(playerDmg);
+            }
+        };
+        localRootNode.depthFirstTraversal(visitor);
     }
 
-    @Override
-    public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
-        //channel.reset(false);
-    }
-
-    private void doAnim(String name, String animation) {
+    private void doAnim(String name, String animation, LoopMode lop) {
 
         SceneGraphVisitor visitor = (Spatial spat) -> {
             if (spat.getName().equals(name)) {
@@ -438,7 +462,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                     aniCon.clearChannels();
                     aniCon.createChannel();
                     aniCon.getChannel(0).setAnim(animation);
-                    aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
+                    aniCon.getChannel(0).setLoopMode(lop);
+                } else {
+                    aniCon.createChannel();
+                    aniCon.getChannel(0).setAnim(animation);
+                    aniCon.getChannel(0).setLoopMode(lop);
                 }
             }
         };
@@ -447,6 +475,12 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
     @Override
     public void collision(PhysicsCollisionEvent event) {
-        System.out.println(event.getNodeA().getName() + " - " + event.getNodeB().getName());
+        if (event.getNodeA().getName().equals("player")) {
+            if (!event.getNodeB().getName().equals("terrain")) {
+                collisionTarget = event.getNodeB().getName();
+            } else {
+                collisionTarget = "";
+            }
+        }
     }
 }
