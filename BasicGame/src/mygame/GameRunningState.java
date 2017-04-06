@@ -14,6 +14,8 @@ import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.PhysicsCollisionEvent;
+import com.jme3.bullet.collision.PhysicsCollisionListener;
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.control.CharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
@@ -42,7 +44,7 @@ import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
-public class GameRunningState extends AbstractAppState implements AnimEventListener {
+public class GameRunningState extends AbstractAppState implements AnimEventListener, PhysicsCollisionListener {
 
     private final ViewPort viewPort;
     private final Node rootNode;
@@ -93,6 +95,7 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setDebugEnabled(false);
+        bulletAppState.getPhysicsSpace().addCollisionListener(this);
 
 //      SKYBOX
         Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
@@ -107,14 +110,15 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         localRootNode.attachChild(sky);
 
 //      PLAYER MODEL
+        characterNode = new Node("character node");
         model = assetManager.loadModel("Models/npc/knight.j3o");
         model.scale(0.45f);
         model.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        physicsCharacter = new CharacterControl(new CapsuleCollisionShape(0.9f, 4f), 0.1f);//
+        CapsuleCollisionShape shape = new CapsuleCollisionShape(0.9f, 4f);
+        physicsCharacter = new CharacterControl(shape, 0.1f);//
         physicsCharacter.setJumpSpeed(jump_Speed);
         physicsCharacter.setMaxSlope(0);
         model.setLocalTranslation(0, 1.25f, 0);
-        characterNode = new Node("character node");
         characterNode.addControl(physicsCharacter);
         physicsCharacter.setSpatial(characterNode);
         physicsCharacter.setUseViewDirection(true);
@@ -196,7 +200,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         priest.setLocalTranslation(5, 7.5f, 5);
         priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         priest.scale(0.35f);
-        RigidBodyControl priestControl = new RigidBodyControl(new CapsuleCollisionShape(1.75f, 3.5f), 0f);
+        CapsuleCollisionShape capsuleCollisionShape = new CapsuleCollisionShape(1.75f, 3.5f);
+        RigidBodyControl priestControl = new RigidBodyControl(capsuleCollisionShape, 0f);
         priest.addControl(priestControl);
         priestControl.setSpatial(priest);
         bulletAppState.getPhysicsSpace().add(priestControl);
@@ -438,5 +443,10 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
             }
         };
         localRootNode.depthFirstTraversal(visitor);
+    }
+
+    @Override
+    public void collision(PhysicsCollisionEvent event) {
+        System.out.println(event.getNodeA().getName() + " - " + event.getNodeB().getName());
     }
 }
