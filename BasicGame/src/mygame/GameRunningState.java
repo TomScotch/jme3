@@ -58,8 +58,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
     private FilterPostProcessor processor;
     private final DirectionalLight sun;
     private final Spatial terrain;
-    private AnimChannel channel;
-    private final AnimControl control;
     private CharacterControl physicsCharacter;
     private final Node characterNode;
     boolean rotate = false;
@@ -109,18 +107,19 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         localRootNode.attachChild(sky);
 
 //      PLAYER MODEL
-        model = assetManager.loadModel("Models/girl/girl.j3o");
+        model = assetManager.loadModel("Models/npc/knight.j3o");
+        model.scale(0.45f);
         model.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        physicsCharacter = new CharacterControl(new CapsuleCollisionShape(0.75f, 3.5f), 0.1f);//
+        physicsCharacter = new CharacterControl(new CapsuleCollisionShape(0.9f, 4f), 0.1f);//
         physicsCharacter.setJumpSpeed(jump_Speed);
         physicsCharacter.setMaxSlope(0);
-        model.setLocalTranslation(0, -0.5f, 0);
+        model.setLocalTranslation(0, 1.25f, 0);
         characterNode = new Node("character node");
-        characterNode.setLocalTranslation(0, 5, 0);
         characterNode.addControl(physicsCharacter);
         physicsCharacter.setSpatial(characterNode);
         physicsCharacter.setUseViewDirection(true);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
+        physicsCharacter.setPhysicsLocation(new Vector3f(0, 5, 0));
         localRootNode.attachChild(characterNode);
         characterNode.attachChild(model);
 
@@ -192,13 +191,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         };
         assetManager.addAssetEventListener(asl);
 
-//      ANIMATION CHANNEL AND CONTROL
-        Node n = (Node) model;
-        Node n1 = (Node) n.getChild("player");
-        control = n1.getControl(AnimControl.class);
-        control.addListener(this);
-        channel = control.createChannel();
-
 //      NPCS
         Spatial priest = assetManager.loadModel("Models/npc/priest_v002.j3o");
         priest.setLocalTranslation(5, 7.5f, 5);
@@ -220,6 +212,8 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
         processor = (FilterPostProcessor) assetManager.loadAsset("Filters/myFilter.j3f");
         viewPort.addProcessor(processor);
         inputManager.setCursorVisible(false);
+        doAnim("priest", "Idle");
+        doAnim("knight", "Idle");
     }
 
     private void loadHintText(String txt, String name) {
@@ -278,7 +272,11 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                     leftRotate = value;
                     break;
                 case "Shoot":
-                    doAnim("priest", "Idle");
+                    if (value) {
+                        doAnim("knight", "Attack");
+                    } else {
+                        doAnim("knight", "Idle");
+                    }
                     break;
                 case "Strafe Left":
                     leftStrafe = value;
@@ -301,23 +299,17 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
                     break;
                 case "Walk Forward":
                     if (value) {
-                        channel.setAnim("cammina");
-                        channel.setLoopMode(LoopMode.Loop);
+                        doAnim("knight", "Walk");
                     } else {
-                        channel.setAnim("cammina");
-                        channel.setLoopMode(LoopMode.DontLoop);
-                        channel.setTime(0);
+                        doAnim("knight", "Idle");
                     }
                     forward = value;
                     break;
                 case "Walk Backward":
                     if (value) {
-                        channel.setAnim("cammina");
-                        channel.setLoopMode(LoopMode.Loop);
+                        doAnim("player", "Walk");
                     } else {
-                        channel.setAnim("cammina");
-                        channel.setLoopMode(LoopMode.DontLoop);
-                        channel.setTime(0);
+                        doAnim("priest", "Idle");
                     }
                     backward = value;
                     break;
@@ -352,7 +344,6 @@ public class GameRunningState extends AbstractAppState implements AnimEventListe
 
             pivot.rotate((FastMath.QUARTER_PI * tpf) / 15, 0, 0);
             sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
-            System.out.println(pivot.getLocalRotation().toString());
 
             Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
             Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
