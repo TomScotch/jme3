@@ -19,7 +19,7 @@ public class Main extends SimpleApplication {
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
 
-    private final static int antiAlias = 0;
+    private final static int antiAlias = 1;
     private final static int depthBit = 24;
 
     public static void main(String[] args) {

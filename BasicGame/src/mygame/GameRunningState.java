@@ -12,10 +12,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.collision.PhysicsCollisionEvent;
-import com.jme3.bullet.collision.PhysicsCollisionListener;
-import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
-import com.jme3.bullet.control.CharacterControl;
+import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
@@ -42,7 +39,7 @@ import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
-public class GameRunningState extends AbstractAppState implements PhysicsCollisionListener {
+public class GameRunningState extends AbstractAppState {
 
     private final ViewPort viewPort;
     private final Node rootNode;
@@ -58,7 +55,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
     private FilterPostProcessor processor;
     private final DirectionalLight sun;
     private final Spatial terrain;
-    private CharacterControl physicsCharacter;
+    private BetterCharacterControl physicsCharacter;
     private final Node characterNode;
     boolean rotate = false;
     private final ChaseCamera chaseCam;
@@ -68,9 +65,9 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 
     private boolean chaseEnabled = true;
 
-    private final float move_speed = 3.5f;
-    private final float strafe_speed = 10f;
-    private final float jump_Speed = 30f;
+    private final float move_speed = 0.1f;
+    private final float strafe_speed = 0.1f;
+    private final float jump_Speed = 25f;
 
     private final int shadowmapSize = 512;
     private final int anisotrpy_samples = 8;
@@ -81,8 +78,13 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
     private boolean attacking = false;
     private float attackTimer = 0f;
     private final float attackTime = 1.5f;
-    private String collisionTarget;
+    private final String collisionTarget = "";
     private final float playerDmg = 30f;
+    private final boolean bgmOn = true;
+
+    private final int timeDelay = 240;
+    private final float gravity = 50;
+    private final float playerMass = 2.5f;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -99,7 +101,6 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setDebugEnabled(false);
-        bulletAppState.getPhysicsSpace().addCollisionListener(this);
 
 //      SKYBOX
         Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
@@ -117,19 +118,25 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         characterNode = new Node("player");
         model = assetManager.loadModel("Models/npc/knight.j3o");
         model.scale(0.45f);
+        characterNode.attachChild(model);
+
+        /*      
+        GhostControl ghost = new GhostControl(
+        new BoxCollisionShape(new Vector3f(4, 2.5f, 4)));
+        characterNode.addControl(ghost);
+        bulletAppState.getPhysicsSpace().add(ghost);
+         */
         model.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        CapsuleCollisionShape shape = new CapsuleCollisionShape(0.9f, 4f);
-        physicsCharacter = new CharacterControl(shape, 0.1f);//
-        physicsCharacter.setJumpSpeed(jump_Speed);
-        physicsCharacter.setMaxSlope(0);
-        model.setLocalTranslation(0, 1.25f, 0);
+        model.setLocalTranslation(0, 4.15f, 0);
+        physicsCharacter = new BetterCharacterControl(3, 6, playerMass);
+        physicsCharacter.warp(new Vector3f(0, 6, 0));
+        physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
+        physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
         characterNode.addControl(physicsCharacter);
         physicsCharacter.setSpatial(characterNode);
-        physicsCharacter.setUseViewDirection(true);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
-        physicsCharacter.setPhysicsLocation(new Vector3f(0, 5, 0));
         localRootNode.attachChild(characterNode);
-        characterNode.attachChild(model);
+
         doAnim("player", "Idle", LoopMode.Loop);
 
 //      SUN
@@ -145,9 +152,10 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);
 
+//      BGM
         Node bgmNode = (Node) terrain;
         bgm = (AudioNode) bgmNode.getChild("AudioNode");
-        bgm.setLooping(true);
+        bgm.setLooping(bgmOn);
 
 //      ChaseCamera
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
@@ -155,7 +163,8 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         chaseCam.setTrailingEnabled(false);
         chaseCam.setSmoothMotion(false);
         chaseCam.setDefaultDistance(7.5f);
-        chaseCam.setLookAtOffset(new Vector3f(0, 3.2f, 0));
+        chaseCam.setMinDistance(5f);
+        chaseCam.setLookAtOffset(new Vector3f(0, 4f, 0));
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDragToRotate(false);
         chaseCam.setRotationSpeed(0.5f);
@@ -178,7 +187,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         dlsr.setLight(sun);
         viewPort.addProcessor(dlsr);
 
-//      ANISOTROPY        
+        //      ANISOTROPY
         AssetEventListener asl = new AssetEventListener() {
             @Override
             public void assetRequested(AssetKey key) {
@@ -201,20 +210,21 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         assetManager.addAssetEventListener(asl);
 
 //      NPCS
+        Node priestNode = new Node("priest");
+
         Spatial priest = assetManager.loadModel("Models/npc/priest_v002.j3o");
-        npcControl npcCon = new npcControl();
-        npcCon.setTarget(model);
-        priest.addControl(npcCon);
-        //priest.setLocalTranslation(5, 7.5f, 5);
-        priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        priestNode.attachChild(priest);
         priest.scale(0.35f);
-        CapsuleCollisionShape capsuleCollisionShape = new CapsuleCollisionShape(1.75f, 3.5f);
-        RigidBodyControl priestControl = new RigidBodyControl(capsuleCollisionShape, 0f);
-        priest.addControl(priestControl);
-        priestControl.setSpatial(priest);
+        priest.setLocalTranslation(0, 3.2f, 0);
+        npcControl npcCon = new npcControl();
+        priest.addControl(npcCon);
+        priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        BetterCharacterControl priestControl = new BetterCharacterControl(3, 6, 100);
+        priestNode.addControl(priestControl);
+        priestControl.setSpatial(priestNode);
+        localRootNode.attachChild(priestNode);
         bulletAppState.getPhysicsSpace().add(priestControl);
-        localRootNode.attachChild(priest);
-        priestControl.setPhysicsLocation(new Vector3f(5, 5, 5));
+        priestControl.warp(new Vector3f(5, 5, 5));
         doAnim("priest", "Idle", LoopMode.Loop);
     }
 
@@ -335,6 +345,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 
         }
     };
+
     Node pivot = new Node();
     int c = 0;
 
@@ -363,7 +374,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
             }
 
             if (model.getWorldTranslation().y < -35) {
-                physicsCharacter.setPhysicsLocation(new Vector3f(5, 5, 5));
+                physicsCharacter.warp(new Vector3f(5, 5, 5));
             }
 
             if (c++ >= 90) {
@@ -372,7 +383,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
                 localGuiNode.detachChildNamed("visitor");
             }
 
-            pivot.rotate((FastMath.QUARTER_PI * tpf) / 15, 0, 0);
+            pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
             sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
             Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
@@ -445,7 +456,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
     private void hit(String name) {
         SceneGraphVisitor visitor = (Spatial spat) -> {
             if (spat.getName().equals(name)) {
-                spat.getControl(npcControl.class).hit(playerDmg);
+                spat.getControl(npcControl.class).hit(playerDmg, "player");
             }
         };
         localRootNode.depthFirstTraversal(visitor);
@@ -471,16 +482,5 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
             }
         };
         localRootNode.depthFirstTraversal(visitor);
-    }
-
-    @Override
-    public void collision(PhysicsCollisionEvent event) {
-        if (event.getNodeA().getName().equals("player")) {
-            if (!event.getNodeB().getName().equals("terrain")) {
-                collisionTarget = event.getNodeB().getName();
-            } else {
-                collisionTarget = "";
-            }
-        }
     }
 }

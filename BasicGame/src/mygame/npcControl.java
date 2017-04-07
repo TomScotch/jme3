@@ -14,19 +14,21 @@ public class npcControl extends AbstractControl {
     private float health = 100;
     private final float dmg = 15;
     private final float armor = 10;
-    private final float attackDelay = 100;
-    private final float speed = 100;
     private boolean dead = false;
     private float hitAnimationDelay = 0;
 
-    private Spatial target;
+    private String targetName = "";
+    private Spatial targetSpatial;
 
     @Override
     protected void controlUpdate(float tpf) {
 
         if (!dead) {
-            if (target != null) {
-                this.spatial.lookAt(target.getWorldTranslation(), Vector3f.UNIT_Y);
+
+            if (!targetName.equals("")) {
+                Node n = (Node) this.spatial;
+                targetSpatial = n.getParent().getChild(targetName);
+                this.spatial.lookAt(targetSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
             }
 
             if (health < 0) {
@@ -43,10 +45,6 @@ public class npcControl extends AbstractControl {
         }
     }
 
-    public void setTarget(Spatial target) {
-        this.target = target;
-    }
-
     private void setAnim(String name, LoopMode mode) {
         Node n = (Node) this.spatial;
         Node n1 = (Node) n.getChild("anim");
@@ -55,8 +53,9 @@ public class npcControl extends AbstractControl {
         control.getChannel(0).setLoopMode(mode);
     }
 
-    public void hit(float dmg) {
+    public void hit(float dmg, String name) {
         if (!dead) {
+            targetName = name;
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1;
