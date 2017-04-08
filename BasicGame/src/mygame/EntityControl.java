@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
+import com.jme3.effect.ParticleEmitter;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -59,6 +60,7 @@ public class EntityControl extends AbstractControl {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1.5f;
                 setAnim("Hit", LoopMode.DontLoop);
+                hitParticles();
             }
         }
     }
@@ -67,5 +69,13 @@ public class EntityControl extends AbstractControl {
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations,
         //not called when spatial is culled.
+    }
+
+    private void hitParticles() {
+        Node n = (Node) this.spatial;
+        Node n1 = (Node) n.getChild("hit");
+        ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
+        child.emitAllParticles();
+
     }
 }
