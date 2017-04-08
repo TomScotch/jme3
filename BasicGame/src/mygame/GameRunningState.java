@@ -12,6 +12,8 @@ import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.PhysicsCollisionEvent;
+import com.jme3.bullet.collision.PhysicsCollisionListener;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.font.BitmapFont;
@@ -39,7 +41,7 @@ import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
-public class GameRunningState extends AbstractAppState {
+public class GameRunningState extends AbstractAppState implements PhysicsCollisionListener {
 
     private final ViewPort viewPort;
     private final Node rootNode;
@@ -62,7 +64,7 @@ public class GameRunningState extends AbstractAppState {
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
-
+    private final static Node pivot = new Node();
     private boolean chaseEnabled = true;
 
     private final float move_speed = 0.1f;
@@ -78,13 +80,15 @@ public class GameRunningState extends AbstractAppState {
     private boolean attacking = false;
     private float attackTimer = 0f;
     private final float attackTime = 1.5f;
-    private final String collisionTarget = "";
+    private String collisionTarget = "";
     private final float playerDmg = 30f;
     private final boolean bgmOn = true;
 
     private final int timeDelay = 240;
     private final float gravity = 50;
     private final float playerMass = 2.5f;
+
+    private final int bgmVolume = 8;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -100,6 +104,7 @@ public class GameRunningState extends AbstractAppState {
 //      PHYSICS STATE
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
+        bulletAppState.getPhysicsSpace().addCollisionListener(this);
         bulletAppState.setDebugEnabled(false);
 
 //      SKYBOX
@@ -119,13 +124,6 @@ public class GameRunningState extends AbstractAppState {
         model = assetManager.loadModel("Models/npc/knight.j3o");
         model.scale(0.45f);
         characterNode.attachChild(model);
-
-        /*      
-        GhostControl ghost = new GhostControl(
-        new BoxCollisionShape(new Vector3f(4, 2.5f, 4)));
-        characterNode.addControl(ghost);
-        bulletAppState.getPhysicsSpace().add(ghost);
-         */
         model.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         model.setLocalTranslation(0, 4.15f, 0);
         physicsCharacter = new BetterCharacterControl(3, 6, playerMass);
@@ -155,6 +153,7 @@ public class GameRunningState extends AbstractAppState {
 //      BGM
         Node bgmNode = (Node) terrain;
         bgm = (AudioNode) bgmNode.getChild("AudioNode");
+        bgm.setVolume(bgm.getVolume() / bgmVolume);
         bgm.setLooping(bgmOn);
 
 //      ChaseCamera
@@ -163,8 +162,8 @@ public class GameRunningState extends AbstractAppState {
         chaseCam.setTrailingEnabled(false);
         chaseCam.setSmoothMotion(false);
         chaseCam.setDefaultDistance(7.5f);
-        chaseCam.setMinDistance(5f);
-        chaseCam.setLookAtOffset(new Vector3f(0, 4f, 0));
+        chaseCam.setMinDistance(3f);
+        chaseCam.setLookAtOffset(new Vector3f(0, 5f, 0));
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDragToRotate(false);
         chaseCam.setRotationSpeed(0.5f);
@@ -180,7 +179,7 @@ public class GameRunningState extends AbstractAppState {
         camNode.setEnabled(false);
 
 //      TEST GUI TEXT
-        loadHintText("Game running", "gametext");
+        displayText("Game running");
 
 //      LIGHT AND SHADOWS
         DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
@@ -214,9 +213,11 @@ public class GameRunningState extends AbstractAppState {
 
         Spatial priest = assetManager.loadModel("Models/npc/priest_v002.j3o");
         priestNode.attachChild(priest);
+        priestNode.setName("priest");
+        priest.setName("priest");
         priest.scale(0.35f);
         priest.setLocalTranslation(0, 3.2f, 0);
-        npcControl npcCon = new npcControl();
+        EntityControl npcCon = new EntityControl();
         priest.addControl(npcCon);
         priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         BetterCharacterControl priestControl = new BetterCharacterControl(3, 6, 100);
@@ -238,16 +239,17 @@ public class GameRunningState extends AbstractAppState {
         inputManager.setCursorVisible(false);
     }
 
-    private void loadHintText(String txt, String name) {
+    private void displayText(String txt) {
 
         BitmapFont guiFont = assetManager.loadFont(
                 "Interface/Fonts/Default.fnt");
         BitmapText displaytext = new BitmapText(guiFont);
-        displaytext.setName(name);
+        DettachTimerControl tc = new DettachTimerControl(5f);
         displaytext.setSize(guiFont.getCharSet().getRenderedSize());
         displaytext.move(10, displaytext.getLineHeight() + 20, 0);
         displaytext.setText(txt);
         localGuiNode.attachChild(displaytext);
+        displaytext.addControl(tc);
     }
 
     private void setupKeys() {
@@ -295,17 +297,22 @@ public class GameRunningState extends AbstractAppState {
                     break;
                 case "Shoot":
                     attacking = value;
+                    break;
+                case "Strafe Left":
+                    leftStrafe = value;
                     if (value) {
-                        doAnim("player", "Attack", LoopMode.Loop);
+                        doAnim("player", "Walk", LoopMode.Loop);
                     } else {
                         doAnim("player", "Idle", LoopMode.Loop);
                     }
                     break;
-                case "Strafe Left":
-                    leftStrafe = value;
-                    break;
                 case "Strafe Right":
                     rightStrafe = value;
+                    if (value) {
+                        doAnim("player", "Walk", LoopMode.Loop);
+                    } else {
+                        doAnim("player", "Idle", LoopMode.Loop);
+                    }
                     break;
                 case "chase":
                     if (value) {
@@ -346,15 +353,14 @@ public class GameRunningState extends AbstractAppState {
         }
     };
 
-    Node pivot = new Node();
-    int c = 0;
-
     private void attack() {
-        if (!collisionTarget.equals("")) {
-            if (attackTimer <= 0) {
-                attackTimer = attackTime;
+
+        if (attackTimer <= 0) {
+            if (!collisionTarget.equals("")) {
                 hit(collisionTarget);
             }
+            doAnim("player", "Attack", LoopMode.DontLoop);
+            attackTimer = attackTime;
         }
     }
 
@@ -369,18 +375,14 @@ public class GameRunningState extends AbstractAppState {
                 attack();
             }
 
+            checkIdleforPlayer();
+
             if (attackTimer > 0) {
-                attackTimer = attackTimer - 1 * tpf;
+                attackTimer -= 1 * tpf;
             }
 
             if (model.getWorldTranslation().y < -35) {
                 physicsCharacter.warp(new Vector3f(5, 5, 5));
-            }
-
-            if (c++ >= 90) {
-                c = 0;
-                localGuiNode.detachChildNamed("gametext");
-                localGuiNode.detachChildNamed("visitor");
             }
 
             pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
@@ -456,7 +458,11 @@ public class GameRunningState extends AbstractAppState {
     private void hit(String name) {
         SceneGraphVisitor visitor = (Spatial spat) -> {
             if (spat.getName().equals(name)) {
-                spat.getControl(npcControl.class).hit(playerDmg, "player");
+                Node n = (Node) spat;
+                Spatial child = n.getChild(name);
+                if (child != null) {
+                    child.getControl(EntityControl.class).hit(playerDmg, "player");
+                }
             }
         };
         localRootNode.depthFirstTraversal(visitor);
@@ -482,5 +488,32 @@ public class GameRunningState extends AbstractAppState {
             }
         };
         localRootNode.depthFirstTraversal(visitor);
+    }
+
+    private void checkIdleforPlayer() {
+
+        Node n = (Node) model;
+        Node n1 = (Node) n.getChild("anim");
+        AnimControl aniCon = n1.getControl(AnimControl.class);
+        if (aniCon.getChannel(0).getAnimationName().equals("Attack")) {
+            if (aniCon.getChannel(0).getTime() == aniCon.getChannel(0).getAnimMaxTime()) {
+                aniCon.clearChannels();
+                aniCon.createChannel();
+                aniCon.getChannel(0).setAnim("Idle");
+                aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
+            }
+        }
+    }
+
+    @Override
+    public void collision(PhysicsCollisionEvent event) {
+        if (!event.getNodeB().getName().equals("")) {
+            if (!event.getNodeB().getName().equals("terrain")) {
+                collisionTarget = event.getNodeB().getName();
+            } else {
+                collisionTarget = "";
+            }
+        }
+
     }
 }

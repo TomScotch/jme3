@@ -9,10 +9,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 
-public class npcControl extends AbstractControl {
+public class EntityControl extends AbstractControl {
 
     private float health = 100;
-    private final float dmg = 15;
     private final float armor = 10;
     private boolean dead = false;
     private float hitAnimationDelay = 0;
@@ -27,7 +26,7 @@ public class npcControl extends AbstractControl {
 
             if (!targetName.equals("")) {
                 Node n = (Node) this.spatial;
-                targetSpatial = n.getParent().getChild(targetName);
+                targetSpatial = n.getParent().getParent().getChild(targetName);
                 this.spatial.lookAt(targetSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
             }
 
@@ -58,7 +57,7 @@ public class npcControl extends AbstractControl {
             targetName = name;
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
-                hitAnimationDelay = 1;
+                hitAnimationDelay = 1.5f;
                 setAnim("Hit", LoopMode.DontLoop);
             }
         }
