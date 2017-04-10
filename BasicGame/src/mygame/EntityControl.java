@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
+import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
@@ -27,8 +28,12 @@ public class EntityControl extends AbstractControl {
 
             if (!targetName.equals("")) {
                 Node n = (Node) this.spatial;
+                BetterCharacterControl control = this.spatial.getParent().
+                        getControl(BetterCharacterControl.class);
                 targetSpatial = n.getParent().getParent().getChild(targetName);
-                this.spatial.lookAt(targetSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
+                Vector3f a = targetSpatial.getWorldTranslation();
+                Vector3f b = this.spatial.getWorldTranslation();
+                control.setViewDirection(a.subtract(b));
             }
 
             if (health < 0) {
