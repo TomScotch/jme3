@@ -4,18 +4,18 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
 
-public class DettachTimerControl extends AbstractControl {
+public abstract class TimedActionControl extends AbstractControl {
 
     private float counter = 0;
     private final float defaultCountDown = 30;
     private float countDown = 0;
     private boolean paused = false;
 
-    public DettachTimerControl() {
+    public TimedActionControl() {
         countDown = defaultCountDown;
     }
 
-    public DettachTimerControl(float countDown) {
+    public TimedActionControl(float countDown) {
         this.countDown = countDown;
     }
 
@@ -25,7 +25,7 @@ public class DettachTimerControl extends AbstractControl {
         if (!paused) {
             counter += tpf;
             if (counter >= countDown) {
-                this.spatial.removeFromParent();
+                action();
             }
         }
     }
@@ -55,4 +55,6 @@ public class DettachTimerControl extends AbstractControl {
     public float getCountDown() {
         return countDown;
     }
+
+    abstract void action();
 }

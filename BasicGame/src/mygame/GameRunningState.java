@@ -211,12 +211,12 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 //      NPCS
         Node priestNode = new Node("priest");
 
-        Spatial priest = assetManager.loadModel("Models/npc/priest_v002.j3o");
+        Spatial priest = assetManager.loadModel("Models/hostile/Demon/demon.j3o");
         priestNode.attachChild(priest);
-        priestNode.setName("priest");
-        priest.setName("priest");
-        priest.scale(0.35f);
-        priest.setLocalTranslation(0, 3.2f, 0);
+        priestNode.setName("demon");
+        priest.setName("demon");
+        priest.scale(3.5f);
+        priest.setLocalTranslation(0, -0.2f, 0);
         EntityControl npcCon = new EntityControl();
         priest.addControl(npcCon);
         priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
@@ -226,7 +226,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         localRootNode.attachChild(priestNode);
         bulletAppState.getPhysicsSpace().add(priestControl);
         priestControl.warp(new Vector3f(5, 5, 5));
-        doAnim("priest", "Idle", LoopMode.Loop);
+        doAnim("priest", "IdleHeadTilt", LoopMode.Loop);
     }
 
     @Override
@@ -244,7 +244,14 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         BitmapFont guiFont = assetManager.loadFont(
                 "Interface/Fonts/Default.fnt");
         BitmapText displaytext = new BitmapText(guiFont);
-        DettachTimerControl tc = new DettachTimerControl(5f);
+
+        TimedActionControl tc = new TimedActionControl(5f) {
+            @Override
+            void action() {
+                this.spatial.removeFromParent();
+            }
+        };
+
         displaytext.setSize(guiFont.getCharSet().getRenderedSize());
         displaytext.move(10, displaytext.getLineHeight() + 20, 0);
         displaytext.setText(txt);

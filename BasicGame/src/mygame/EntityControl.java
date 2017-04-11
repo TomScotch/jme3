@@ -38,24 +38,44 @@ public class EntityControl extends AbstractControl {
 
             if (health < 0) {
                 dead = true;
-                setAnim("Die", LoopMode.DontLoop);
+                setAnim("FiggetIdle", LoopMode.DontLoop);
             }
 
             if (hitAnimationDelay > 0) {
                 hitAnimationDelay -= tpf;
                 if (hitAnimationDelay <= 0) {
-                    setAnim("Idle", LoopMode.Loop);
+                    setAnim("IdleHeadTilt", LoopMode.Loop);
                 }
             }
         }
+
+        if (dead) {
+
+            BetterCharacterControl control = this.spatial.getParent().
+                    getControl(BetterCharacterControl.class);
+            control.getPhysicsSpace().remove(control);
+            this.spatial.getParent().removeControl(BetterCharacterControl.class);
+            this.spatial.getParent().removeFromParent();
+            this.spatial.removeControl(this);
+        }
+
     }
 
     private void setAnim(String name, LoopMode mode) {
-        Node n = (Node) this.spatial;
-        Node n1 = (Node) n.getChild("anim");
-        AnimControl control = n1.getControl(AnimControl.class);
-        control.getChannel(0).setAnim(name);
-        control.getChannel(0).setLoopMode(mode);
+        Node n = (Node) this.spatial.getParent();
+        Node e = (Node) n.getChild("anim");
+        AnimControl aniCon = e.getControl(AnimControl.class);
+
+        if (aniCon.getClass() != null) {
+            aniCon.clearChannels();
+            aniCon.createChannel();
+            aniCon.getChannel(0).setAnim(name);
+            aniCon.getChannel(0).setLoopMode(mode);
+        } else {
+            aniCon.createChannel();
+            aniCon.getChannel(0).setAnim(name);
+            aniCon.getChannel(0).setLoopMode(mode);
+        }
     }
 
     public void hit(float dmg, String name) {
@@ -64,7 +84,7 @@ public class EntityControl extends AbstractControl {
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1.5f;
-                setAnim("Hit", LoopMode.DontLoop);
+                setAnim("AlertToRunTransition", LoopMode.DontLoop);
                 hitParticles();
             }
         }
@@ -77,10 +97,9 @@ public class EntityControl extends AbstractControl {
     }
 
     private void hitParticles() {
-        Node n = (Node) this.spatial;
+        Node n = (Node) this.spatial.getParent();
         Node n1 = (Node) n.getChild("hit");
         ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
         child.emitAllParticles();
-
     }
 }
