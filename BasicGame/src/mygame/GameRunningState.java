@@ -149,12 +149,10 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 
 //      FLASHLIGHT        
         lamp = new SpotLight();
-        lamp.setSpotRange(40);                           // distance
+        lamp.setSpotRange(50);                           // distance
         lamp.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD); // inner light cone (central beam)
         lamp.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD); // outer light cone (edge of the light)
-        lamp.setColor(ColorRGBA.White.mult(1.3f));         // light color
-        lamp.setPosition(app.getCamera().getLocation());               // shine from camera loc
-        lamp.setDirection(app.getCamera().getDirection());             // shine forward from camera loc
+        lamp.setColor(ColorRGBA.White.mult(flashLightStrength));         // light color
         lamp.setEnabled(false);
         localRootNode.addLight(lamp);
 
@@ -248,6 +246,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         priestControl.warp(new Vector3f(5, 5, 5));
         doAnim("priest", "IdleHeadTilt", LoopMode.Loop);
     }
+    private final float flashLightStrength = 1.3f;
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -457,7 +456,9 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 
             physicsCharacter.setWalkDirection(walkDirection);
         }
-        lamp.setPosition(model.getWorldTranslation());
+
+        lamp.setPosition(characterNode.getLocalTranslation());
+        lamp.getPosition().addLocal(0, 3, 0);
         lamp.setDirection(viewPort.getCamera().getDirection());
 
         if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
