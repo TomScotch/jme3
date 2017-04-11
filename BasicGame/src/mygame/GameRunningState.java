@@ -28,6 +28,7 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.ViewPort;
@@ -73,7 +74,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 
     private final int shadowmapSize = 512;
     private final int anisotrpy_samples = 8;
-    private final float rotationSpeed = 2.5f;
+    private final float rotationSpeed = 0.05f;
     private final CameraNode camNode;
     private final AudioNode bgm;
 
@@ -87,6 +88,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
     private final int timeDelay = 240;
     private final float gravity = 50;
     private final float playerMass = 2.5f;
+    private final float chaseCamRotationSpeed = 0.5f;
 
     private final int bgmVolume = 8;
 
@@ -166,7 +168,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         chaseCam.setLookAtOffset(new Vector3f(0, 5f, 0));
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setDragToRotate(false);
-        chaseCam.setRotationSpeed(0.5f);
+        chaseCam.setRotationSpeed(chaseCamRotationSpeed);
         chaseCam.setDownRotateOnCloseViewOnly(true);
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
@@ -174,12 +176,16 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         camNode = new CameraNode("Camera Node", app.getCamera());
         camNode.setControlDir(ControlDirection.SpatialToCamera);
         characterNode.attachChild(camNode);
-        camNode.setLocalTranslation(new Vector3f(0, 7.5f, -10));
+        camNode.setLocalTranslation(new Vector3f(0, 4.4f, -18f));
         camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
         camNode.setEnabled(false);
 
 //      TEST GUI TEXT
-        displayText("Game running");
+        displayText("Game running",
+                new Vector2f(10, 20),
+                1.8f,
+                ColorRGBA.Blue,
+                9f);
 
 //      LIGHT AND SHADOWS
         DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
@@ -239,22 +245,23 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         inputManager.setCursorVisible(false);
     }
 
-    private void displayText(String txt) {
+    private void displayText(String txt, Vector2f pos, float size, ColorRGBA color, float lifetime) {
 
         BitmapFont guiFont = assetManager.loadFont(
                 "Interface/Fonts/Default.fnt");
         BitmapText displaytext = new BitmapText(guiFont);
 
-        TimedActionControl tc = new TimedActionControl(5f) {
+        TimedActionControl tc = new TimedActionControl(lifetime) {
             @Override
             void action() {
                 this.spatial.removeFromParent();
             }
         };
 
-        displaytext.setSize(guiFont.getCharSet().getRenderedSize());
-        displaytext.move(10, displaytext.getLineHeight() + 20, 0);
         displaytext.setText(txt);
+        displaytext.setColor(color);
+        displaytext.setSize(guiFont.getCharSet().getRenderedSize() * size);
+        displaytext.move(pos.x, displaytext.getLineHeight() + pos.y, 0);
         localGuiNode.attachChild(displaytext);
         displaytext.addControl(tc);
     }
