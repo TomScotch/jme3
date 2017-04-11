@@ -26,6 +26,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
+import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
@@ -74,7 +75,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 
     private final int shadowmapSize = 512;
     private final int anisotrpy_samples = 8;
-    private final float rotationSpeed = 0.05f;
+    private final float rotationSpeed = 0.005f;
     private final CameraNode camNode;
     private final AudioNode bgm;
 
@@ -91,6 +92,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
     private final float chaseCamRotationSpeed = 0.5f;
 
     private final int bgmVolume = 8;
+    private final SpotLight lamp;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -142,7 +144,19 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
 //      SUN
         sun = new DirectionalLight();
         sun.setDirection(model.getWorldTranslation());
+        sun.setColor(ColorRGBA.Orange);
         localRootNode.addLight(sun);
+
+//      FLASHLIGHT        
+        lamp = new SpotLight();
+        lamp.setSpotRange(40);                           // distance
+        lamp.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD); // inner light cone (central beam)
+        lamp.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD); // outer light cone (edge of the light)
+        lamp.setColor(ColorRGBA.White.mult(1.3f));         // light color
+        lamp.setPosition(app.getCamera().getLocation());               // shine from camera loc
+        lamp.setDirection(app.getCamera().getDirection());             // shine forward from camera loc
+        lamp.setEnabled(false);
+        localRootNode.addLight(lamp);
 
 //      TERRAIN
         terrain = assetManager.loadModel("Scenes/terrain.j3o");
@@ -214,18 +228,18 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         };
         assetManager.addAssetEventListener(asl);
 
-//      NPCS
+//      HOSTILE
         Node priestNode = new Node("priest");
 
-        Spatial priest = assetManager.loadModel("Models/hostile/Demon/demon.j3o");
-        priestNode.attachChild(priest);
+        Spatial hostile = assetManager.loadModel("Models/hostile/Demon/demon.j3o");
+        priestNode.attachChild(hostile);
         priestNode.setName("demon");
-        priest.setName("demon");
-        priest.scale(3.5f);
-        priest.setLocalTranslation(0, -0.2f, 0);
+        hostile.setName("demon");
+        //hostile.scale(3.75f);
+        hostile.setLocalTranslation(0, -0.2f, 0);
         EntityControl npcCon = new EntityControl();
-        priest.addControl(npcCon);
-        priest.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        hostile.addControl(npcCon);
+        hostile.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         BetterCharacterControl priestControl = new BetterCharacterControl(3, 6, 100);
         priestNode.addControl(priestControl);
         priestControl.setSpatial(priestNode);
@@ -267,7 +281,8 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
     }
 
     private void setupKeys() {
-
+        inputManager.addMapping("flashlight",
+                new KeyTrigger(KeyInput.KEY_F));
         inputManager.addMapping("leftRotate",
                 new KeyTrigger(KeyInput.KEY_Y));
         inputManager.addMapping("rightRotate",
@@ -294,7 +309,7 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
         inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
         inputManager.addListener(actionListener, "debug", "chase");
-        inputManager.addListener(actionListener, "Jump", "Shoot");
+        inputManager.addListener(actionListener, "Jump", "Shoot", "flashlight");
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -303,6 +318,11 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
         public void onAction(String binding, boolean value, float tpf) {
 
             switch (binding) {
+                case "flashlight":
+                    if (value) {
+                        lamp.setEnabled(!lamp.isEnabled());
+                    }
+                    break;
                 case "rightRotate":
                     rightRotate = value;
                     break;
@@ -436,7 +456,14 @@ public class GameRunningState extends AbstractAppState implements PhysicsCollisi
             }
 
             physicsCharacter.setWalkDirection(walkDirection);
+        }
+        lamp.setPosition(model.getWorldTranslation());
+        lamp.setDirection(viewPort.getCamera().getDirection());
 
+        if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
+            model.setCullHint(Spatial.CullHint.Always);
+        } else {
+            model.setCullHint(Spatial.CullHint.Dynamic);
         }
     }
 

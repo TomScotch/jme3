@@ -17,6 +17,7 @@ public class EntityControl extends AbstractControl {
     private final float armor = 10;
     private boolean dead = false;
     private float hitAnimationDelay = 0;
+    private float deadDelay = 3f;
 
     private String targetName = "";
     private Spatial targetSpatial;
@@ -49,14 +50,17 @@ public class EntityControl extends AbstractControl {
             }
         }
 
-        if (dead) {
-
+        if (deadDelay <= 0) {
             BetterCharacterControl control = this.spatial.getParent().
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
             this.spatial.getParent().removeControl(BetterCharacterControl.class);
             this.spatial.getParent().removeFromParent();
             this.spatial.removeControl(this);
+        }
+
+        if (dead) {
+            deadDelay -= tpf;
         }
 
     }
