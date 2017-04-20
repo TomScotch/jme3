@@ -409,7 +409,9 @@ public class GameRunningState extends AbstractAppState {
 
             if (ghostControl.getOverlappingObjects().size() > 1) {
                 Node overlap = (Node) ghostControl.getOverlapping(1).getUserObject();
-                collisionTarget = overlap.getName();
+                if (!overlap.getName().equals("terrain") && !overlap.getName().equals("")) {
+                    collisionTarget = overlap.getName();
+                }
             } else {
                 collisionTarget = "";
             }

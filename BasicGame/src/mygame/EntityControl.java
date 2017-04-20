@@ -4,7 +4,6 @@ import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.effect.ParticleEmitter;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -57,13 +56,25 @@ public class EntityControl extends AbstractControl {
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
             this.spatial.getParent().removeControl(BetterCharacterControl.class);
+            this.spatial.getParent().removeControl(FlipFlopControl.class);
             this.spatial.getParent().removeFromParent();
             this.spatial.removeControl(this);
         }
 
         if (dead) {
             if (deadDelay >= 3f) {
-                hitParticles(9999, new Vector3f(100f, -75f, 100f), ColorRGBA.Magenta);
+                deadParticles(400);
+                this.spatial.getParent().addControl(new FlipFlopControl() {
+                    @Override
+                    void action(boolean flipflop) {
+                        Node n = (Node)this.spatial ;
+                        if (flipflop) {
+                            n.getChild("anim").setCullHint(Spatial.CullHint.Always);
+                        } else {
+                            n.getChild("anim").setCullHint(Spatial.CullHint.Never);
+                        }
+                    }
+                });
             }
             deadDelay -= tpf;
         }
@@ -112,14 +123,10 @@ public class EntityControl extends AbstractControl {
         child.emitAllParticles();
     }
 
-    private void hitParticles(int quantity, Vector3f gravity, ColorRGBA color) {
+    private void deadParticles(int num) {
         Node n = (Node) this.spatial.getParent();
-        Node n1 = (Node) n.getChild("hit");
+        Node n1 = (Node) n.getChild("death");
         ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
-        child.setParticlesPerSec(quantity);
-        child.setNumParticles(quantity);
-        child.setGravity(gravity);
-        child.setStartColor(color);
-        child.emitAllParticles();
+        child.setParticlesPerSec(num);
     }
 }
