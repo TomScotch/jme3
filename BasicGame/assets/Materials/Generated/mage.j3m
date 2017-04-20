@@ -5,11 +5,11 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         ParallaxHeight : 0.05
         Ambient : 1.0 1.0 1.0 1.0
         BackfaceShadows : false
-        DiffuseMap : WrapRepeat_S WrapRepeat_T MinNearestNoMipMaps MagNearest "Models/npc/Mage.png"
         Specular : 0.0 0.0 0.0 1.0
         Shininess : 50.0
         NumberOfBones : 50
-        LightMap : Flip Models/npc/Mage.png
+        LightMap : Flip Models/npc/mage_texture.png
+        HardwareShadows : true
     }
     AdditionalRenderState {
       PointSprite On

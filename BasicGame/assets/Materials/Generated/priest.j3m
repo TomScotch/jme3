@@ -1,6 +1,7 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        LightMap : Flip Models/npc/berzerker_texture.png
+        LightMap : Flip Models/npc/priest_texture.png
+        HardwareShadows : true
     }
     AdditionalRenderState {
       PointSprite On

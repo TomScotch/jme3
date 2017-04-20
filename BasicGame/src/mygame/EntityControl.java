@@ -4,6 +4,7 @@ import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -51,6 +52,7 @@ public class EntityControl extends AbstractControl {
         }
 
         if (deadDelay <= 0) {
+
             BetterCharacterControl control = this.spatial.getParent().
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
@@ -60,6 +62,9 @@ public class EntityControl extends AbstractControl {
         }
 
         if (dead) {
+            if (deadDelay >= 3f) {
+                hitParticles(9999, new Vector3f(100f, -75f, 100f), ColorRGBA.Magenta);
+            }
             deadDelay -= tpf;
         }
 
@@ -104,6 +109,17 @@ public class EntityControl extends AbstractControl {
         Node n = (Node) this.spatial.getParent();
         Node n1 = (Node) n.getChild("hit");
         ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
+        child.emitAllParticles();
+    }
+
+    private void hitParticles(int quantity, Vector3f gravity, ColorRGBA color) {
+        Node n = (Node) this.spatial.getParent();
+        Node n1 = (Node) n.getChild("hit");
+        ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
+        child.setParticlesPerSec(quantity);
+        child.setNumParticles(quantity);
+        child.setGravity(gravity);
+        child.setStartColor(color);
         child.emitAllParticles();
     }
 }
