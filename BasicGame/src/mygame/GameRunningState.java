@@ -1,6 +1,5 @@
 package mygame;
 
-import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -33,7 +32,6 @@ import com.jme3.util.SkyFactory;
 import com.jme3.asset.AssetEventListener;
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.TextureKey;
-import com.jme3.scene.SceneGraphVisitor;
 
 public class GameRunningState extends AbstractAppState {
 
@@ -87,6 +85,8 @@ public class GameRunningState extends AbstractAppState {
         sky.setLocalTranslation(0, -1000, 0);
         localRootNode.attachChild(sky);
 
+        this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
+        this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 //      PLAYER
         playerControl = new playerControl(app, bulletAppState, localRootNode);
         Node player = new Node("playerNode");
