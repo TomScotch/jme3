@@ -58,6 +58,7 @@ public class GameRunningState extends AbstractAppState {
     private final int bgmVolume = 8;
     private final int anisotrpy_samples = 4;
     private final boolean globalLightning = true;
+    private final DirectionalLightShadowRenderer dlsr;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -125,7 +126,7 @@ public class GameRunningState extends AbstractAppState {
                 9f);
 
 //      LIGHT AND SHADOWS
-        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
+        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
         dlsr.setLight(sun);
         viewPort.addProcessor(dlsr);
 
@@ -245,25 +246,20 @@ public class GameRunningState extends AbstractAppState {
                 float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
 
                 if (z > 0.75f) {
-                    System.out.println("Morning");
                     sun.setEnabled(true);
                     sun.setColor(ColorRGBA.White);
                     terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
                 }
                 if (z < 0.75f && z > 0.50f) {
-                    System.out.println("Late Morning");
                     sun.setColor(ColorRGBA.LightGray);
                 }
                 if (z < 0.5f && z > 0.25f) {
-                    System.out.println("Noon");
                     sun.setColor(ColorRGBA.Gray);
                 }
                 if (z < 0.25f && z > 0.1f) {
-                    System.out.println("Early Evening");
                     sun.setColor(ColorRGBA.DarkGray);
                 }
-                if (z < 0.1f) {
-                    System.out.println("Evening");
+                if (z < 0.0f) {
                     sun.setEnabled(false);
                     terrain.setShadowMode(RenderQueue.ShadowMode.Off);
                 }
