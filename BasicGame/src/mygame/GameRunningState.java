@@ -43,20 +43,21 @@ public class GameRunningState extends AbstractAppState {
     private final Node localGuiNode = new Node("Game Screen GuiNode");
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
-    private boolean isRunning = false;
     private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
-    private FilterPostProcessor processor;
     private final DirectionalLight sun;
     private final Spatial terrain;
     private final static Node pivot = new Node();
+    private final playerControl playerControl;
+    private boolean isRunning = false;
+    private FilterPostProcessor processor;
+    //
     private final int shadowmapSize = 512;
     private final AudioNode bgm;
     private final boolean bgmOn = false;
-    private final int timeDelay = 1;
+    private final int timeDelay = 12;
     private final int bgmVolume = 8;
     private final int anisotrpy_samples = 4;
     private final boolean globalLightning = true;
-    private final playerControl playerControl;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -96,7 +97,7 @@ public class GameRunningState extends AbstractAppState {
 //      SUN
         sun = new DirectionalLight();
         sun.setDirection(new Vector3f(0, 0, 0));
-        sun.setColor(ColorRGBA.Orange);
+        sun.setColor(ColorRGBA.White);
         localRootNode.addLight(sun);
 
 //      TERRAIN
@@ -238,8 +239,34 @@ public class GameRunningState extends AbstractAppState {
             super.update(tpf);
 
             if (globalLightning) {
+
                 pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
+                float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
+
+                if (z > 0.75f) {
+                    System.out.println("Morning");
+                    sun.setEnabled(true);
+                    sun.setColor(ColorRGBA.White);
+                    terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
+                }
+                if (z < 0.75f && z > 0.50f) {
+                    System.out.println("Late Morning");
+                    sun.setColor(ColorRGBA.LightGray);
+                }
+                if (z < 0.5f && z > 0.25f) {
+                    System.out.println("Noon");
+                    sun.setColor(ColorRGBA.Gray);
+                }
+                if (z < 0.25f && z > 0.1f) {
+                    System.out.println("Early Evening");
+                    sun.setColor(ColorRGBA.DarkGray);
+                }
+                if (z < 0.1f) {
+                    System.out.println("Evening");
+                    sun.setEnabled(false);
+                    terrain.setShadowMode(RenderQueue.ShadowMode.Off);
+                }
             }
         }
     }
@@ -247,6 +274,7 @@ public class GameRunningState extends AbstractAppState {
     @Override
     public void stateAttached(AppStateManager stateManager) {
         System.out.println("Game State is being attached");
+        playerControl.setEnabled(true);
         bgm.play();
         rootNode.attachChild(localRootNode);
         guiNode.attachChild(localGuiNode);
@@ -257,6 +285,7 @@ public class GameRunningState extends AbstractAppState {
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
+        playerControl.setEnabled(false);
         bgm.stop();
         viewPort.removeProcessor(processor);
         inputManager.removeListener(actionListener);
