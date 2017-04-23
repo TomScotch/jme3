@@ -67,7 +67,7 @@ public class EntityControl extends AbstractControl {
                 this.spatial.getParent().addControl(new FlipFlopControl() {
                     @Override
                     void action(boolean flipflop) {
-                        Node n = (Node)this.spatial ;
+                        Node n = (Node) this.spatial;
                         if (flipflop) {
                             n.getChild("anim").setCullHint(Spatial.CullHint.Always);
                         } else {
@@ -81,7 +81,7 @@ public class EntityControl extends AbstractControl {
 
     }
 
-    private void setAnim(String name, LoopMode mode) {
+    public void setAnim(String name, LoopMode mode) {
         Node n = (Node) this.spatial.getParent();
         Node e = (Node) n.getChild("anim");
         AnimControl aniCon = e.getControl(AnimControl.class);

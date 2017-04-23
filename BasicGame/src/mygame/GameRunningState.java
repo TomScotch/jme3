@@ -1,5 +1,7 @@
 package mygame;
 
+import com.jme3.animation.AnimControl;
+import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -31,6 +33,7 @@ import com.jme3.util.SkyFactory;
 import com.jme3.asset.AssetEventListener;
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.TextureKey;
+import com.jme3.scene.SceneGraphVisitor;
 
 public class GameRunningState extends AbstractAppState {
 
@@ -51,7 +54,7 @@ public class GameRunningState extends AbstractAppState {
     private final int shadowmapSize = 512;
     private final AudioNode bgm;
     private final boolean bgmOn = false;
-    private final int timeDelay = 240;
+    private final int timeDelay = 1;
     private final int bgmVolume = 8;
     private final int anisotrpy_samples = 4;
     private final boolean globalLightning = true;
@@ -168,7 +171,7 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(enemyNode);
         bulletAppState.getPhysicsSpace().add(priestControl);
         priestControl.warp(new Vector3f(5, 5, 5));
-        //doAnim("demon", "IdleHeadTilt", LoopMode.Loop);
+        npcCon.setAnim("IdleHeadTilt", LoopMode.Loop);
     }
 
     @Override
