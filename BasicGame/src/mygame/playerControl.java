@@ -130,7 +130,7 @@ public class playerControl extends AbstractControl {
 
             switch (binding) {
                 case "flashlight":
-                    if (value) {
+                    if (value && isEnabled()) {
                         lamp.setEnabled(!lamp.isEnabled());
                     }
                     break;
@@ -160,7 +160,7 @@ public class playerControl extends AbstractControl {
                     }
                     break;
                 case "chase":
-                    if (value) {
+                    if (value && isEnabled()) {
                         camNode.setEnabled(!camNode.isEnabled());
                         chaseCam.setEnabled(!chaseCam.isEnabled());
                         chaseEnabled = !chaseEnabled;
@@ -169,7 +169,7 @@ public class playerControl extends AbstractControl {
                     break;
 
                 case "Walk Forward":
-                    if (value) {
+                    if (value&& isEnabled()) {
                         doAnim("player", "Walk", LoopMode.Loop);
                     } else {
                         doAnim("player", "Idle", LoopMode.Loop);
@@ -177,7 +177,7 @@ public class playerControl extends AbstractControl {
                     forward = value;
                     break;
                 case "Walk Backward":
-                    if (value) {
+                    if (value&& isEnabled()) {
                         doAnim("player", "Walk", LoopMode.Loop);
                     } else {
                         doAnim("player", "Idle", LoopMode.Loop);

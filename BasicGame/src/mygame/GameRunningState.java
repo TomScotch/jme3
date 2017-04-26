@@ -16,9 +16,7 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -26,7 +24,6 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import com.jme3.asset.AssetEventListener;
@@ -44,21 +41,18 @@ public class GameRunningState extends AbstractAppState {
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
-    private final DirectionalLight sun;
     private final Spatial terrain;
-    private final static Node pivot = new Node();
+
     private final playerControl playerControl;
     private boolean isRunning = false;
     private FilterPostProcessor processor;
     //
-    private final int shadowmapSize = 512;
+
     private final AudioNode bgm;
     private final boolean bgmOn = false;
-    private final int timeDelay = 12;
     private final int bgmVolume = 8;
     private final int anisotrpy_samples = 4;
-    private final boolean globalLightning = true;
-    private final DirectionalLightShadowRenderer dlsr;
+    private final GlobalLightingControl glc;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -96,10 +90,10 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(player);
 
 //      SUN
-        sun = new DirectionalLight();
-        sun.setDirection(new Vector3f(0, 0, 0));
-        sun.setColor(ColorRGBA.White);
-        localRootNode.addLight(sun);
+        Node sunNode = new Node("sunNode");
+        glc = new GlobalLightingControl(viewPort, assetManager, localRootNode);
+        sunNode.addControl(glc);
+        localRootNode.attachChild(sunNode);
 
 //      TERRAIN
         terrain = assetManager.loadModel("Scenes/terrain.j3o");
@@ -125,11 +119,6 @@ public class GameRunningState extends AbstractAppState {
                 ColorRGBA.Blue,
                 9f);
 
-//      LIGHT AND SHADOWS
-        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
-        dlsr.setLight(sun);
-        viewPort.addProcessor(dlsr);
-
 //      ANISOTROPY
         AssetEventListener asl = new AssetEventListener() {
             @Override
@@ -153,6 +142,7 @@ public class GameRunningState extends AbstractAppState {
         assetManager.addAssetEventListener(asl);
 
         addHostile();
+        setupKeys();
     }
 
     private void addHostile() {
@@ -223,7 +213,7 @@ public class GameRunningState extends AbstractAppState {
             switch (binding) {
 
                 case "debug":
-                    if (value) {
+                    if (value && isRunning) {
                         bulletAppState.setDebugEnabled(!bulletAppState.isDebugEnabled());
                     }
                     break;
@@ -239,31 +229,6 @@ public class GameRunningState extends AbstractAppState {
 
             super.update(tpf);
 
-            if (globalLightning) {
-
-                pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
-                sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
-                float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
-
-                if (z > 0.75f) {
-                    sun.setEnabled(true);
-                    sun.setColor(ColorRGBA.White);
-                    terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
-                }
-                if (z < 0.75f && z > 0.50f) {
-                    sun.setColor(ColorRGBA.LightGray);
-                }
-                if (z < 0.5f && z > 0.25f) {
-                    sun.setColor(ColorRGBA.Gray);
-                }
-                if (z < 0.25f && z > 0.1f) {
-                    sun.setColor(ColorRGBA.DarkGray);
-                }
-                if (z < 0.0f) {
-                    sun.setEnabled(false);
-                    terrain.setShadowMode(RenderQueue.ShadowMode.Off);
-                }
-            }
         }
     }
 
@@ -274,7 +239,6 @@ public class GameRunningState extends AbstractAppState {
         bgm.play();
         rootNode.attachChild(localRootNode);
         guiNode.attachChild(localGuiNode);
-        setupKeys();
         setIsRunning(true);
     }
 
@@ -284,7 +248,6 @@ public class GameRunningState extends AbstractAppState {
         playerControl.setEnabled(false);
         bgm.stop();
         viewPort.removeProcessor(processor);
-        inputManager.removeListener(actionListener);
         rootNode.detachChild(localRootNode);
         guiNode.detachChild(localGuiNode);
         setIsRunning(false);
