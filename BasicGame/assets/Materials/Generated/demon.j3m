@@ -4,14 +4,12 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         UseMaterialColors : true
         ParallaxHeight : 0.05
         Ambient : 1.0 1.0 1.0 1.0
-        BackfaceShadows : true
+        BackfaceShadows : false
         Specular : 0.5 0.5 0.5 1.0
         Shininess : 50.0
         NumberOfBones : 70
         LightMap : Flip Models/hostile/Demon/Low Poly_baseTexBaked.jpg
-        HardwareShadows : true
-        ShadowMap0 : Flip Models/hostile/Demon/SkinMaskBW.jpg
-        ShadowMap1 : Flip Models/hostile/Demon/BoneAndHornMask.jpg
+        HardwareShadows : false
         ShadowIntensity : 1.0
     }
     AdditionalRenderState {

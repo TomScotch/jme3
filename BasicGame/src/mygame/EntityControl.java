@@ -12,21 +12,21 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 
 public class EntityControl extends AbstractControl {
-
+    
     private float health = 100;
     private final float armor = 10;
     private boolean dead = false;
     private float hitAnimationDelay = 0;
     private float deadDelay = 3f;
-
+    
     private String targetName = "";
     private Spatial targetSpatial;
-
+    
     @Override
     protected void controlUpdate(float tpf) {
-
+        
         if (!dead) {
-
+            
             if (!targetName.equals("")) {
                 Node n = (Node) this.spatial;
                 BetterCharacterControl control = this.spatial.getParent().
@@ -36,22 +36,22 @@ public class EntityControl extends AbstractControl {
                 Vector3f b = this.spatial.getWorldTranslation();
                 control.setViewDirection(a.subtract(b));
             }
-
+            
             if (health < 0) {
                 dead = true;
-                setAnim("FiggetIdle", LoopMode.DontLoop);
+                setAnim("Idle", LoopMode.DontLoop);
             }
-
+            
             if (hitAnimationDelay > 0) {
                 hitAnimationDelay -= tpf;
                 if (hitAnimationDelay <= 0) {
-                    setAnim("IdleHeadTilt", LoopMode.Loop);
+                    setAnim("Idle", LoopMode.Loop);
                 }
             }
         }
-
+        
         if (deadDelay <= 0) {
-
+            
             BetterCharacterControl control = this.spatial.getParent().
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
@@ -60,32 +60,33 @@ public class EntityControl extends AbstractControl {
             this.spatial.getParent().removeFromParent();
             this.spatial.removeControl(this);
         }
-
+        
         if (dead) {
             if (deadDelay >= 3f) {
-                deadParticles(400);
-                this.spatial.getParent().addControl(new FlipFlopControl() {
-                    @Override
-                    void action(boolean flipflop) {
-                        Node n = (Node) this.spatial;
-                        if (flipflop) {
-                            n.getChild("anim").setCullHint(Spatial.CullHint.Always);
-                        } else {
-                            n.getChild("anim").setCullHint(Spatial.CullHint.Never);
-                        }
-                    }
-                });
+                deadParticles(4);
+                setAnim("Dying", LoopMode.DontLoop);
+                /*                this.spatial.getParent().addControl(new FlipFlopControl() {
+                @Override
+                void action(boolean flipflop) {
+                Node n = (Node) this.spatial;
+                if (flipflop) {
+                n.getChild("anim").setCullHint(Spatial.CullHint.Always);
+                } else {
+                n.getChild("anim").setCullHint(Spatial.CullHint.Never);
+                }
+                }
+                });*/
             }
             deadDelay -= tpf;
         }
-
+        
     }
-
+    
     public void setAnim(String name, LoopMode mode) {
         Node n = (Node) this.spatial.getParent();
         Node e = (Node) n.getChild("anim");
         AnimControl aniCon = e.getControl(AnimControl.class);
-
+        
         if (aniCon.getClass() != null) {
             aniCon.clearChannels();
             aniCon.createChannel();
@@ -97,32 +98,32 @@ public class EntityControl extends AbstractControl {
             aniCon.getChannel(0).setLoopMode(mode);
         }
     }
-
+    
     public void hit(float dmg, String name) {
         if (!dead) {
             targetName = name;
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1.5f;
-                setAnim("AlertToRunTransition", LoopMode.DontLoop);
+                //setAnim("AlertToRunTransition", LoopMode.DontLoop);
                 hitParticles();
             }
         }
     }
-
+    
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations,
         //not called when spatial is culled.
     }
-
+    
     private void hitParticles() {
         Node n = (Node) this.spatial.getParent();
         Node n1 = (Node) n.getChild("hit");
         ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
         child.emitAllParticles();
     }
-
+    
     private void deadParticles(int num) {
         Node n = (Node) this.spatial.getParent();
         Node n1 = (Node) n.getChild("death");

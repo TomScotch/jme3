@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.light.DirectionalLight;
+import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -12,6 +13,8 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 
 public class GlobalLightingControl extends AbstractControl {
+
+    private final SpotLight sl;
 
     public boolean isGlobalLightning() {
         return globalLightning;
@@ -50,6 +53,7 @@ public class GlobalLightingControl extends AbstractControl {
         dlsr.setLight(sun);
         this.vp = vp;
         this.vp.addProcessor(dlsr);
+        sl = (SpotLight) this.localRootNode.getLocalLightList().get(0);
     }
 
     @Override
@@ -61,22 +65,24 @@ public class GlobalLightingControl extends AbstractControl {
 
                 pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
 
-                sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
+                if (isSun) {
+                    sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
+                } else {
+                    sun.setDirection(sl.getDirection());
+                }
 
                 float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
 
                 if (z > 0.55f) {
                     if (isSun == false) {
                         localRootNode.addLight(sun);
-                        //this.vp.addProcessor(dlsr);
                         isSun = true;
                     }
                 }
-                System.out.println(z);
+
                 if (z < -0.99f) {
                     if (isSun == true) {
                         localRootNode.removeLight(sun);
-                        //this.vp.removeProcessor(dlsr);
                         isSun = false;
                     }
                 }

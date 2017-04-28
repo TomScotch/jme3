@@ -83,6 +83,7 @@ public class GameRunningState extends AbstractAppState {
 
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
         this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
+        
 //      PLAYER
         playerControl = new playerControl(app, bulletAppState, localRootNode);
         Node player = new Node("playerNode");
@@ -94,6 +95,10 @@ public class GameRunningState extends AbstractAppState {
         glc = new GlobalLightingControl(viewPort, assetManager, localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
+        
+
+        
+
 
 //      TERRAIN
         terrain = assetManager.loadModel("Scenes/terrain.j3o");
@@ -148,7 +153,7 @@ public class GameRunningState extends AbstractAppState {
     private void addHostile() {
         //      HOSTILE
         Node enemyNode = new Node();
-        Spatial hostile = assetManager.loadModel("Models/hostile/Demon/demon.j3o");
+        Spatial hostile = assetManager.loadModel("Models/hostile/forestmonster/forest-monster.j3o");
         enemyNode.attachChild(hostile);
         enemyNode.setName("demon");
         hostile.setName("demon");
@@ -163,7 +168,7 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(enemyNode);
         bulletAppState.getPhysicsSpace().add(priestControl);
         priestControl.warp(new Vector3f(5, 5, 5));
-        npcCon.setAnim("IdleHeadTilt", LoopMode.Loop);
+        npcCon.setAnim("Idle", LoopMode.Loop);
     }
 
     @Override
