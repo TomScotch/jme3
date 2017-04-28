@@ -1,7 +1,7 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         Diffuse : 1.0 1.0 1.0 1.0
-        UseMaterialColors : true
+        UseMaterialColors : false
         ParallaxHeight : 0.05
         Ambient : 1.0 1.0 1.0 1.0
         BackfaceShadows : false
@@ -9,7 +9,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Shininess : 50.0
         NumberOfBones : 50
         LightMap : Flip Models/npc/mage_texture.png
-        HardwareShadows : true
+        HardwareShadows : false
     }
     AdditionalRenderState {
       PointSprite On
