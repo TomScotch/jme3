@@ -28,6 +28,7 @@ import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.CameraControl;
+import com.jme3.scene.control.LightControl;
 
 public class playerControl extends AbstractControl {
 
@@ -91,12 +92,19 @@ public class playerControl extends AbstractControl {
         camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
         camNode.setEnabled(false);
         lamp = new SpotLight();
-        lamp.setSpotRange(50);
+        lamp.setSpotRange(25);
         lamp.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
         lamp.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
         lamp.setColor(ColorRGBA.White.mult(flashLightStrength));
         lamp.setEnabled(false);
         this.localRootNode.addLight(lamp);
+
+        LightControl lc = new LightControl(lamp, LightControl.ControlDirection.SpatialToLight);
+        Node lightNode = new Node("");
+        lightNode.addControl(lc);
+        characterNode.attachChild(lightNode);
+        lightNode.getLocalTranslation().addLocal(0, 2.79f, 1.87f);
+
         model = assetManager.loadModel("Models/npc/knight.j3o");
         model.scale(0.45f);
         characterNode.attachChild(model);
@@ -169,7 +177,7 @@ public class playerControl extends AbstractControl {
                     break;
 
                 case "Walk Forward":
-                    if (value&& isEnabled()) {
+                    if (value && isEnabled()) {
                         doAnim("player", "Walk", LoopMode.Loop);
                     } else {
                         doAnim("player", "Idle", LoopMode.Loop);
@@ -177,7 +185,7 @@ public class playerControl extends AbstractControl {
                     forward = value;
                     break;
                 case "Walk Backward":
-                    if (value&& isEnabled()) {
+                    if (value && isEnabled()) {
                         doAnim("player", "Walk", LoopMode.Loop);
                     } else {
                         doAnim("player", "Idle", LoopMode.Loop);
@@ -294,8 +302,7 @@ public class playerControl extends AbstractControl {
 
             physicsCharacter.setWalkDirection(walkDirection);
 
-            lamp.setPosition(characterNode.getLocalTranslation());
-            lamp.getPosition().addLocal(0, 3, 0);
+            //lamp.setPosition(viewPort.getCamera().getLocation());
             lamp.setDirection(viewPort.getCamera().getDirection());
 
             if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
@@ -308,11 +315,13 @@ public class playerControl extends AbstractControl {
 
     private void hit(String name) {
         SceneGraphVisitor visitor = (Spatial spat) -> {
-            if (spat.getName().equals(name)) {
-                Node n = (Node) spat;
-                Spatial child = n.getChild(name);
-                if (child != null) {
-                    child.getControl(EntityControl.class).hit(playerDmg, "player");
+            if (spat.getName() != null) {
+                if (spat.getName().equals(name)) {
+                    Node n = (Node) spat;
+                    Spatial child = n.getChild(name);
+                    if (child != null) {
+                        child.getControl(EntityControl.class).hit(playerDmg, "player");
+                    }
                 }
             }
         };
@@ -322,17 +331,20 @@ public class playerControl extends AbstractControl {
     private void doAnim(String name, String animation, LoopMode lop) {
 
         SceneGraphVisitor visitor = (Spatial spat) -> {
-            if (spat.getName().equals(name)) {
 
-                if (aniCon.getClass() != null) {
-                    aniCon.clearChannels();
-                    aniCon.createChannel();
-                    aniCon.getChannel(0).setAnim(animation);
-                    aniCon.getChannel(0).setLoopMode(lop);
-                } else {
-                    aniCon.createChannel();
-                    aniCon.getChannel(0).setAnim(animation);
-                    aniCon.getChannel(0).setLoopMode(lop);
+            if (spat.getName() != null) {
+                if (spat.getName().equals(name)) {
+
+                    if (aniCon.getClass() != null) {
+                        aniCon.clearChannels();
+                        aniCon.createChannel();
+                        aniCon.getChannel(0).setAnim(animation);
+                        aniCon.getChannel(0).setLoopMode(lop);
+                    } else {
+                        aniCon.createChannel();
+                        aniCon.getChannel(0).setAnim(animation);
+                        aniCon.getChannel(0).setLoopMode(lop);
+                    }
                 }
             }
         };

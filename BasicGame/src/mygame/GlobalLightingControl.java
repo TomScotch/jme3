@@ -2,6 +2,9 @@ package mygame;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.light.DirectionalLight;
+import com.jme3.light.Light;
+import com.jme3.light.LightList;
+import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -10,11 +13,134 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
+import com.jme3.shadow.PointLightShadowRenderer;
+import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.shape.Sphere;
+import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
+import com.jme3.shadow.EdgeFilteringMode;
+import com.jme3.shadow.SpotLightShadowRenderer;
 
 public class GlobalLightingControl extends AbstractControl {
 
+    private final Node localRootNode;
+    private final static Node pivot = new Node();
+    private final int shadowmapSize = 512;
+    private boolean globalLightning = true;
+    private int timeDelay = 10;
+    private boolean isSun = true;
     private final SpotLight sl;
+    private final DirectionalLight sun;
+    private final Node pivotSun;
+    private final float sunHeight = 150f;
+    private final Geometry sphereGeo;
+    private final SpotLightShadowRenderer slsr;
+    private final SpotLight dummySpotLight;
+    private final DirectionalLightShadowRenderer dlsr;
+
+    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, Node localRootNode) {
+
+        this.localRootNode = localRootNode;
+
+        //Player Flashlight
+        sl = (SpotLight) this.localRootNode.getLocalLightList().get(0);
+        dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
+
+        //PointLightSunPivotNode
+        pivot.getWorldTranslation().set(0, 0, 0);
+        pivotSun = new Node();
+        pivot.attachChild(pivotSun);
+        pivotSun.getLocalTranslation().addLocal(0, sunHeight, 0);
+        localRootNode.attachChild(pivot);
+
+        //Sun Sphere
+        Sphere sphereMesh = new Sphere(32, 32, 20);
+        sphereGeo = new Geometry("", sphereMesh);
+        sphereGeo.setMaterial(assetManager.loadMaterial("Common/Materials/RedColor.j3m"));
+        sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));
+        pivotSun.attachChild(sphereGeo);
+        sphereGeo.setShadowMode(RenderQueue.ShadowMode.Off);
+
+        //Sun
+        sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.Orange);
+        localRootNode.addLight(sun);
+
+        //Point Light Shadow Renderer
+        LightList localLightList = localRootNode.getLocalLightList();
+        for (Light light : localLightList) {
+            if (light.getClass() == PointLight.class) {
+                PointLightShadowRenderer plsr = new PointLightShadowRenderer(assetManager, shadowmapSize);
+                plsr.setLight((PointLight) light);
+                vp.addProcessor(plsr);
+            }
+        }
+
+        //Directional Light Shadow Renderer
+        dlsr = new DirectionalLightShadowRenderer(assetManager, 1024, 2);
+        dlsr.setLight(sun);
+        vp.addProcessor(dlsr);
+
+        //Spot Light Shadow Renderer
+        slsr = new SpotLightShadowRenderer(assetManager, shadowmapSize);
+        slsr.setLight(dummySpotLight);
+        slsr.setShadowCompareMode(CompareMode.Hardware);
+        slsr.setShadowIntensity(0.3f);
+        slsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
+        slsr.setEdgesThickness(2);
+        vp.addProcessor(slsr);
+    }
+
+    @Override
+    protected void controlUpdate(float tpf) {
+
+        if (isEnabled()) {
+
+            if (sl.isEnabled()) {
+                slsr.setLight(sl);
+            } else {
+                slsr.setLight(dummySpotLight);
+            }
+
+            if (globalLightning) {
+
+                pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
+
+                if (isSun) {
+                    sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
+                } else {
+                    sun.setDirection(new Vector3f(0, 1, 0));
+                }
+
+                float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
+
+                if (z > 0.50f) {
+                    sun.getColor().interpolateLocal(ColorRGBA.White, 0.001f);
+                    if (isSun == false) {
+                        localRootNode.addLight(sun);
+                        sun.setColor(ColorRGBA.Orange);
+                        isSun = true;
+                    }
+                }
+
+                if (z < -0.25f && z > -0.99f) {
+                    sun.getColor().interpolateLocal(ColorRGBA.Blue, 0.001f);
+                }
+
+                if (z < -0.99f) {
+
+                    if (isSun == true) {
+                        localRootNode.removeLight(sun);
+                        isSun = false;
+                    }
+                }
+            } else {
+                sun.setDirection(new Vector3f(-5, -5, -5));
+                sun.setColor(ColorRGBA.White);
+            }
+        }
+    }
 
     public boolean isGlobalLightning() {
         return globalLightning;
@@ -30,67 +156,6 @@ public class GlobalLightingControl extends AbstractControl {
 
     public void setTimeDelay(int timeDelay) {
         this.timeDelay = timeDelay;
-    }
-
-    private final Node localRootNode;
-    private final static Node pivot = new Node();
-    private final DirectionalLightShadowRenderer dlsr;
-    private final int shadowmapSize = 512;
-    private final DirectionalLight sun;
-    private boolean globalLightning = true;
-    private int timeDelay = 12;
-    private final ViewPort vp;
-    private boolean isSun = true;
-
-    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, Node localRootNode) {
-
-        this.localRootNode = localRootNode;
-        sun = new DirectionalLight();
-        sun.setDirection(new Vector3f(0, 0, 0));
-        sun.setColor(ColorRGBA.White);
-        this.localRootNode.addLight(sun);
-        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
-        dlsr.setLight(sun);
-        this.vp = vp;
-        this.vp.addProcessor(dlsr);
-        sl = (SpotLight) this.localRootNode.getLocalLightList().get(0);
-    }
-
-    @Override
-    protected void controlUpdate(float tpf) {
-
-        if (isEnabled()) {
-
-            if (globalLightning) {
-
-                pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
-
-                if (isSun) {
-                    sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
-                } else {
-                    sun.setDirection(sl.getDirection());
-                }
-
-                float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
-
-                if (z > 0.55f) {
-                    if (isSun == false) {
-                        localRootNode.addLight(sun);
-                        isSun = true;
-                    }
-                }
-
-                if (z < -0.99f) {
-                    if (isSun == true) {
-                        localRootNode.removeLight(sun);
-                        isSun = false;
-                    }
-                }
-            } else {
-                sun.setDirection(new Vector3f(-5, -5, -5));
-                sun.setColor(ColorRGBA.White);
-            }
-        }
     }
 
     @Override
