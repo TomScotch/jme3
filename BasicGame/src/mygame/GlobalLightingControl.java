@@ -78,7 +78,7 @@ public class GlobalLightingControl extends AbstractControl {
         }
 
         //Directional Light Shadow Renderer
-        dlsr = new DirectionalLightShadowRenderer(assetManager, 1024, 2);
+        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
         dlsr.setLight(sun);
         vp.addProcessor(dlsr);
 
@@ -86,9 +86,9 @@ public class GlobalLightingControl extends AbstractControl {
         slsr = new SpotLightShadowRenderer(assetManager, shadowmapSize);
         slsr.setLight(dummySpotLight);
         slsr.setShadowCompareMode(CompareMode.Hardware);
-        slsr.setShadowIntensity(0.3f);
+        slsr.setShadowIntensity(0.45f);
         slsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
-        slsr.setEdgesThickness(2);
+        slsr.setEdgesThickness(10);
         vp.addProcessor(slsr);
     }
 
