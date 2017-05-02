@@ -1,0 +1,26 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        Diffuse : 1.0 1.0 1.0 1.0
+        UseMaterialColors : false
+        SpecularMap : returned null key
+        ParallaxHeight : 0.05
+        Ambient : 1.0 1.0 1.0 1.0
+        BackfaceShadows : false
+        DiffuseMap : returned null key
+        Specular : 0.1 0.1 0.1 1.0
+        Shininess : 60.0
+        NumberOfBones : 50
+        LightMap : Flip Models/hostile/Spider/Spinnen_Bein_tex.jpg
+    }
+    AdditionalRenderState {
+      PointSprite On
+      FaceCull Back
+      AlphaTestFalloff 0.0
+      DepthWrite On
+      ColorWrite On
+      PolyOffset 0.0 0.0
+      DepthTest On
+      Blend Off
+      Wireframe Off
+    }
+}

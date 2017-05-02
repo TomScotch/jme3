@@ -83,7 +83,7 @@ public class GameRunningState extends AbstractAppState {
 
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
         this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
-        
+
 //      PLAYER
         playerControl = new playerControl(app, bulletAppState, localRootNode);
         Node player = new Node("playerNode");
@@ -95,10 +95,6 @@ public class GameRunningState extends AbstractAppState {
         glc = new GlobalLightingControl(viewPort, assetManager, localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
-        
-
-        
-
 
 //      TERRAIN
         terrain = assetManager.loadModel("Scenes/terrain.j3o");
@@ -146,28 +142,30 @@ public class GameRunningState extends AbstractAppState {
         };
         assetManager.addAssetEventListener(asl);
 
-        addHostile();
+        addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-6, 0, 6));
+        addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(6, 0, 6));
+        addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(6, 0, -6));
         setupKeys();
     }
 
-    private void addHostile() {
+    private void addHostile(String name, Vector3f pos) {
         //      HOSTILE
         Node enemyNode = new Node();
-        Spatial hostile = assetManager.loadModel("Models/hostile/forestmonster/forest-monster.j3o");
+        Spatial hostile = assetManager.loadModel(name);
         enemyNode.attachChild(hostile);
-        enemyNode.setName("demon");
-        hostile.setName("demon");
+        enemyNode.setName(name);
+        hostile.setName(name);
         //hostile.scale(3.75f);
-        hostile.setLocalTranslation(0, -0.2f, 0);
+        hostile.setLocalTranslation(pos);
         EntityControl npcCon = new EntityControl();
         hostile.addControl(npcCon);
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
-        BetterCharacterControl priestControl = new BetterCharacterControl(3, 6, 100);
-        enemyNode.addControl(priestControl);
-        //priestControl.setSpatial(priestNode);
+        BetterCharacterControl bcc = new BetterCharacterControl(5, 10, 100);
+        bcc.setSpatial(hostile);
+        hostile.addControl(bcc);
         localRootNode.attachChild(enemyNode);
-        bulletAppState.getPhysicsSpace().add(priestControl);
-        priestControl.warp(new Vector3f(5, 5, 5));
+        bulletAppState.getPhysicsSpace().add(bcc);
+        bcc.warp(new Vector3f(pos));
         npcCon.setAnim("Idle", LoopMode.Loop);
     }
 

@@ -29,7 +29,7 @@ public class EntityControl extends AbstractControl {
 
             if (!targetName.equals("")) {
                 Node n = (Node) this.spatial;
-                BetterCharacterControl control = this.spatial.getParent().
+                BetterCharacterControl control = this.spatial.
                         getControl(BetterCharacterControl.class);
                 targetSpatial = n.getParent().getParent().getChild(targetName);
                 Vector3f a = targetSpatial.getWorldTranslation();
@@ -52,12 +52,12 @@ public class EntityControl extends AbstractControl {
 
         if (deadDelay <= 0) {
 
-            BetterCharacterControl control = this.spatial.getParent().
+            BetterCharacterControl control = this.spatial.
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
-            this.spatial.getParent().removeControl(BetterCharacterControl.class);
-            this.spatial.getParent().removeControl(FlipFlopControl.class);
-            this.spatial.getParent().removeFromParent();
+            this.spatial.removeControl(BetterCharacterControl.class);
+            //this.spatial.removeControl(FlipFlopControl.class);
+            this.spatial.removeFromParent();
             this.spatial.removeControl(this);
         }
 
@@ -105,7 +105,7 @@ public class EntityControl extends AbstractControl {
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1.5f;
-                setAnim("Idle", LoopMode.Loop);
+                setAnim("Hit", LoopMode.Loop);
                 hitParticles();
             }
         }
