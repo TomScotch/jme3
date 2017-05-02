@@ -42,6 +42,7 @@ public class GameRunningState extends AbstractAppState {
     private final BulletAppState bulletAppState;
     private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
     private final Spatial terrain;
+    private final Spatial sky;
 
     private final playerControl playerControl;
     private boolean isRunning = false;
@@ -77,7 +78,7 @@ public class GameRunningState extends AbstractAppState {
         Texture south = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_south.jpg");
         Texture up = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_up.jpg");
         Texture down = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_down.jpg");
-        Spatial sky = SkyFactory.createSky(assetManager, west, east, north, south, up, down);
+        sky = SkyFactory.createSky(assetManager, west, east, north, south, up, down);
         sky.setLocalTranslation(0, -1000, 0);
         localRootNode.attachChild(sky);
 
@@ -232,6 +233,7 @@ public class GameRunningState extends AbstractAppState {
 
             super.update(tpf);
 
+            sky.rotate(0, tpf / (glc.getTimeDelay() * 8), 0);
         }
     }
 
