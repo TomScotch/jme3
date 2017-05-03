@@ -39,8 +39,8 @@ public class playerControl extends AbstractControl {
     private boolean chaseEnabled = true;
     private final float jump_Speed = 25f;
     private final CameraNode camNode;
-    private final float gravity = 50;
-    private final float playerMass = 2.5f;
+    private final float gravity = 75;
+    private final float playerMass = 5f;
     private final float chaseCamRotationSpeed = 0.5f;
     private final SpotLight lamp;
     private final GhostControl ghostControl;

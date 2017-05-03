@@ -146,7 +146,7 @@ public class GameRunningState extends AbstractAppState {
         EntityControl npcCon = new EntityControl();
         hostile.addControl(npcCon);
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
-        BetterCharacterControl bcc = new BetterCharacterControl(3.5f, 10, 100);
+        BetterCharacterControl bcc = new BetterCharacterControl(3, 7, 3);
         bcc.setSpatial(hostile);
         hostile.addControl(bcc);
         localRootNode.attachChild(enemyNode);
@@ -217,7 +217,6 @@ public class GameRunningState extends AbstractAppState {
         if (getIsRunning()) {
 
             super.update(tpf);
-
 
         }
     }
