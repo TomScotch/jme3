@@ -24,8 +24,6 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.texture.Texture;
-import com.jme3.util.SkyFactory;
 import com.jme3.asset.AssetEventListener;
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.TextureKey;
@@ -42,8 +40,6 @@ public class GameRunningState extends AbstractAppState {
     private final BulletAppState bulletAppState;
     private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
     private final Spatial terrain;
-    private final Spatial sky;
-
     private final playerControl playerControl;
     private boolean isRunning = false;
     private FilterPostProcessor processor;
@@ -70,17 +66,6 @@ public class GameRunningState extends AbstractAppState {
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setDebugEnabled(false);
-
-//      SKYBOX
-        Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
-        Texture east = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_east.jpg");
-        Texture north = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_north.jpg");
-        Texture south = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_south.jpg");
-        Texture up = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_up.jpg");
-        Texture down = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_down.jpg");
-        sky = SkyFactory.createSky(assetManager, west, east, north, south, up, down);
-        sky.setLocalTranslation(0, -1000, 0);
-        localRootNode.attachChild(sky);
 
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
         this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
@@ -233,7 +218,7 @@ public class GameRunningState extends AbstractAppState {
 
             super.update(tpf);
 
-            sky.rotate(0, tpf / (glc.getTimeDelay() * 8), 0);
+
         }
     }
 
