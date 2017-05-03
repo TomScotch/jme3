@@ -37,10 +37,10 @@ public class playerControl extends AbstractControl {
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     private boolean chaseEnabled = true;
-    private final float jump_Speed = 25f;
+    private final float jump_Speed = 35f;
     private final CameraNode camNode;
-    private final float gravity = 75;
-    private final float playerMass = 5f;
+    private final float gravity = 100f;
+    private final float playerMass = 4.2f;
     private final float chaseCamRotationSpeed = 0.5f;
     private final SpotLight lamp;
     private final GhostControl ghostControl;
@@ -193,7 +193,9 @@ public class playerControl extends AbstractControl {
                     backward = value;
                     break;
                 case "Jump":
-                    physicsCharacter.jump();
+                    if (value && physicsCharacter.isOnGround()) {
+                        physicsCharacter.jump();
+                    }
                     break;
                 default:
                     break;
