@@ -157,11 +157,11 @@ public class GameRunningState extends AbstractAppState {
         enemyNode.setName(name);
         hostile.setName(name);
         //hostile.scale(3.75f);
-        hostile.setLocalTranslation(pos);
+        //hostile.setLocalTranslation(pos);
         EntityControl npcCon = new EntityControl();
         hostile.addControl(npcCon);
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
-        BetterCharacterControl bcc = new BetterCharacterControl(5, 10, 100);
+        BetterCharacterControl bcc = new BetterCharacterControl(3.5f, 10, 100);
         bcc.setSpatial(hostile);
         hostile.addControl(bcc);
         localRootNode.attachChild(enemyNode);
