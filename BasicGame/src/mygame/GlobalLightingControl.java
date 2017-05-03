@@ -121,9 +121,8 @@ public class GlobalLightingControl extends AbstractControl {
                 slsr.setLight(dummySpotLight);
             }
 
-            day.rotate(0, tpf / (getTimeDelay() * 16), 0);
-            night.rotate(0, tpf / (getTimeDelay() * 16), 0);
-
+            //day.rotate(0, tpf / (getTimeDelay() * 16), 0);
+            //night.rotate(0, tpf / (getTimeDelay() * 16), 0);
             if (globalLightning) {
 
                 pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
@@ -136,7 +135,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
 
-                if (z > 0.50f) {
+                if (z > 0.99f) {
 
                     sun.getColor().interpolateLocal(ColorRGBA.White, 0.001f);
                     if (isSun == false) {
@@ -152,7 +151,7 @@ public class GlobalLightingControl extends AbstractControl {
                     sun.getColor().interpolateLocal(ColorRGBA.Blue, 0.001f);
                 }
 
-                if (z < -0.99f) {
+                if (z < -0.999f) {
 
                     if (isSun == true) {
                         day.removeFromParent();

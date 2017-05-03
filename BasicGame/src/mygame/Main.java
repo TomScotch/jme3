@@ -25,9 +25,9 @@ public class Main extends SimpleApplication {
     public static void main(String[] args) {
         Main app = new Main();
         AppSettings cfg = new AppSettings(true);
-        //cfg.setFrameRate(60);
+        cfg.setFrameRate(60);
         cfg.setVSync(false);
-        //cfg.setFrequency(60);
+        cfg.setFrequency(60);
         cfg.setResolution(1600, 900);
         cfg.setSamples(antiAlias);
         cfg.setDepthBits(depthBit);
