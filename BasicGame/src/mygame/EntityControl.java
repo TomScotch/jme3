@@ -18,7 +18,7 @@ public class EntityControl extends AbstractControl {
     private boolean dead = false;
     private float hitAnimationDelay = 0;
     private float deadDelay = 3f;
-
+    private final float fleeDistance = 40;
     private String targetName = "";
     private Spatial targetSpatial;
 
@@ -35,6 +35,11 @@ public class EntityControl extends AbstractControl {
                 Vector3f a = targetSpatial.getWorldTranslation();
                 Vector3f b = this.spatial.getWorldTranslation();
                 control.setViewDirection(a.subtract(b));
+                float distance = a.distance(b);
+                if (distance > fleeDistance) {
+                    targetName = "";
+                    control.setViewDirection(new Vector3f(0, 0, 0));
+                }
             }
 
             if (health < 0) {
@@ -56,7 +61,6 @@ public class EntityControl extends AbstractControl {
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
             this.spatial.removeControl(BetterCharacterControl.class);
-            //this.spatial.removeControl(FlipFlopControl.class);
             this.spatial.removeFromParent();
             this.spatial.removeControl(this);
         }
@@ -65,17 +69,6 @@ public class EntityControl extends AbstractControl {
             if (deadDelay >= 3f) {
                 deadParticles(4);
                 setAnim("Dying", LoopMode.DontLoop);
-                /*                this.spatial.getParent().addControl(new FlipFlopControl() {
-                @Override
-                void action(boolean flipflop) {
-                Node n = (Node) this.spatial;
-                if (flipflop) {
-                n.getChild("anim").setCullHint(Spatial.CullHint.Always);
-                } else {
-                n.getChild("anim").setCullHint(Spatial.CullHint.Never);
-                }
-                }
-                });*/
             }
             deadDelay -= tpf;
         }

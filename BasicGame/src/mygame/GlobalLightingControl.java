@@ -16,14 +16,11 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.shadow.EdgeFilteringMode;
 import com.jme3.shadow.SpotLightShadowRenderer;
-import com.jme3.texture.Texture;
-import com.jme3.util.SkyFactory;
 
 public class GlobalLightingControl extends AbstractControl {
 
@@ -41,8 +38,6 @@ public class GlobalLightingControl extends AbstractControl {
     private final SpotLightShadowRenderer slsr;
     private final SpotLight dummySpotLight;
     private final DirectionalLightShadowRenderer dlsr;
-    private final Spatial night;
-    private final Spatial day;
 
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, Node localRootNode) {
 
@@ -66,19 +61,6 @@ public class GlobalLightingControl extends AbstractControl {
         sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));
         pivotSun.attachChild(sphereGeo);
         sphereGeo.setShadowMode(RenderQueue.ShadowMode.Off);
-
-        Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
-        Texture east = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_east.jpg");
-        Texture north = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_north.jpg");
-        Texture south = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_south.jpg");
-        Texture up = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_up.jpg");
-        Texture down = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_down.jpg");
-        night = SkyFactory.createSky(assetManager, west, east, north, south, up, down);
-        day = SkyFactory.createSky(
-                assetManager, "Textures/Sky/Bright/BrightSky.dds", SkyFactory.EnvMapType.CubeMap);
-        night.setLocalTranslation(0, -1000, 0);
-        day.setLocalTranslation(0, -1000, 0);
-        localRootNode.attachChild(day);
 
         //Sun
         sun = new DirectionalLight();
@@ -108,6 +90,7 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
         slsr.setEdgesThickness(10);
         vp.addProcessor(slsr);
+
     }
 
     @Override
@@ -121,8 +104,6 @@ public class GlobalLightingControl extends AbstractControl {
                 slsr.setLight(dummySpotLight);
             }
 
-            //day.rotate(0, tpf / (getTimeDelay() * 16), 0);
-            //night.rotate(0, tpf / (getTimeDelay() * 16), 0);
             if (globalLightning) {
 
                 pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
@@ -139,8 +120,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                     sun.getColor().interpolateLocal(ColorRGBA.White, 0.001f);
                     if (isSun == false) {
-                        night.removeFromParent();
-                        localRootNode.attachChild(day);
+                        slsr.setShadowIntensity(0.35f);
                         localRootNode.addLight(sun);
                         sun.setColor(ColorRGBA.Orange);
                         isSun = true;
@@ -149,15 +129,15 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (z < -0.25f && z > -0.99f) {
                     sun.getColor().interpolateLocal(ColorRGBA.Blue, 0.001f);
+                    slsr.setShadowIntensity(0.25f);
                 }
 
                 if (z < -0.999f) {
 
                     if (isSun == true) {
-                        day.removeFromParent();
-                        localRootNode.attachChild(night);
                         localRootNode.removeLight(sun);
                         isSun = false;
+                        slsr.setShadowIntensity(0.5f);
                     }
                 }
             } else {
@@ -187,5 +167,21 @@ public class GlobalLightingControl extends AbstractControl {
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations,
         //not called when spatial is culled.
+    }
+
+    public Vector3f getSunPosition() {
+        return sphereGeo.getWorldTranslation();
+    }
+
+    public Vector3f getSunDirection() {
+        return sun.getDirection();
+    }
+
+    public float getTimingValue() {
+        return pivot.getLocalRotation().getRotationColumn(2).getZ();
+    }
+
+    public boolean getIsSun() {
+        return isSun;
     }
 }

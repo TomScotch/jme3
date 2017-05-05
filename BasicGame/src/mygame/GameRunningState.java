@@ -9,7 +9,6 @@ import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.BetterCharacterControl;
-import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
@@ -19,14 +18,10 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.asset.AssetEventListener;
-import com.jme3.asset.AssetKey;
-import com.jme3.asset.TextureKey;
 
 public class GameRunningState extends AbstractAppState {
 
@@ -39,12 +34,11 @@ public class GameRunningState extends AbstractAppState {
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
-    private final Spatial terrain;
+
     private final playerControl playerControl;
     private boolean isRunning = false;
-    private FilterPostProcessor processor;
-    //
 
+    //
     private final AudioNode bgm;
     private final boolean bgmOn = false;
     private final int bgmVolume = 8;
@@ -67,6 +61,7 @@ public class GameRunningState extends AbstractAppState {
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setDebugEnabled(false);
 
+//      CAMERA        
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
         this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
@@ -76,22 +71,32 @@ public class GameRunningState extends AbstractAppState {
         player.addControl(playerControl);
         localRootNode.attachChild(player);
 
+//      SKY
+        localRootNode.addControl(new SkyControl(assetManager));
+
 //      SUN
         Node sunNode = new Node("sunNode");
         glc = new GlobalLightingControl(viewPort, assetManager, localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
 
+//      LightScatter
+        localRootNode.addControl(new LightScatterFilter(viewPort, assetManager));
+
+//      FOG
+        localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
+
+//      Bloom
+        localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
+
+//      WATER
+        localRootNode.addControl(
+                new WaterPostFilter(assetManager, viewPort));
 //      TERRAIN
-        terrain = assetManager.loadModel("Scenes/terrain.j3o");
-        terrain.setLocalTranslation(0, 1.45f, 0);
-        terrain.addControl(new RigidBodyControl(0));
-        terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
-        bulletAppState.getPhysicsSpace().addAll(terrain);
-        localRootNode.attachChild(terrain);
+        localRootNode.addControl(new Terrain(assetManager, bulletAppState));
 
 //      BGM
-        Node bgmNode = (Node) terrain;
+        Node bgmNode = (Node) localRootNode.getChild("terrain");
         bgm = (AudioNode) bgmNode.getChild("AudioNode");
         bgm.setVolume(bgm.getVolume() / bgmVolume);
         if (bgmOn == false) {
@@ -104,29 +109,10 @@ public class GameRunningState extends AbstractAppState {
                 new Vector2f(10, 20),
                 1.8f,
                 ColorRGBA.Blue,
-                9f);
+                4f);
 
 //      ANISOTROPY
-        AssetEventListener asl = new AssetEventListener() {
-            @Override
-            public void assetRequested(AssetKey key) {
-                if (key.getExtension().equals("png") || key.getExtension().equals("jpg") || key.getExtension().equals("dds")) {
-                    TextureKey tkey = (TextureKey) key;
-                    tkey.setAnisotropy(anisotrpy_samples);
-                }
-            }
-
-            @Override
-            public void assetLoaded(AssetKey key) {
-                //throw new UnsupportedOperationException("Not supported yet.");
-            }
-
-            @Override
-            public void assetDependencyNotFound(AssetKey parentKey, AssetKey dependentAssetKey) {
-                //throw new UnsupportedOperationException("Not supported yet.");
-            }
-        };
-        assetManager.addAssetEventListener(asl);
+        localRootNode.addControl(new AnisotropyControl(assetManager, 2));
 
         addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-6, 0, 6));
         addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(6, 0, 6));
@@ -134,7 +120,7 @@ public class GameRunningState extends AbstractAppState {
         setupKeys();
     }
 
-    private void addHostile(String name, Vector3f pos) {
+    protected final void addHostile(String name, Vector3f pos) {
         //      HOSTILE
         Node enemyNode = new Node();
         Spatial hostile = assetManager.loadModel(name);
@@ -160,8 +146,6 @@ public class GameRunningState extends AbstractAppState {
         super.initialize(stateManager, app);
         System.out.println("Game State is being initialized");
         viewPort.setBackgroundColor(backgroundColor);
-        processor = (FilterPostProcessor) assetManager.loadAsset("Filters/myFilter.j3f");
-        viewPort.addProcessor(processor);
         inputManager.setCursorVisible(false);
     }
 
@@ -236,7 +220,6 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being detached");
         playerControl.setEnabled(false);
         bgm.stop();
-        viewPort.removeProcessor(processor);
         rootNode.detachChild(localRootNode);
         guiNode.detachChild(localGuiNode);
         setIsRunning(false);

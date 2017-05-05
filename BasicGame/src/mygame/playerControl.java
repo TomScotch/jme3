@@ -59,7 +59,7 @@ public class playerControl extends AbstractControl {
     private final Node characterNode;
     boolean rotate = false;
     private final ChaseCamera chaseCam;
-    private final float flashLightStrength = 1.3f;
+    private final float flashLightStrength = 1.75f;
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
     private final AnimControl aniCon;
