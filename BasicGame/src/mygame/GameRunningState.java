@@ -71,17 +71,18 @@ public class GameRunningState extends AbstractAppState {
         player.addControl(playerControl);
         localRootNode.attachChild(player);
 
-//      SKY
-        localRootNode.addControl(new SkyControl(assetManager));
-
 //      SUN
         Node sunNode = new Node("sunNode");
         glc = new GlobalLightingControl(viewPort, assetManager, localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
 
+        SkyControl skyControl = new SkyControl(assetManager, glc);
+//      SKY
+        localRootNode.addControl(skyControl);
+
 //      LightScatter
-        localRootNode.addControl(new LightScatterFilter(viewPort, assetManager));
+        localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
 
 //      FOG
         localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
@@ -91,9 +92,9 @@ public class GameRunningState extends AbstractAppState {
 
 //      WATER
         localRootNode.addControl(
-                new WaterPostFilter(assetManager, viewPort));
+                new WaterPostFilter(assetManager, viewPort, glc));
 //      TERRAIN
-        localRootNode.addControl(new Terrain(assetManager, bulletAppState));
+        localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode));
 
 //      BGM
         Node bgmNode = (Node) localRootNode.getChild("terrain");

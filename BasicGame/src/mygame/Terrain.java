@@ -12,13 +12,12 @@ import com.jme3.scene.control.AbstractControl;
 
 public class Terrain extends AbstractControl {
 
-    public Terrain(AssetManager assetManager, BulletAppState bulletAppState) {
+    public Terrain(AssetManager assetManager, BulletAppState bulletAppState, Node localRootNode) {
         Spatial terrain = assetManager.loadModel("Scenes/terrain.j3o");
         terrain.setLocalTranslation(0, 1.45f, 0);
         terrain.addControl(new RigidBodyControl(0));
         terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
         bulletAppState.getPhysicsSpace().addAll(terrain);
-        Node localRootNode = (Node) spatial;
         localRootNode.attachChild(terrain);
     }
 

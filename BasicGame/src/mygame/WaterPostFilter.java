@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -15,30 +16,29 @@ public class WaterPostFilter extends AbstractControl {
     private float waterHeight = -0.1f;
     private final float initialWaterHeight = -0.9f;
     private final WaterFilter water;
-    private final GlobalLightingControl control;
+    private final GlobalLightingControl glc;
 
-    public WaterPostFilter(AssetManager assetManager, ViewPort viewPort) {
-
+    public WaterPostFilter(AssetManager assetManager, ViewPort viewPort, GlobalLightingControl glc) {
+        this.glc = glc;
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-
-        control = this.spatial.getControl(GlobalLightingControl.class);
-        water = new WaterFilter((Node) spatial, control.getSunDirection());
+        water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
         water.setWaterHeight(initialWaterHeight);
-
         fpp.addFilter(water);
         viewPort.addProcessor(fpp);
     }
 
     @Override
     protected void controlUpdate(float tpf) {
-        time += tpf;
-        waterHeight = (float) Math.cos(((time * 0.6f) % FastMath.TWO_PI)) * 1.5f;
-        water.setWaterHeight(initialWaterHeight + waterHeight);
-        water.getLightDirection().set(control.getSunDirection());
+        if (isEnabled()) {
+            time += tpf;
+            waterHeight = (float) Math.cos(((time * 0.6f) % FastMath.TWO_PI)) * 1.5f;
+            water.setWaterHeight(initialWaterHeight + waterHeight);
+            water.getLightDirection().set(glc.getSunDirection());
+        }
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -13,10 +13,11 @@ public class SkyControl extends AbstractControl {
 
     private final Spatial night;
     private final Spatial day;
-    private final Node localRootNode;
-    private final GlobalLightingControl lightingControl;
+    private final GlobalLightingControl glc;
 
-    public SkyControl(AssetManager assetManager) {
+    public SkyControl(AssetManager assetManager, GlobalLightingControl glc) {
+
+        this.glc = glc;
 
         Texture west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
         Texture east = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_east.jpg");
@@ -29,31 +30,25 @@ public class SkyControl extends AbstractControl {
                 assetManager, "Textures/Sky/Bright/BrightSky.dds", SkyFactory.EnvMapType.CubeMap);
         night.setLocalTranslation(0, -1000, 0);
         day.setLocalTranslation(0, -1000, 0);
-        localRootNode = (Node) spatial;
-        localRootNode.attachChild(day);
-        lightingControl = localRootNode.getControl(GlobalLightingControl.class);
     }
 
     @Override
     protected void controlUpdate(float tpf) {
 
-        day.rotate(0, tpf / (lightingControl.getTimeDelay() * 24), 0);
-        night.rotate(0, tpf / (lightingControl.getTimeDelay() * 24), 0);
+        if (isEnabled()) {
 
-        if (lightingControl.getTimingValue() > 0.99f) {
+            Node localRootNode = (Node) this.spatial;
 
-            if (lightingControl.getIsSun() == false) {
-                night.removeFromParent();
-                localRootNode.attachChild(day);
+            if (!localRootNode.hasChild(day) && !localRootNode.hasChild(night)) {
+                if (glc.getIsSun()) {
+                    localRootNode.attachChild(day);
+                } else {
+                    localRootNode.attachChild(night);
+                }
             }
-        }
 
-        if (lightingControl.getTimingValue() < -0.999f) {
-
-            if (lightingControl.getIsSun() == true) {
-                day.removeFromParent();
-                localRootNode.attachChild(night);
-            }
+            day.rotate(0, tpf / (glc.getTimeDelay() * 24), 0);
+            night.rotate(0, tpf / (glc.getTimeDelay() * 24), 0);
         }
     }
 

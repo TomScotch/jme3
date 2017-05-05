@@ -11,9 +11,10 @@ import com.jme3.scene.control.AbstractControl;
 public class LightScatterFilter extends AbstractControl {
 
     private final LightScatteringFilter sunlight;
+    private final GlobalLightingControl glc;
 
-    public LightScatterFilter(ViewPort vp, AssetManager am) {
-
+    public LightScatterFilter(ViewPort vp, AssetManager am, GlobalLightingControl glc) {
+        this.glc = glc;
         FilterPostProcessor fpp = new FilterPostProcessor(am);
         sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
         fpp.addFilter(sunlight);
@@ -23,7 +24,7 @@ public class LightScatterFilter extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        sunlight.setLightPosition(this.spatial.getControl(GlobalLightingControl.class).getSunPosition());
+        sunlight.setLightPosition(glc.getSunPosition());
     }
 
     @Override
