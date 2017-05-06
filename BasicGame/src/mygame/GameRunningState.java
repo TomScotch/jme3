@@ -40,11 +40,10 @@ public class GameRunningState extends AbstractAppState {
     private final playerControl playerControl;
     private boolean isRunning = false;
 
-    //
     private final AudioNode bgm;
     private final boolean bgmOn = false;
     private final int bgmVolume = 8;
-    private final int anisotrpy_samples = 4;
+    private final int anisotrpy_samples = 2;
     private final GlobalLightingControl glc;
     private SafeArrayList<SceneProcessor> processors;
 
@@ -115,7 +114,8 @@ public class GameRunningState extends AbstractAppState {
                 4f);
 
 //      ANISOTROPY
-        //localRootNode.addControl(new AnisotropyControl(assetManager, 2));
+        localRootNode.addControl(new AnisotropyControl(assetManager, 2));
+
         addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-6, 0, 6));
         addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(6, 0, 6));
         addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(6, 0, -6));
@@ -174,10 +174,26 @@ public class GameRunningState extends AbstractAppState {
 
     private void setupKeys() {
 
+        inputManager.addMapping("treeoutroot",
+                new KeyTrigger(KeyInput.KEY_O));
+
+        inputManager.addListener(actionListener, "treeoutroot");
+
         inputManager.addMapping("debug",
                 new KeyTrigger(KeyInput.KEY_Q));
 
         inputManager.addListener(actionListener, "debug");
+    }
+
+    private void treeoutroot(Node node) {
+        node.getChildren().stream().map((spatial) -> {
+            System.out.println(spatial.getName());
+            return spatial;
+        }).map((spatial) -> (Node) spatial).forEachOrdered((spat) -> {
+            spat.getChildren().forEach((spatial) -> {
+                treeoutroot((Node) spatial);
+            });
+        });
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -186,6 +202,12 @@ public class GameRunningState extends AbstractAppState {
         public void onAction(String binding, boolean value, float tpf) {
 
             switch (binding) {
+
+                case "treeoutroot":
+                    if (value && isRunning) {
+                        treeoutroot(localRootNode);
+                    }
+                    break;
 
                 case "debug":
                     if (value && isRunning) {

@@ -51,7 +51,6 @@ public class Main extends SimpleApplication {
         setDisplayFps(true);
         setDisplayStatView(false);
 
-        gameRunningState = new GameRunningState(this);
         startScreenState = new StartScreenState(this);
         settingsScreenState = new SettingsScreenState(this);
 
@@ -64,13 +63,26 @@ public class Main extends SimpleApplication {
         inputManager.addMapping("record", record_trigger);
         inputManager.addListener(actionListener, new String[]{"record"});
     }
+
+    private void loadGame() {
+        gameRunningState = new GameRunningState(this);
+    }
+
     private final ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
 
-            isRunning = gameRunningState.getIsRunning();
+            if (gameRunningState != null) {
+                isRunning = gameRunningState.getIsRunning();
+            } else {
+                isRunning = false;
+            }
 
             if (name.equals("Game Pause Unpause") && !isPressed) {
+
+                if (gameRunningState == null) {
+                    loadGame();
+                }
 
                 if (isRunning) {
                     stateManager.detach(gameRunningState);

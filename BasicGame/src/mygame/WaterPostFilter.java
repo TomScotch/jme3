@@ -30,8 +30,11 @@ public class WaterPostFilter extends AbstractControl {
         water.setWaterHeight(initialWaterHeight);
         water.setUseSpecular(false);
         water.setUseHQShoreline(false);
+        water.setUseCaustics(false);
+        water.setUseFoam(false);
+        water.setUseRefraction(false);
+        water.setUseRipples(false);
         fpp.addFilter(water);
-        //viewPort.addProcessor(fpp);
         dynamicLighting = false;
         dynamicWater = false;
     }
