@@ -101,14 +101,14 @@ public class GameRunningState extends AbstractAppState {
         if (fogEnabled) {
             localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
         }
+
+//      WATER
+        localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
+        
 //      Bloom
         if (bloomEnabled) {
             localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
         }
-
-//      WATER
-        localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
-
 //      TERRAIN
         localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode));
 
@@ -204,7 +204,18 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void treeoutroot(Node node) {
+
+        System.out.println(node.getName());
         for (Spatial spat : node.getChildren()) {
+
+            if (spat.getClass() == Node.class | spat.getClass() == Spatial.class) {
+                System.out.println(spat.getName());
+                Node children = (Node) spat;
+                for (Spatial child : children.getChildren()) {
+                    Node spn = (Node) child;
+                    treeoutroot(spn);
+                }
+            }
 
         }
 
