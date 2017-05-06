@@ -18,10 +18,12 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.post.SceneProcessor;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.util.SafeArrayList;
 
 public class GameRunningState extends AbstractAppState {
 
@@ -44,6 +46,7 @@ public class GameRunningState extends AbstractAppState {
     private final int bgmVolume = 8;
     private final int anisotrpy_samples = 4;
     private final GlobalLightingControl glc;
+    private SafeArrayList<SceneProcessor> processors;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -77,9 +80,8 @@ public class GameRunningState extends AbstractAppState {
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
 
-        SkyControl skyControl = new SkyControl(assetManager, glc);
 //      SKY
-        localRootNode.addControl(skyControl);
+        localRootNode.addControl(new SkyControl(assetManager, glc));
 
 //      LightScatter
         localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
@@ -91,8 +93,8 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
 
 //      WATER
-        localRootNode.addControl(
-                new WaterPostFilter(assetManager, viewPort, glc));
+        localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
+
 //      TERRAIN
         localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode));
 
@@ -113,8 +115,7 @@ public class GameRunningState extends AbstractAppState {
                 4f);
 
 //      ANISOTROPY
-        localRootNode.addControl(new AnisotropyControl(assetManager, 2));
-
+        //localRootNode.addControl(new AnisotropyControl(assetManager, 2));
         addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-6, 0, 6));
         addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(6, 0, 6));
         addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(6, 0, -6));
@@ -213,12 +214,14 @@ public class GameRunningState extends AbstractAppState {
         bgm.play();
         rootNode.attachChild(localRootNode);
         guiNode.attachChild(localGuiNode);
+        localRootNode.getControl(WaterPostFilter.class).start();
         setIsRunning(true);
     }
 
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
+        localRootNode.getControl(WaterPostFilter.class).stop();
         playerControl.setEnabled(false);
         bgm.stop();
         rootNode.detachChild(localRootNode);

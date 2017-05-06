@@ -13,32 +13,73 @@ import com.jme3.water.WaterFilter;
 public class WaterPostFilter extends AbstractControl {
 
     private float time = 0.0f;
-    private float waterHeight = -0.1f;
-    private final float initialWaterHeight = -0.9f;
+    private float waterHeight = -2f;
+    private final float initialWaterHeight = -2f;
     private final WaterFilter water;
     private final GlobalLightingControl glc;
+    private boolean dynamicWater;
+    private boolean dynamicLighting;
+    private final ViewPort viewPort;
+    private final FilterPostProcessor fpp;
 
     public WaterPostFilter(AssetManager assetManager, ViewPort viewPort, GlobalLightingControl glc) {
         this.glc = glc;
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        this.viewPort = viewPort;
+        fpp = new FilterPostProcessor(assetManager);
         water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
         water.setWaterHeight(initialWaterHeight);
+        water.setUseSpecular(false);
+        water.setUseHQShoreline(false);
         fpp.addFilter(water);
+        //viewPort.addProcessor(fpp);
+        dynamicLighting = false;
+        dynamicWater = false;
+    }
+
+    public void start() {
         viewPort.addProcessor(fpp);
+    }
+
+    public void stop() {
+        viewPort.removeProcessor(fpp);
     }
 
     @Override
     protected void controlUpdate(float tpf) {
         if (isEnabled()) {
+
             time += tpf;
-            waterHeight = (float) Math.cos(((time * 0.6f) % FastMath.TWO_PI)) * 1.5f;
-            water.setWaterHeight(initialWaterHeight + waterHeight);
-            water.getLightDirection().set(glc.getSunDirection());
+
+            if (dynamicWater) {
+                waterHeight = (float) Math.cos(((time * 0.6f) % FastMath.TWO_PI)) * 1.5f;
+                water.setWaterHeight(initialWaterHeight + waterHeight);
+            }
+
+            if (dynamicLighting) {
+                water.getLightDirection().set(glc.getSunDirection());
+            }
+
         }
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean isDynamicWater() {
+        return dynamicWater;
+    }
+
+    public boolean isDynamicLighting() {
+        return dynamicLighting;
+    }
+
+    public void setDynamicWater(boolean dynamicWater) {
+        this.dynamicWater = dynamicWater;
+    }
+
+    public void setDynamicLighting(boolean dynamicLighting) {
+        this.dynamicLighting = dynamicLighting;
     }
 }

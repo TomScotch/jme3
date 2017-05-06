@@ -38,11 +38,12 @@ public class SkyControl extends AbstractControl {
         if (isEnabled()) {
 
             Node localRootNode = (Node) this.spatial;
-
-            if (!localRootNode.hasChild(day) && !localRootNode.hasChild(night)) {
-                if (glc.getIsSun()) {
+            if (glc.getIsSun()) {
+                if (!localRootNode.hasChild(day)) {
                     localRootNode.attachChild(day);
-                } else {
+                }
+            } else {
+                if (!localRootNode.hasChild(night)) {
                     localRootNode.attachChild(night);
                 }
             }

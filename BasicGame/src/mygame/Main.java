@@ -31,7 +31,7 @@ public class Main extends SimpleApplication {
         cfg.setResolution(1600, 900);
         cfg.setSamples(antiAlias);
         cfg.setDepthBits(depthBit);
-        cfg.setFullscreen(false);
+        cfg.setFullscreen(true);
         cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
         cfg.setTitle("Serenity");
         app.setPauseOnLostFocus(true);
