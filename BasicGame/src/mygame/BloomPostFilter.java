@@ -15,7 +15,8 @@ public class BloomPostFilter extends AbstractControl {
 
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
         bloom = new BloomFilter();
-        bloom.setBloomIntensity(0.15f);
+        bloom.setBloomIntensity(0.3f);
+        bloom.setDownSamplingFactor(6);
         fpp.addFilter(bloom);
         viewPort.addProcessor(fpp);
     }

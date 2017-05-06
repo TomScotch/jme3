@@ -47,9 +47,19 @@ public class GameRunningState extends AbstractAppState {
     private final GlobalLightingControl glc;
     private SafeArrayList<SceneProcessor> processors;
 
+    private final boolean bloomEnabled;
+    private final boolean fogEnabled;
+    private final boolean lightScatterEnabled;
+    private final boolean anisotropyEnabled;
+
     public GameRunningState(SimpleApplication app) {
 
         System.out.println("Game State is being constructed");
+
+        fogEnabled = false;
+        bloomEnabled = true;
+        lightScatterEnabled = true;
+        anisotropyEnabled = true;
 
 //      CONSTRUKTOR
         this.rootNode = app.getRootNode();
@@ -83,13 +93,18 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.addControl(new SkyControl(assetManager, glc));
 
 //      LightScatter
-        localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
+        if (lightScatterEnabled) {
+            localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
+        }
 
 //      FOG
-        localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
-
+        if (fogEnabled) {
+            localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
+        }
 //      Bloom
-        localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
+        if (bloomEnabled) {
+            localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
+        }
 
 //      WATER
         localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
@@ -114,11 +129,14 @@ public class GameRunningState extends AbstractAppState {
                 4f);
 
 //      ANISOTROPY
-        localRootNode.addControl(new AnisotropyControl(assetManager, 2));
+        if (anisotropyEnabled) {
+            localRootNode.addControl(new AnisotropyControl(assetManager, 2));
+        }
 
-        addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-6, 0, 6));
-        addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(6, 0, 6));
-        addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(6, 0, -6));
+        addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-12, 0, 12));
+        addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(12, 0, 12));
+        addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(12, 0, -12));
+
         setupKeys();
     }
 
@@ -186,14 +204,10 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void treeoutroot(Node node) {
-        node.getChildren().stream().map((spatial) -> {
-            System.out.println(spatial.getName());
-            return spatial;
-        }).map((spatial) -> (Node) spatial).forEachOrdered((spat) -> {
-            spat.getChildren().forEach((spatial) -> {
-                treeoutroot((Node) spatial);
-            });
-        });
+        for (Spatial spat : node.getChildren()) {
+
+        }
+
     }
 
     private final ActionListener actionListener = new ActionListener() {

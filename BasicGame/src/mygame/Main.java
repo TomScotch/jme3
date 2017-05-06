@@ -32,7 +32,7 @@ public class Main extends SimpleApplication {
         cfg.setSamples(antiAlias);
         cfg.setDepthBits(depthBit);
         cfg.setFullscreen(true);
-        cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
+        cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
         cfg.setTitle("Serenity");
         app.setPauseOnLostFocus(true);
         app.setShowSettings(false);

@@ -19,8 +19,8 @@ public class LightScatterFilter extends AbstractControl {
         this.glc = glc;
         fpp = new FilterPostProcessor(am);
         sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
-        sunlight.setLightDensity(0.275f);
-        sunlight.setNbSamples(7);
+        sunlight.setLightDensity(0.5f);
+        sunlight.setNbSamples(5);
         fpp.addFilter(sunlight);
         vp.addProcessor(fpp);
         dynamicLightScatter = true;
@@ -31,7 +31,7 @@ public class LightScatterFilter extends AbstractControl {
 
         if (isEnabled()) {
             if (glc.getIsSun()) {
-                sunlight.setLightDensity(0.275f);
+                sunlight.setLightDensity(0.4f);
 
                 if (isDynamicLightScatter()) {
                     sunlight.setLightPosition(glc.getSunPosition());
