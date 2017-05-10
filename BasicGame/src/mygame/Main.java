@@ -41,7 +41,7 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-
+        
         inputManager.setCursorVisible(false);
         flyCam.setEnabled(false);
 

@@ -58,9 +58,9 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being constructed");
 
         fogEnabled = false;
-        bloomEnabled = true;
-        lightScatterEnabled = true;
-        anisotropyEnabled = true;
+        bloomEnabled = false;
+        lightScatterEnabled = false;
+        anisotropyEnabled = false;
         waterPostProcessing = true;
 
 //      CONSTRUKTOR
@@ -91,13 +91,13 @@ public class GameRunningState extends AbstractAppState {
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
 
-//      SKY
-        localRootNode.addControl(new SkyControl(assetManager, glc));
-
 //      LightScatter
         if (lightScatterEnabled) {
             localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
         }
+
+//      SKY
+        localRootNode.addControl(new SkyControl(assetManager, glc));
 
 //      FOG
         if (fogEnabled) {
@@ -111,6 +111,7 @@ public class GameRunningState extends AbstractAppState {
         if (bloomEnabled) {
             localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
         }
+
 //      TERRAIN
         localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode));
 
@@ -138,7 +139,6 @@ public class GameRunningState extends AbstractAppState {
         addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-12, 0, 12));
         addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(12, 0, 12));
         addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(12, 0, -12));
-
     }
 
     protected final void addHostile(String name, Vector3f pos) {
@@ -253,7 +253,21 @@ public class GameRunningState extends AbstractAppState {
 
     @Override
     public void update(float tpf) {
-        super.update(tpf);
+        if (isRunning) {
+            super.update(tpf);
+        }
+    }
+
+    public void attachLocalRootNode() {
+        if (!rootNode.hasChild(localRootNode)) {
+            rootNode.attachChild(localRootNode);
+        }
+    }
+
+    public void attachLocalGuiNode() {
+        if (!guiNode.hasChild(localGuiNode)) {
+            guiNode.attachChild(localGuiNode);
+        }
     }
 
     @Override
@@ -265,9 +279,8 @@ public class GameRunningState extends AbstractAppState {
         if (waterPostProcessing) {
             localRootNode.getControl(WaterPostFilter.class).start();
         }
-
-        rootNode.attachChild(localRootNode);
-        guiNode.attachChild(localGuiNode);
+        attachLocalGuiNode();
+        attachLocalRootNode();
         setupKeys();
         setIsRunning(true);
     }

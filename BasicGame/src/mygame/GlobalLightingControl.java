@@ -28,7 +28,7 @@ public class GlobalLightingControl extends AbstractControl {
     private final static Node pivot = new Node();
     private final int shadowmapSize = 256;
     private boolean globalLightning = true;
-    private int timeDelay = 10;
+    private int timeDelay = 128;
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;
@@ -57,11 +57,11 @@ public class GlobalLightingControl extends AbstractControl {
         //Sun Sphere
         Sphere sphereMesh = new Sphere(32, 32, 20);
         sphereGeo = new Geometry("", sphereMesh);
-        sphereGeo.setMaterial(assetManager.loadMaterial("Common/Materials/RedColor.j3m"));
+        sphereGeo.setMaterial(assetManager.loadMaterial("Common/Materials/WhiteColor.j3m"));
         sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));
         pivotSun.attachChild(sphereGeo);
         sphereGeo.setShadowMode(RenderQueue.ShadowMode.Off);
-
+        
         //Sun
         sun = new DirectionalLight();
         sun.setColor(ColorRGBA.Orange);
