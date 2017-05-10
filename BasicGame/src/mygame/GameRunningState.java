@@ -41,16 +41,17 @@ public class GameRunningState extends AbstractAppState {
     private boolean isRunning = false;
 
     private final AudioNode bgm;
-    private final boolean bgmOn = false;
-    private final int bgmVolume = 8;
-    private final int anisotrpy_samples = 2;
+    private boolean bgmOn = false;
+    private int bgmVolume = 8;
+    private int anisotrpy_samples = 2;
     private final GlobalLightingControl glc;
     private SafeArrayList<SceneProcessor> processors;
 
-    private final boolean bloomEnabled;
-    private final boolean fogEnabled;
-    private final boolean lightScatterEnabled;
-    private final boolean anisotropyEnabled;
+    private boolean bloomEnabled;
+    private boolean fogEnabled;
+    private boolean lightScatterEnabled;
+    private boolean anisotropyEnabled;
+    private boolean waterPostProcessing;
 
     public GameRunningState(SimpleApplication app) {
 
@@ -60,6 +61,7 @@ public class GameRunningState extends AbstractAppState {
         bloomEnabled = true;
         lightScatterEnabled = true;
         anisotropyEnabled = true;
+        waterPostProcessing = true;
 
 //      CONSTRUKTOR
         this.rootNode = app.getRootNode();
@@ -104,7 +106,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      WATER
         localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
-        
+
 //      Bloom
         if (bloomEnabled) {
             localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
@@ -137,7 +139,6 @@ public class GameRunningState extends AbstractAppState {
         addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(12, 0, 12));
         addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(12, 0, -12));
 
-        setupKeys();
     }
 
     protected final void addHostile(String name, Vector3f pos) {
@@ -167,6 +168,7 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being initialized");
         viewPort.setBackgroundColor(backgroundColor);
         inputManager.setCursorVisible(false);
+
     }
 
     private void displayText(String txt, Vector2f pos, float size, ColorRGBA color, float lifetime) {
@@ -204,20 +206,25 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void treeoutroot(Node node) {
-
-        System.out.println(node.getName());
-        for (Spatial spat : node.getChildren()) {
-
-            if (spat.getClass() == Node.class | spat.getClass() == Spatial.class) {
-                System.out.println(spat.getName());
-                Node children = (Node) spat;
-                for (Spatial child : children.getChildren()) {
-                    Node spn = (Node) child;
-                    treeoutroot(spn);
-                }
-            }
-
+        int n = node.getQuantity();
+        if (n > 0) {
+            System.out.println("+" + node.getName() + " " + n);
+        } else {
+            System.out.println("+" + node.getName());
         }
+        node.getChildren().stream().filter((spat) -> (spat.getClass() == Node.class | spat.getClass() == Spatial.class)).map((spat) -> {
+            int c = spat.getParent().getChildIndex(spat);
+            if (c > 0) {
+                System.out.println(c + "-" + spat.getName());
+            } else {
+                System.out.println("-" + spat.getName());
+            }
+            return spat;
+        }).map((spat) -> (Node) spat).forEachOrdered((children) -> {
+            children.getChildren().stream().map((child) -> (Node) child).forEachOrdered((spn) -> {
+                treeoutroot(spn);
+            });
+        });
 
     }
 
@@ -246,12 +253,7 @@ public class GameRunningState extends AbstractAppState {
 
     @Override
     public void update(float tpf) {
-
-        if (getIsRunning()) {
-
-            super.update(tpf);
-
-        }
+        super.update(tpf);
     }
 
     @Override
@@ -259,9 +261,14 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being attached");
         playerControl.setEnabled(true);
         bgm.play();
+
+        if (waterPostProcessing) {
+            localRootNode.getControl(WaterPostFilter.class).start();
+        }
+
         rootNode.attachChild(localRootNode);
         guiNode.attachChild(localGuiNode);
-        localRootNode.getControl(WaterPostFilter.class).start();
+        setupKeys();
         setIsRunning(true);
     }
 
@@ -282,6 +289,70 @@ public class GameRunningState extends AbstractAppState {
 
     public void setIsRunning(boolean isRunning) {
         this.isRunning = isRunning;
+    }
+
+    public boolean isBgmOn() {
+        return bgmOn;
+    }
+
+    public void setBgmOn(boolean bgmOn) {
+        this.bgmOn = bgmOn;
+    }
+
+    public int getBgmVolume() {
+        return bgmVolume;
+    }
+
+    public void setBgmVolume(int bgmVolume) {
+        this.bgmVolume = bgmVolume;
+    }
+
+    public int getAnisotrpy_samples() {
+        return anisotrpy_samples;
+    }
+
+    public void setAnisotrpy_samples(int anisotrpy_samples) {
+        this.anisotrpy_samples = anisotrpy_samples;
+    }
+
+    public boolean isBloomEnabled() {
+        return bloomEnabled;
+    }
+
+    public void setBloomEnabled(boolean bloomEnabled) {
+        this.bloomEnabled = bloomEnabled;
+    }
+
+    public boolean isFogEnabled() {
+        return fogEnabled;
+    }
+
+    public void setFogEnabled(boolean fogEnabled) {
+        this.fogEnabled = fogEnabled;
+    }
+
+    public boolean isLightScatterEnabled() {
+        return lightScatterEnabled;
+    }
+
+    public void setLightScatterEnabled(boolean lightScatterEnabled) {
+        this.lightScatterEnabled = lightScatterEnabled;
+    }
+
+    public boolean isAnisotropyEnabled() {
+        return anisotropyEnabled;
+    }
+
+    public void setAnisotropyEnabled(boolean anisotropyEnabled) {
+        this.anisotropyEnabled = anisotropyEnabled;
+    }
+
+    public boolean isWaterPostProcessing() {
+        return waterPostProcessing;
+    }
+
+    public void setWaterPostProcessing(boolean waterPostProcessing) {
+        this.waterPostProcessing = waterPostProcessing;
     }
 
 }

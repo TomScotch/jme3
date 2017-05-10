@@ -61,6 +61,8 @@ public class EntityControl extends AbstractControl {
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
             this.spatial.removeControl(BetterCharacterControl.class);
+            Node n = (Node) this.spatial;
+            n.getParent().removeFromParent();
             this.spatial.removeFromParent();
             this.spatial.removeControl(this);
         }

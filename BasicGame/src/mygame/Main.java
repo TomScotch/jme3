@@ -14,7 +14,6 @@ public class Main extends SimpleApplication {
     private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
     private final Trigger save_trigger = new KeyTrigger(KeyInput.KEY_RETURN);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
-    private boolean isRunning = false;
     private static GameRunningState gameRunningState;
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
@@ -71,11 +70,10 @@ public class Main extends SimpleApplication {
 
             if (name.equals("Game Pause Unpause") && !isPressed) {
 
-                if (isRunning) {
+                if (gameRunningState.getIsRunning()) {
                     stateManager.detach(gameRunningState);
                     stateManager.attach(startScreenState);
                     System.out.println("switching to startscreen...");
-
                 } else {
                     if (stateManager.hasState(startScreenState)) {
                         stateManager.detach(startScreenState);
@@ -87,16 +85,20 @@ public class Main extends SimpleApplication {
 
             if (name.equals("record") && !isPressed) {
 
-                if (stateManager.hasState(videoRecorderAppState)) {
-                    stateManager.detach(videoRecorderAppState);
-                    System.out.println("finished recording");
-                } else if (!stateManager.hasState(videoRecorderAppState)) {
-                    stateManager.attach(videoRecorderAppState);
-                    System.out.println("start record");
+                if (gameRunningState.getIsRunning()) {
+                    if (stateManager.hasState(videoRecorderAppState)) {
+                        stateManager.detach(videoRecorderAppState);
+                        System.out.println("finished recording");
+                    } else if (!stateManager.hasState(videoRecorderAppState)) {
+                        stateManager.attach(videoRecorderAppState);
+                        System.out.println("start record");
+                    }
+                } else {
+                    System.out.println("start game to begin recording");
                 }
             }
 
-            if (name.equals("Toggle Settings") && !isPressed && !isRunning) {
+            if (name.equals("Toggle Settings") && !isPressed && !gameRunningState.getIsRunning()) {
                 if (stateManager.hasState(startScreenState)) {
                     stateManager.detach(startScreenState);
                     stateManager.attach(settingsScreenState);
