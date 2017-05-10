@@ -43,7 +43,7 @@ public class GameRunningState extends AbstractAppState {
     private final AudioNode bgm;
     private boolean bgmOn = false;
     private int bgmVolume = 8;
-    private int anisotrpy_samples = 2;
+    private int anisotrpy_samples = 4;
     private final GlobalLightingControl glc;
     private SafeArrayList<SceneProcessor> processors;
 
@@ -58,9 +58,9 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being constructed");
 
         fogEnabled = false;
-        bloomEnabled = false;
-        lightScatterEnabled = false;
-        anisotropyEnabled = false;
+        bloomEnabled = true;
+        lightScatterEnabled = true;
+        anisotropyEnabled = true;
         waterPostProcessing = true;
 
 //      CONSTRUKTOR
@@ -91,26 +91,8 @@ public class GameRunningState extends AbstractAppState {
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
 
-//      LightScatter
-        if (lightScatterEnabled) {
-            localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
-        }
-
 //      SKY
         localRootNode.addControl(new SkyControl(assetManager, glc));
-
-//      FOG
-        if (fogEnabled) {
-            localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
-        }
-
-//      WATER
-        localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
-
-//      Bloom
-        if (bloomEnabled) {
-            localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
-        }
 
 //      TERRAIN
         localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode));
@@ -164,10 +146,41 @@ public class GameRunningState extends AbstractAppState {
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
+
         super.initialize(stateManager, app);
+
         System.out.println("Game State is being initialized");
+
         viewPort.setBackgroundColor(backgroundColor);
+
         inputManager.setCursorVisible(false);
+
+//      LightScatter
+        if (lightScatterEnabled) {
+            if (localRootNode.getControl(LightScatterFilter.class) == null) {
+                localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
+            }
+        }
+
+//      Bloom
+        if (bloomEnabled) {
+            if (localRootNode.getControl(BloomPostFilter.class) == null) {
+                localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
+            }
+        }
+
+//      FOG
+        if (fogEnabled) {
+            if (localRootNode.getControl(FogPostFilter.class) == null) {
+                localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
+            }
+        }
+
+//      WATER
+        if (localRootNode.getControl(WaterPostFilter.class) == null) {
+            localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
+            localRootNode.getControl(WaterPostFilter.class).start();
+        }
 
     }
 
@@ -277,8 +290,11 @@ public class GameRunningState extends AbstractAppState {
         bgm.play();
 
         if (waterPostProcessing) {
-            localRootNode.getControl(WaterPostFilter.class).start();
+            if (localRootNode.getControl(WaterPostFilter.class) != null) {
+                localRootNode.getControl(WaterPostFilter.class).start();
+            }
         }
+
         attachLocalGuiNode();
         attachLocalRootNode();
         setupKeys();

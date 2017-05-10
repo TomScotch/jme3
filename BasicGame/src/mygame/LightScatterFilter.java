@@ -19,8 +19,8 @@ public class LightScatterFilter extends AbstractControl {
         this.glc = glc;
         fpp = new FilterPostProcessor(am);
         sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
-        sunlight.setLightDensity(0.2f);
-        sunlight.setNbSamples(20);
+        sunlight.setLightDensity(0.45f);
+        sunlight.setNbSamples(9);
         fpp.addFilter(sunlight);
         vp.addProcessor(fpp);
         dynamicLightScatter = true;
