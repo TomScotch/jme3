@@ -1,6 +1,5 @@
 package mygame;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
 import com.jme3.renderer.RenderManager;
@@ -11,14 +10,12 @@ public class BloomPostFilter extends AbstractControl {
 
     private final BloomFilter bloom;
 
-    public BloomPostFilter(AssetManager assetManager, ViewPort viewPort) {
+    public BloomPostFilter(FilterPostProcessor fpp) {
 
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        bloom = new BloomFilter();
+        bloom = new BloomFilter(BloomFilter.GlowMode.SceneAndObjects);
         bloom.setBloomIntensity(0.3f);
         bloom.setDownSamplingFactor(6);
         fpp.addFilter(bloom);
-        viewPort.addProcessor(fpp);
     }
 
     @Override

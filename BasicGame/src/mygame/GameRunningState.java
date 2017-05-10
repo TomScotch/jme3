@@ -18,6 +18,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.SceneProcessor;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
@@ -52,12 +53,13 @@ public class GameRunningState extends AbstractAppState {
     private boolean lightScatterEnabled;
     private boolean anisotropyEnabled;
     private boolean waterPostProcessing;
+    private static FilterPostProcessor fpp;
 
     public GameRunningState(SimpleApplication app) {
 
         System.out.println("Game State is being constructed");
 
-        fogEnabled = false;
+        fogEnabled = true;
         bloomEnabled = true;
         lightScatterEnabled = true;
         anisotropyEnabled = true;
@@ -69,6 +71,8 @@ public class GameRunningState extends AbstractAppState {
         this.guiNode = app.getGuiNode();
         this.assetManager = app.getAssetManager();
         this.inputManager = app.getInputManager();
+
+        fpp = new FilterPostProcessor(assetManager);
 
 //      PHYSICS STATE
         bulletAppState = new BulletAppState();
@@ -93,6 +97,34 @@ public class GameRunningState extends AbstractAppState {
 
 //      SKY
         localRootNode.addControl(new SkyControl(assetManager, glc));
+
+//      Bloom
+        if (bloomEnabled) {
+            if (localRootNode.getControl(BloomPostFilter.class) == null) {
+                localRootNode.addControl(new BloomPostFilter(fpp));
+            }
+        }
+
+//      LightScatter
+        if (lightScatterEnabled) {
+
+            if (localRootNode.getControl(LightScatterFilter.class) == null) {
+                localRootNode.addControl(new LightScatterFilter(fpp, glc));
+            }
+        }
+
+//      FOG
+        if (fogEnabled) {
+            if (localRootNode.getControl(FogPostFilter.class) == null) {
+                localRootNode.addControl(new FogPostFilter(fpp));
+            }
+        }
+
+//      WATER
+        if (localRootNode.getControl(WaterPostFilter.class) == null) {
+            localRootNode.addControl(new WaterPostFilter(fpp));
+
+        }
 
 //      TERRAIN
         localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode));
@@ -154,34 +186,6 @@ public class GameRunningState extends AbstractAppState {
         viewPort.setBackgroundColor(backgroundColor);
 
         inputManager.setCursorVisible(false);
-
-//      LightScatter
-        if (lightScatterEnabled) {
-            if (localRootNode.getControl(LightScatterFilter.class) == null) {
-                localRootNode.addControl(new LightScatterFilter(viewPort, assetManager, glc));
-            }
-        }
-
-//      Bloom
-        if (bloomEnabled) {
-            if (localRootNode.getControl(BloomPostFilter.class) == null) {
-                localRootNode.addControl(new BloomPostFilter(assetManager, viewPort));
-            }
-        }
-
-//      FOG
-        if (fogEnabled) {
-            if (localRootNode.getControl(FogPostFilter.class) == null) {
-                localRootNode.addControl(new FogPostFilter(assetManager, viewPort));
-            }
-        }
-
-//      WATER
-        if (localRootNode.getControl(WaterPostFilter.class) == null) {
-            localRootNode.addControl(new WaterPostFilter(assetManager, viewPort, glc));
-            localRootNode.getControl(WaterPostFilter.class).start();
-        }
-
     }
 
     private void displayText(String txt, Vector2f pos, float size, ColorRGBA color, float lifetime) {
@@ -291,22 +295,31 @@ public class GameRunningState extends AbstractAppState {
 
         if (waterPostProcessing) {
             if (localRootNode.getControl(WaterPostFilter.class) != null) {
-                localRootNode.getControl(WaterPostFilter.class).start();
+                //localRootNode.getControl(WaterPostFilter.class).start();
             }
+        }
+
+        if (!viewPort.getProcessors().contains(fpp)) {
+            viewPort.addProcessor(fpp);
         }
 
         attachLocalGuiNode();
         attachLocalRootNode();
+
         setupKeys();
         setIsRunning(true);
+
     }
 
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
-        localRootNode.getControl(WaterPostFilter.class).stop();
+        //localRootNode.getControl(WaterPostFilter.class).stop();
         playerControl.setEnabled(false);
         bgm.stop();
+        if (viewPort.getProcessors().contains(fpp)) {
+            viewPort.removeProcessor(fpp);
+        }
         rootNode.detachChild(localRootNode);
         guiNode.detachChild(localGuiNode);
         setIsRunning(false);

@@ -1,6 +1,5 @@
 package mygame;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -16,16 +15,28 @@ public class WaterPostFilter extends AbstractControl {
     private float waterHeight = -2f;
     private final float initialWaterHeight = -2f;
     private final WaterFilter water;
-    private final GlobalLightingControl glc;
+    private GlobalLightingControl glc;
     private boolean dynamicWater;
     private boolean dynamicLighting;
-    private final ViewPort viewPort;
-    private final FilterPostProcessor fpp;
 
-    public WaterPostFilter(AssetManager assetManager, ViewPort viewPort, GlobalLightingControl glc) {
+    public WaterPostFilter(FilterPostProcessor fpp, GlobalLightingControl glc) {
+
         this.glc = glc;
-        this.viewPort = viewPort;
-        fpp = new FilterPostProcessor(assetManager);
+        water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
+        water.setWaterHeight(initialWaterHeight);
+        water.setUseSpecular(true);
+        water.setUseHQShoreline(true);
+        water.setUseCaustics(true);
+        water.setUseFoam(true);
+        water.setUseRefraction(true);
+        water.setUseRipples(true);
+        dynamicLighting = true;
+        dynamicWater = true;
+        fpp.addFilter(water);
+    }
+
+    public WaterPostFilter(FilterPostProcessor fpp) {
+
         water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
         water.setWaterHeight(initialWaterHeight);
         water.setUseSpecular(false);
@@ -34,17 +45,9 @@ public class WaterPostFilter extends AbstractControl {
         water.setUseFoam(false);
         water.setUseRefraction(false);
         water.setUseRipples(false);
-        fpp.addFilter(water);
         dynamicLighting = false;
         dynamicWater = false;
-    }
-
-    public void start() {
-        viewPort.addProcessor(fpp);
-    }
-
-    public void stop() {
-        viewPort.removeProcessor(fpp);
+        fpp.addFilter(water);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package mygame;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.math.ColorRGBA;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.FogFilter;
@@ -26,14 +25,13 @@ public class FogPostFilter extends AbstractControl {
         fog.setFogDensity(density);
     }
 
-    public FogPostFilter(AssetManager assetManager, ViewPort vp) {
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+    public FogPostFilter(FilterPostProcessor fpp) {
+
         fog = new FogFilter();
         fog.setFogColor(ColorRGBA.White);
         fog.setFogDistance(999);
         fog.setFogDensity(0.1f);
         fpp.addFilter(fog);
-        vp.addProcessor(fpp);
     }
 
     @Override

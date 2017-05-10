@@ -1,6 +1,5 @@
 package mygame;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.LightScatteringFilter;
@@ -13,16 +12,15 @@ public class LightScatterFilter extends AbstractControl {
     private final LightScatteringFilter sunlight;
     private final GlobalLightingControl glc;
     private boolean dynamicLightScatter;
-    private final FilterPostProcessor fpp;
 
-    public LightScatterFilter(ViewPort vp, AssetManager am, GlobalLightingControl glc) {
+    public LightScatterFilter(FilterPostProcessor fpp, GlobalLightingControl glc) {
+
         this.glc = glc;
-        fpp = new FilterPostProcessor(am);
+
         sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
         sunlight.setLightDensity(0.45f);
         sunlight.setNbSamples(9);
         fpp.addFilter(sunlight);
-        vp.addProcessor(fpp);
         dynamicLightScatter = true;
     }
 

@@ -41,7 +41,7 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        
+
         inputManager.setCursorVisible(false);
         flyCam.setEnabled(false);
 
@@ -62,6 +62,7 @@ public class Main extends SimpleApplication {
         inputManager.addListener(actionListener, new String[]{"Toggle Settings"});
         inputManager.addMapping("record", record_trigger);
         inputManager.addListener(actionListener, new String[]{"record"});
+
     }
 
     private final ActionListener actionListener = new ActionListener() {
