@@ -19,16 +19,22 @@ public class SkyControl extends AbstractControl {
 
         this.glc = glc;
 
-        Texture west = assetManager.loadTexture("Textures/skybox/6.png");
-        Texture east = assetManager.loadTexture("Textures/skybox/5.png");
-        Texture north = assetManager.loadTexture("Textures/skybox/4.png");
-        Texture south = assetManager.loadTexture("Textures/skybox/3.png");
-        Texture up = assetManager.loadTexture("Textures/skybox/2.png");
-        Texture down = assetManager.loadTexture("Textures/skybox/1.png");
+        Texture west = assetManager.loadTexture("Textures/skybox/Night/FullMoonLeft2048.png");
+        Texture east = assetManager.loadTexture("Textures/skybox/Night/FullMoonRight2048.png");
+        Texture north = assetManager.loadTexture("Textures/skybox/Night/FullMoonBack2048.png");
+        Texture south = assetManager.loadTexture("Textures/skybox/Night/FullMoonFront2048.png");
+        Texture up = assetManager.loadTexture("Textures/skybox/Night/FullMoonUp2048.png");
+        Texture down = assetManager.loadTexture("Textures/skybox/Night/FullMoonDown2048.png");
         night = SkyFactory.createSky(assetManager, west, east, north, south, up, down);
 
-        day = SkyFactory.createSky(
-                assetManager, "Textures/Sky/Bright/BrightSky.dds", SkyFactory.EnvMapType.CubeMap);
+        Texture west1 = assetManager.loadTexture("Textures/skybox/Midday/TropicalSunnyDayLeft2048.png");
+        Texture east1 = assetManager.loadTexture("Textures/skybox/Midday/TropicalSunnyDayRight2048.png");
+        Texture north1 = assetManager.loadTexture("Textures/skybox/Midday/TropicalSunnyDayBack2048.png");
+        Texture south1 = assetManager.loadTexture("Textures/skybox/Midday/TropicalSunnyDayFront2048.png");
+        Texture up1 = assetManager.loadTexture("Textures/skybox/Midday/TropicalSunnyDayUp2048.png");
+        Texture down1 = assetManager.loadTexture("Textures/skybox/Midday/TropicalSunnyDayDown2048.png");
+        day = SkyFactory.createSky(assetManager, west1, east1, north1, south1, up1, down1);
+
         night.setLocalTranslation(0, -1000, 0);
         day.setLocalTranslation(0, -1000, 0);
     }
@@ -52,7 +58,7 @@ public class SkyControl extends AbstractControl {
                     }
                 }
             }
-            night.rotate(0, tpf / (glc.getTimeDelay() * 20), 0);
+            night.rotate(0, tpf / (glc.getTimeDelay() * 5), 0);
         }
     }
 

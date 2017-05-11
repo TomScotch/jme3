@@ -59,7 +59,8 @@ public class playerControl extends AbstractControl {
     private final Node characterNode;
     boolean rotate = false;
     private final ChaseCamera chaseCam;
-    private final float flashLightStrength = 1.75f;
+    private final float flashLightStrength = 2.75f;
+    private final float flashLightSpotRange = 45f;
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
     private final AnimControl aniCon;
@@ -92,10 +93,12 @@ public class playerControl extends AbstractControl {
         camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
         camNode.setEnabled(false);
         lamp = new SpotLight();
-        lamp.setSpotRange(25);
-        lamp.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
-        lamp.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
+        lamp.setSpotRange(flashLightSpotRange);
+        lamp.setSpotInnerAngle(30f * FastMath.DEG_TO_RAD);
+        lamp.setSpotOuterAngle(50f * FastMath.DEG_TO_RAD);
         lamp.setColor(ColorRGBA.White.mult(flashLightStrength));
+        lamp.setFrustumCheckNeeded(true);
+        lamp.setIntersectsFrustum(true);
         lamp.setEnabled(false);
         this.localRootNode.addLight(lamp);
 
@@ -105,16 +108,16 @@ public class playerControl extends AbstractControl {
         characterNode.attachChild(lightNode);
         lightNode.getLocalTranslation().addLocal(0, 2.79f, 1.87f);
 
-        model = assetManager.loadModel("Models/npc/knight.j3o");
-        model.scale(0.45f);
+        model = assetManager.loadModel("Models/npc/berzerker.j3o");
+        model.scale(0.3f);
         characterNode.attachChild(model);
         model.setShadowMode(RenderQueue.ShadowMode.Cast);
-        model.setLocalTranslation(0, 4.15f, 0);
+        model.setLocalTranslation(0, 2.25f, 0);
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("anim");
         aniCon = n1.getControl(AnimControl.class);
         physicsCharacter = new BetterCharacterControl(3, 6, playerMass);
-        physicsCharacter.warp(new Vector3f(0, 6, 0));
+        physicsCharacter.warp(new Vector3f(0, 2, 0));
         physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
         physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
         characterNode.addControl(physicsCharacter);
@@ -193,7 +196,7 @@ public class playerControl extends AbstractControl {
                     backward = value;
                     break;
                 case "Jump":
-                    if (value && physicsCharacter.isOnGround()) {
+                    if (value) { //&& physicsCharacter.isOnGround()
                         physicsCharacter.jump();
                     }
                     break;
@@ -265,8 +268,8 @@ public class playerControl extends AbstractControl {
                 attackTimer -= 1 * tpf;
             }
 
-            if (model.getWorldTranslation().y < -35) {
-                physicsCharacter.warp(new Vector3f(5, 5, 5));
+            if (model.getWorldTranslation().y < -300f) {
+                physicsCharacter.warp(new Vector3f(0, 2, 0));
             }
 
             Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();

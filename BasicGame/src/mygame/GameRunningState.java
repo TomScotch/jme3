@@ -41,7 +41,7 @@ public class GameRunningState extends AbstractAppState {
     private final playerControl playerControl;
     private boolean isRunning = false;
 
-    private final AudioNode bgm;
+    private final AudioNode bgm = new AudioNode();
     private boolean bgmOn = false;
     private int bgmVolume = 8;
     private int anisotrpy_samples = 4;
@@ -82,6 +82,9 @@ public class GameRunningState extends AbstractAppState {
 //      CAMERA        
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
         this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
+
+//      TERRAIN
+        localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode, viewPort));
 
 //      PLAYER
         playerControl = new playerControl(app, bulletAppState, localRootNode);
@@ -126,18 +129,15 @@ public class GameRunningState extends AbstractAppState {
 
         }
 
-//      TERRAIN
-        localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode));
-
 //      BGM
-        Node bgmNode = (Node) localRootNode.getChild("terrain");
-        bgm = (AudioNode) bgmNode.getChild("AudioNode");
-        bgm.setVolume(bgm.getVolume() / bgmVolume);
-        if (bgmOn == false) {
-            bgm.setVolume(0);
-        }
-        bgm.setLooping(bgmOn);
+        // Node bgmNode = (Node) localRootNode.getChild("terrain");
+        //  bgm = (AudioNode) bgmNode.getChild("AudioNode");
 
+        /*        bgm.setVolume(bgm.getVolume() / bgmVolume);
+        if (bgmOn == false) {
+        bgm.setVolume(0);
+        }
+        bgm.setLooping(bgmOn);*/
 //      TEST GUI TEXT
         displayText("Game running",
                 new Vector2f(10, 20),
@@ -260,6 +260,7 @@ public class GameRunningState extends AbstractAppState {
 
                 case "debug":
                     if (value && isRunning) {
+                        System.out.print(viewPort.getCamera().getLocation());
                         bulletAppState.setDebugEnabled(!bulletAppState.isDebugEnabled());
                     }
                     break;
@@ -291,7 +292,7 @@ public class GameRunningState extends AbstractAppState {
     public void stateAttached(AppStateManager stateManager) {
         System.out.println("Game State is being attached");
         playerControl.setEnabled(true);
-        bgm.play();
+        //bgm.play();
 
         if (waterPostProcessing) {
             if (localRootNode.getControl(WaterPostFilter.class) != null) {
@@ -316,7 +317,7 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being detached");
         //localRootNode.getControl(WaterPostFilter.class).stop();
         playerControl.setEnabled(false);
-        bgm.stop();
+        //bgm.stop();
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
         }

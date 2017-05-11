@@ -28,7 +28,7 @@ public class GlobalLightingControl extends AbstractControl {
     private final static Node pivot = new Node();
     private final int shadowmapSize = 256;
     private boolean globalLightning = true;
-    private int timeDelay = 96;
+    private int timeDelay = 12;
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;

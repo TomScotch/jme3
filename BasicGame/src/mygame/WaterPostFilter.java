@@ -12,8 +12,8 @@ import com.jme3.water.WaterFilter;
 public class WaterPostFilter extends AbstractControl {
 
     private float time = 0.0f;
-    private float waterHeight = -2f;
-    private final float initialWaterHeight = -2f;
+    private float waterHeight = -70f;
+    private final float initialWaterHeight = -80f;
     private final WaterFilter water;
     private GlobalLightingControl glc;
     private boolean dynamicWater;
