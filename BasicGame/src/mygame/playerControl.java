@@ -64,6 +64,7 @@ public class playerControl extends AbstractControl {
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
     private final AnimControl aniCon;
+    private final float scale = 0.45f;
 
     public playerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -108,11 +109,11 @@ public class playerControl extends AbstractControl {
         characterNode.attachChild(lightNode);
         lightNode.getLocalTranslation().addLocal(0, 2.79f, 1.87f);
 
-        model = assetManager.loadModel("Models/npc/berzerker.j3o");
-        model.scale(0.3f);
+        model = assetManager.loadModel("Models/npc/knight.j3o");
+        model.scale(scale);
         characterNode.attachChild(model);
         model.setShadowMode(RenderQueue.ShadowMode.Cast);
-        model.setLocalTranslation(0, 2.25f, 0);
+        model.setLocalTranslation(0, 4, 0);
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("anim");
         aniCon = n1.getControl(AnimControl.class);
@@ -196,8 +197,10 @@ public class playerControl extends AbstractControl {
                     backward = value;
                     break;
                 case "Jump":
-                    if (value) { //&& physicsCharacter.isOnGround()
-                        physicsCharacter.jump();
+                    if (value) {
+                        if (physicsCharacter.isOnGround()) {
+                            physicsCharacter.jump();
+                        }
                     }
                     break;
                 default:
@@ -249,9 +252,11 @@ public class playerControl extends AbstractControl {
 
         if (isEnabled()) {
 
-            if (ghostControl.getOverlappingObjects().size() > 1) {
-                Node overlap = (Node) ghostControl.getOverlapping(1).getUserObject();
-                if (!overlap.getName().equals("terrain") && !overlap.getName().equals("")) {
+            if (ghostControl.getOverlappingObjects().size() > 2) {
+
+                Node overlap = (Node) ghostControl.getOverlapping(2).getUserObject();
+
+                if (!overlap.getName().equals("terrain")) {
                     collisionTarget = overlap.getName();
                 }
             } else {
@@ -322,13 +327,13 @@ public class playerControl extends AbstractControl {
         SceneGraphVisitor visitor = (Spatial spat) -> {
             if (spat.getName() != null) {
                 if (spat.getName().equals(name)) {
-                    Node n = (Node) spat;
-                    Spatial child = n.getChild(name);
-                    if (child != null) {
-                        child.getControl(EntityControl.class).hit(playerDmg, "player");
+                    if (spat.getControl(EntityControl.class) != null) {
+                        spat.getControl(EntityControl.class).hit(playerDmg, "player");
                     }
                 }
+
             }
+
         };
         localRootNode.depthFirstTraversal(visitor);
     }
@@ -373,7 +378,9 @@ public class playerControl extends AbstractControl {
         if (attackTimer <= 0) {
 
             if (!collisionTarget.equals("")) {
-                hit(collisionTarget);
+                if (!collisionTarget.equals("player")) {
+                    hit(collisionTarget);
+                }
             }
             doAnim("player", "Attack", LoopMode.DontLoop);
             attackTimer = attackTime;

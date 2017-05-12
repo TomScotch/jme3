@@ -10,6 +10,8 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.renderer.queue.RenderQueue;
 
 public class EntityControl extends AbstractControl {
 
@@ -21,6 +23,22 @@ public class EntityControl extends AbstractControl {
     private final float fleeDistance = 40;
     private String targetName = "";
     private Spatial targetSpatial;
+    private final BetterCharacterControl bcc;
+
+    public EntityControl(Spatial hostile, BulletAppState bulletState, String name, Vector3f pos) {
+
+        this.spatial = hostile;
+        //hostile.setName(name);
+        //hostile.scale(3.75f);
+        //hostile.setLocalTranslation(pos);
+        hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
+        bcc = new BetterCharacterControl(3, 7, 3);
+        bcc.setSpatial(hostile);
+        hostile.addControl(bcc);
+        bulletState.getPhysicsSpace().add(bcc);
+        bcc.warp(new Vector3f(pos));
+        setAnim("Idle", LoopMode.Loop);
+    }
 
     @Override
     protected void controlUpdate(float tpf) {
@@ -29,16 +47,14 @@ public class EntityControl extends AbstractControl {
 
             if (!targetName.equals("")) {
                 Node n = (Node) this.spatial;
-                BetterCharacterControl control = this.spatial.
-                        getControl(BetterCharacterControl.class);
                 targetSpatial = n.getParent().getParent().getChild(targetName);
                 Vector3f a = targetSpatial.getWorldTranslation();
                 Vector3f b = this.spatial.getWorldTranslation();
-                control.setViewDirection(a.subtract(b));
+                bcc.setViewDirection(a.subtract(b));
                 float distance = a.distance(b);
                 if (distance > fleeDistance) {
                     targetName = "";
-                    control.setViewDirection(new Vector3f(0, 0, 0));
+                    bcc.setViewDirection(new Vector3f(0, 0, 0));
                 }
             }
 
@@ -61,8 +77,8 @@ public class EntityControl extends AbstractControl {
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
             this.spatial.removeControl(BetterCharacterControl.class);
-            Node n = (Node) this.spatial;
-            n.getParent().removeFromParent();
+            //Node n = (Node) this.spatial;
+            //n.getParent().removeFromParent();
             this.spatial.removeFromParent();
             this.spatial.removeControl(this);
         }
@@ -77,8 +93,9 @@ public class EntityControl extends AbstractControl {
 
     }
 
-    public void setAnim(String name, LoopMode mode) {
-        Node n = (Node) this.spatial.getParent();
+    private void setAnim(String name, LoopMode mode) {
+
+        Node n = (Node) this.spatial;
         Node e = (Node) n.getChild("anim");
         AnimControl aniCon = e.getControl(AnimControl.class);
 

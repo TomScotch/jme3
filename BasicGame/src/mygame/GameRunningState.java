@@ -1,6 +1,5 @@
 package mygame;
 
-import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -8,7 +7,6 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
@@ -21,7 +19,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.SceneProcessor;
 import com.jme3.renderer.ViewPort;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.util.SafeArrayList;
@@ -150,30 +147,11 @@ public class GameRunningState extends AbstractAppState {
             localRootNode.addControl(new AnisotropyControl(assetManager, 2));
         }
 
-        addHostile("Models/hostile/Demon/demon.j3o", new Vector3f(-12, 0, 12));
-        addHostile("Models/hostile/forestmonster/forest-monster.j3o", new Vector3f(12, 0, 12));
-        addHostile("Models/hostile/Spider/spider.j3o", new Vector3f(12, 0, -12));
-    }
-
-    protected final void addHostile(String name, Vector3f pos) {
-        //      HOSTILE
-        Node enemyNode = new Node();
-        Spatial hostile = assetManager.loadModel(name);
-        enemyNode.attachChild(hostile);
-        enemyNode.setName(name);
-        hostile.setName(name);
-        //hostile.scale(3.75f);
-        //hostile.setLocalTranslation(pos);
-        EntityControl npcCon = new EntityControl();
-        hostile.addControl(npcCon);
-        hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
-        BetterCharacterControl bcc = new BetterCharacterControl(3, 7, 3);
-        bcc.setSpatial(hostile);
-        hostile.addControl(bcc);
-        localRootNode.attachChild(enemyNode);
-        bulletAppState.getPhysicsSpace().add(bcc);
-        bcc.warp(new Vector3f(pos));
-        npcCon.setAnim("Idle", LoopMode.Loop);
+//      HOSTILE
+        Spatial enemy = assetManager.loadModel("Models/hostile/demon/demon.j3o");
+        EntityControl ec = new EntityControl(enemy, bulletAppState, "demon", new Vector3f(0, 0, 0));
+        enemy.addControl(ec);
+        localRootNode.attachChild(enemy);
     }
 
     @Override
@@ -224,22 +202,35 @@ public class GameRunningState extends AbstractAppState {
 
     private void treeoutroot(Node node) {
         int n = node.getQuantity();
-        if (n > 0) {
-            System.out.println("+" + node.getName() + " " + n);
-        } else {
-            System.out.println("+" + node.getName());
+        if (node.getName() != null) {
+            if (!node.getName().equals("null")) {
+                if (n > 0) {
+                    System.out.println("+ " + node.getName() + " " + n);
+                } else {
+                    System.out.println(node.getName());
+                }
+            }
         }
         node.getChildren().stream().filter((spat) -> (spat.getClass() == Node.class | spat.getClass() == Spatial.class)).map((spat) -> {
             int c = spat.getParent().getChildIndex(spat);
-            if (c > 0) {
-                System.out.println(c + "-" + spat.getName());
-            } else {
-                System.out.println("-" + spat.getName());
+
+            if (node.getName() != null) {
+                if (!node.getName().equals("null")) {
+                    if (c > 0) {
+                        System.out.println("-" + spat.getName() + " " + c);
+                    } else {
+                        System.out.println(spat.getName());
+                    }
+                }
             }
+
             return spat;
         }).map((spat) -> (Node) spat).forEachOrdered((children) -> {
-            children.getChildren().stream().map((child) -> (Node) child).forEachOrdered((spn) -> {
-                treeoutroot(spn);
+            children.getChildren().stream().map((child) -> child).forEachOrdered((spn) -> {
+                if (spn.getClass().equals(Spatial.class) | spn.getClass().equals(Node.class)) {
+                    Node s = (Node) spn;
+                    treeoutroot(s);
+                }
             });
         });
 
@@ -260,7 +251,6 @@ public class GameRunningState extends AbstractAppState {
 
                 case "debug":
                     if (value && isRunning) {
-                        System.out.print(viewPort.getCamera().getLocation());
                         bulletAppState.setDebugEnabled(!bulletAppState.isDebugEnabled());
                     }
                     break;
