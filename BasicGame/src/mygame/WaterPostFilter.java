@@ -12,42 +12,39 @@ import com.jme3.water.WaterFilter;
 public class WaterPostFilter extends AbstractControl {
 
     private float time = 0.0f;
-    private float waterHeight = -70f;
-    private final float initialWaterHeight = -80f;
+    private float waterHeight = -12f;
+    private final float initialWaterHeight = -10f;
     private final WaterFilter water;
     private GlobalLightingControl glc;
     private boolean dynamicWater;
     private boolean dynamicLighting;
 
-    public WaterPostFilter(FilterPostProcessor fpp, GlobalLightingControl glc) {
+    public WaterPostFilter(FilterPostProcessor fpp, GlobalLightingControl glc, boolean specular, boolean hqshore, boolean caustics, boolean foam, boolean refraction, boolean ripples, boolean dynamicLight, boolean dynamicWater) {
 
         this.glc = glc;
         water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
         water.setWaterHeight(initialWaterHeight);
-        water.setUseSpecular(true);
-        water.setUseHQShoreline(true);
-        water.setUseCaustics(true);
-        water.setUseFoam(true);
-        water.setUseRefraction(true);
-        water.setUseRipples(true);
-        dynamicLighting = true;
-        dynamicWater = true;
+        initWater(specular, hqshore, caustics, foam, refraction, ripples, dynamicLight, dynamicWater);
         fpp.addFilter(water);
     }
 
-    public WaterPostFilter(FilterPostProcessor fpp) {
+    public WaterPostFilter(FilterPostProcessor fpp, boolean specular, boolean hqshore, boolean caustics, boolean foam, boolean refraction, boolean ripples, boolean dynamicWater) {
 
         water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
         water.setWaterHeight(initialWaterHeight);
-        water.setUseSpecular(false);
-        water.setUseHQShoreline(false);
-        water.setUseCaustics(false);
-        water.setUseFoam(false);
-        water.setUseRefraction(false);
-        water.setUseRipples(false);
-        dynamicLighting = false;
-        dynamicWater = false;
+        initWater(specular, hqshore, caustics, foam, refraction, ripples, false, dynamicWater);
         fpp.addFilter(water);
+    }
+
+    private void initWater(boolean specular, boolean hqShore, boolean caustic, boolean foam, boolean refraction, boolean ripples, boolean dynamicLight, boolean dynamicWater) {
+        water.setUseSpecular(specular);
+        water.setUseHQShoreline(hqShore);
+        water.setUseCaustics(caustic);
+        water.setUseFoam(foam);
+        water.setUseRefraction(refraction);
+        water.setUseRipples(ripples);
+        dynamicLighting = dynamicLight;
+        this.dynamicWater = dynamicWater;
     }
 
     @Override

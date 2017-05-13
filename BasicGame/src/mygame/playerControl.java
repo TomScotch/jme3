@@ -173,10 +173,7 @@ public class playerControl extends AbstractControl {
                     break;
                 case "chase":
                     if (value && isEnabled()) {
-                        camNode.setEnabled(!camNode.isEnabled());
-                        chaseCam.setEnabled(!chaseCam.isEnabled());
-                        chaseEnabled = !chaseEnabled;
-                        chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
+                        makeChase();
                     }
                     break;
 
@@ -209,6 +206,21 @@ public class playerControl extends AbstractControl {
 
         }
     };
+
+    public void makeChase() {
+        camNode.setEnabled(!camNode.isEnabled());
+        chaseCam.setEnabled(!chaseCam.isEnabled());
+        chaseEnabled = !chaseEnabled;
+        chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
+    }
+
+    public void removeChaseCam() {
+        characterNode.removeControl(chaseCam);
+    }
+
+    public void attachChaseCam() {
+        characterNode.addControl(chaseCam);
+    }
 
     private void setupKeys() {
 

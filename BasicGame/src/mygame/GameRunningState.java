@@ -7,6 +7,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.export.binary.BinaryExporter;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
@@ -22,6 +23,8 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.util.SafeArrayList;
+import java.io.File;
+import java.io.IOException;
 
 public class GameRunningState extends AbstractAppState {
 
@@ -122,8 +125,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      WATER
         if (localRootNode.getControl(WaterPostFilter.class) == null) {
-            localRootNode.addControl(new WaterPostFilter(fpp));
-
+            localRootNode.addControl(new WaterPostFilter(fpp, true, true, true, true, true, true, true));
         }
 
 //      BGM
@@ -148,10 +150,21 @@ public class GameRunningState extends AbstractAppState {
         }
 
 //      HOSTILE
-        Spatial enemy = assetManager.loadModel("Models/hostile/demon/demon.j3o");
-        EntityControl ec = new EntityControl(enemy, bulletAppState, "demon", new Vector3f(0, 0, 0));
-        enemy.addControl(ec);
-        localRootNode.attachChild(enemy);
+        Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
+        EntityControl ec1 = new EntityControl(demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
+        demon.addControl(ec1);
+        localRootNode.attachChild(demon);
+
+        Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
+        EntityControl ec2 = new EntityControl(forestmonster, bulletAppState, "forestmonster", new Vector3f(-10, 0, 10));
+        forestmonster.addControl(ec2);
+        localRootNode.attachChild(forestmonster);
+
+        Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
+        EntityControl ec3 = new EntityControl(spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
+        spider.addControl(ec3);
+        localRootNode.attachChild(spider);
+
     }
 
     @Override
@@ -188,6 +201,11 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void setupKeys() {
+
+        inputManager.addMapping("write",
+                new KeyTrigger(KeyInput.KEY_F9));
+
+        inputManager.addListener(actionListener, "write");
 
         inputManager.addMapping("treeoutroot",
                 new KeyTrigger(KeyInput.KEY_O));
@@ -243,6 +261,12 @@ public class GameRunningState extends AbstractAppState {
 
             switch (binding) {
 
+                case "write":
+                    if (value && isRunning) {
+                        write(localRootNode, "localRootNode");
+                    }
+                    break;
+
                 case "treeoutroot":
                     if (value && isRunning) {
                         treeoutroot(localRootNode);
@@ -257,7 +281,25 @@ public class GameRunningState extends AbstractAppState {
             }
 
         }
+
     };
+
+    private void write(Node node, String name) {
+
+        String userHome = System.getProperty("user.home");
+        BinaryExporter exporter = BinaryExporter.getInstance();
+        File file = new File(userHome + "/" + name + ".j3o");
+
+        playerControl.removeChaseCam();
+
+        try {
+            exporter.save(node, file);
+        } catch (IOException ex) {
+            System.out.println("Failed to save node!");
+            // Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Failed to save node!", ex);
+        }
+        playerControl.attachChaseCam();
+    }
 
     @Override
     public void update(float tpf) {

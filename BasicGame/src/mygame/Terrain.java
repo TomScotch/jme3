@@ -41,17 +41,17 @@ public class Terrain extends AbstractControl {
         matRock.setTexture("Tex3", rock);
         matRock.setFloat("Tex3Scale", 128f);
         TerrainQuad terrain;
-        
-        AbstractHeightMap heightmap ;
-        heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 1f);
+
+        AbstractHeightMap heightmap;
+        heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 0.275f);
         heightmap.load();
-        terrain = new TerrainQuad("terrain", 65, 513,  heightmap.getHeightMap());
+        terrain = new TerrainQuad("terrain", 65, 513, heightmap.getHeightMap());
         terrain.setMaterial(matRock);
         terrain.setMaterial(new Material(assetManager, "Common/MatDefs/Terrain/TerrainLighting.j3md"));
         //terrain.setLocalScale(2f, 1f, 2f); // scale to make it less steep
         TerrainLodControl control = new TerrainLodControl(terrain, vp.getCamera());
         terrain.addControl(control);
-        terrain.setLocalTranslation(-164.0f, -90f, 8.9f);
+        terrain.setLocalTranslation(-164.0f, -9f, 8.9f);
         terrain.addControl(new RigidBodyControl(0));
         terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
         bulletAppState.getPhysicsSpace().addAll(terrain);
