@@ -28,9 +28,7 @@ public class EntityControl extends AbstractControl {
     public EntityControl(Spatial hostile, BulletAppState bulletState, String name, Vector3f pos) {
 
         this.spatial = hostile;
-        //hostile.setName(name);
         //hostile.scale(3.75f);
-        //hostile.setLocalTranslation(pos);
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
         bcc = new BetterCharacterControl(3, 7, 3);
         bcc.setSpatial(hostile);
@@ -47,7 +45,7 @@ public class EntityControl extends AbstractControl {
 
             if (!targetName.equals("")) {
                 Node n = (Node) this.spatial;
-                targetSpatial = n.getParent().getParent().getChild(targetName);
+                targetSpatial = n.getParent().getChild(targetName);
                 Vector3f a = targetSpatial.getWorldTranslation();
                 Vector3f b = this.spatial.getWorldTranslation();
                 bcc.setViewDirection(a.subtract(b));
@@ -77,8 +75,6 @@ public class EntityControl extends AbstractControl {
                     getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
             this.spatial.removeControl(BetterCharacterControl.class);
-            //Node n = (Node) this.spatial;
-            //n.getParent().removeFromParent();
             this.spatial.removeFromParent();
             this.spatial.removeControl(this);
         }
@@ -130,14 +126,14 @@ public class EntityControl extends AbstractControl {
     }
 
     private void hitParticles() {
-        Node n = (Node) this.spatial.getParent();
+        Node n = (Node) this.spatial;
         Node n1 = (Node) n.getChild("hit");
         ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
         child.emitAllParticles();
     }
 
     private void deadParticles(int num) {
-        Node n = (Node) this.spatial.getParent();
+        Node n = (Node) this.spatial;
         Node n1 = (Node) n.getChild("death");
         ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
         child.setParticlesPerSec(num);

@@ -109,7 +109,7 @@ public class playerControl extends AbstractControl {
         characterNode.attachChild(lightNode);
         lightNode.getLocalTranslation().addLocal(0, 2.79f, 1.87f);
 
-        model = assetManager.loadModel("Models/npc/knight.j3o");
+        model = assetManager.loadModel("Models/npc/berzerker.j3o");
         model.scale(scale);
         characterNode.attachChild(model);
         model.setShadowMode(RenderQueue.ShadowMode.Cast);
