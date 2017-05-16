@@ -27,10 +27,10 @@ public class Main extends SimpleApplication {
         //cfg.setFrameRate(60);
         cfg.setVSync(false);
         //cfg.setFrequency(60);
-        cfg.setResolution(1600, 900);
+        //cfg.setResolution(1600, 900);
         cfg.setSamples(antiAlias);
         cfg.setDepthBits(depthBit);
-        cfg.setFullscreen(true);
+        cfg.setFullscreen(false);
         cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
         cfg.setTitle("Serenity");
         app.setPauseOnLostFocus(true);

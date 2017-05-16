@@ -41,7 +41,7 @@ public class Terrain extends AbstractControl {
         terrain.setLocalScale(1.5f, 0.75f, 1.5f);
         TerrainLodControl control = new TerrainLodControl(terrain, vp.getCamera());
         terrain.addControl(control);
-        terrain.setLocalTranslation(-164.0f, -7.5f, 8.9f);
+        terrain.setLocalTranslation(-164.0f, -20, 8.9f);
         terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
         terrain.addControl(new RigidBodyControl(0));
         bulletAppState.getPhysicsSpace().addAll(terrain);
