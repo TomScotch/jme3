@@ -32,6 +32,14 @@ import com.jme3.scene.control.LightControl;
 
 public class playerControl extends AbstractControl {
 
+    public boolean isChaseEnabled() {
+        return chaseEnabled;
+    }
+
+    public SpotLight getLamp() {
+        return lamp;
+    }
+
     private final ViewPort viewPort;
     private final AssetManager assetManager;
     private final InputManager inputManager;
@@ -143,7 +151,7 @@ public class playerControl extends AbstractControl {
             switch (binding) {
                 case "flashlight":
                     if (value && isEnabled()) {
-                        lamp.setEnabled(!lamp.isEnabled());
+                        getLamp().setEnabled(!lamp.isEnabled());
                     }
                     break;
                 case "rightRotate":

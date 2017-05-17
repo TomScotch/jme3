@@ -94,7 +94,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      SUN
         Node sunNode = new Node("sunNode");
-        glc = new GlobalLightingControl(viewPort, assetManager, localRootNode);
+        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
 
@@ -164,6 +164,8 @@ public class GameRunningState extends AbstractAppState {
         EntityControl ec3 = new EntityControl(spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
         spider.addControl(ec3);
         localRootNode.attachChild(spider);
+
+        setupKeys();
 
     }
 
@@ -339,7 +341,6 @@ public class GameRunningState extends AbstractAppState {
         attachLocalGuiNode();
         attachLocalRootNode();
 
-        setupKeys();
         setIsRunning(true);
 
     }

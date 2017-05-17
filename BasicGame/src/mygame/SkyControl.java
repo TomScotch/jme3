@@ -19,7 +19,6 @@ public class SkyControl extends AbstractControl {
     private final Spatial evening;
     private final Spatial morning;
     private final GlobalLightingControl glc;
-    private boolean firstinit = true;
 
     /*    private final Material matMorning;
     private final Material matDay;
@@ -95,20 +94,6 @@ public class SkyControl extends AbstractControl {
 
             Node localRootNode = (Node) this.spatial;
 
-            if (firstinit) {
-
-                firstinit = false;
-
-                localRootNode.attachChild(night);
-                localRootNode.attachChild(day);
-                localRootNode.attachChild(evening);
-                localRootNode.attachChild(morning);
-
-                localRootNode.detachChild(night);
-                localRootNode.detachChild(day);
-                localRootNode.detachChild(evening);
-            }
-
             Float z = glc.getTimingValue();
 
             if (glc.getIsSun()) {
@@ -165,6 +150,7 @@ public class SkyControl extends AbstractControl {
             evening.rotate(0, tpf / (glc.getTimeDelay() * 5), 0);
             morning.rotate(0, tpf / (glc.getTimeDelay() * 5), 0);
         }
+
     }
 
     @Override

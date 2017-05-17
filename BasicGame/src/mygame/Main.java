@@ -11,9 +11,12 @@ import com.jme3.system.AppSettings;
 public class Main extends SimpleApplication {
 
     private VideoRecorderAppState videoRecorderAppState;
+
     private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
     private final Trigger save_trigger = new KeyTrigger(KeyInput.KEY_RETURN);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
+    private final Trigger restart_trigger = new KeyTrigger(KeyInput.KEY_F12);
+
     private static GameRunningState gameRunningState;
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
@@ -57,17 +60,42 @@ public class Main extends SimpleApplication {
 
         inputManager.addMapping("Game Pause Unpause", pause_trigger);
         inputManager.addListener(actionListener, new String[]{"Game Pause Unpause"});
+
         inputManager.addMapping("Toggle Settings", save_trigger);
         inputManager.addListener(actionListener, new String[]{"Toggle Settings"});
+
         inputManager.addMapping("record", record_trigger);
         inputManager.addListener(actionListener, new String[]{"record"});
 
+        inputManager.addMapping("restart", restart_trigger);
+        inputManager.addListener(actionListener, new String[]{"restart"});
     }
 
     private void loadGame() {
         if (gameRunningState == null) {
             gameRunningState = new GameRunningState(this);
+            startScreenState.setGameIsLoaded(true);
         }
+    }
+
+    public void doRestart() {
+
+        System.out.println("restart");
+
+        if (stateManager.hasState(gameRunningState)) {
+            stateManager.detach(gameRunningState);
+        }
+        if (stateManager.hasState(startScreenState)) {
+            stateManager.detach(startScreenState);
+        }
+        if (stateManager.hasState(settingsScreenState)) {
+            stateManager.detach(settingsScreenState);
+        }
+
+        startScreenState = new StartScreenState(this);
+        settingsScreenState = new SettingsScreenState(this);
+        gameRunningState = null;
+        stateManager.attach(startScreenState);
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -94,6 +122,11 @@ public class Main extends SimpleApplication {
                         }
                     }
                 }
+            }
+
+            if (name.equals("restart") && !isPressed) {
+
+                doRestart();
             }
 
             if (name.equals("record") && !isPressed) {

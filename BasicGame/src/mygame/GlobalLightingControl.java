@@ -33,18 +33,19 @@ public class GlobalLightingControl extends AbstractControl {
     private final SpotLight sl;
     private final DirectionalLight sun;
     private final Node pivotSun;
-    private final float sunHeight = 150f;
+    private final float sunHeight = 300f;
     private final Geometry sphereGeo;
     private final SpotLightShadowRenderer slsr;
     private final SpotLight dummySpotLight;
     private final DirectionalLightShadowRenderer dlsr;
 
-    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, Node localRootNode) {
+    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
         this.localRootNode = localRootNode;
 
-        //Player Flashlight
-        sl = (SpotLight) this.localRootNode.getLocalLightList().get(0);
+        //Player FlashLight
+        this.sl = sl;
+
         dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
 
         //PointLightSunPivotNode
