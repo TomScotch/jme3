@@ -1,10 +1,11 @@
 package mygame;
 
+/*import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
+import com.jme3.scene.Geometry;*/
 import com.jme3.asset.AssetManager;
-import com.jme3.material.Material;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
@@ -18,13 +19,12 @@ public class SkyControl extends AbstractControl {
     private final Spatial evening;
     private final Spatial morning;
     private final GlobalLightingControl glc;
-    private final Material matMorning;
-    private final Material matDay;
-    private final Material matEvening;
-    private final Material matNight;
-
     private boolean firstinit = true;
 
+    /*    private final Material matMorning;
+    private final Material matDay;
+    private final Material matEvening;
+    private final Material matNight;*/
     public SkyControl(AssetManager assetManager, GlobalLightingControl glc, Node localRootNode) {
 
         this.glc = glc;
@@ -66,18 +66,6 @@ public class SkyControl extends AbstractControl {
         night.setLocalTranslation(0, -1000, 0);
         day.setLocalTranslation(0, -1000, 0);
 
-        Geometry morningGeom = (Geometry) morning;
-        matMorning = morningGeom.getMaterial();
-
-        Geometry dayGeom = (Geometry) day;
-        matDay = dayGeom.getMaterial();
-
-        Geometry eveningGeom = (Geometry) evening;
-        matEvening = eveningGeom.getMaterial();
-
-        Geometry nightGeom = (Geometry) night;
-        matNight = nightGeom.getMaterial();
-
         localRootNode.attachChild(day);
         localRootNode.attachChild(night);
         localRootNode.attachChild(morning);
@@ -86,6 +74,18 @@ public class SkyControl extends AbstractControl {
         localRootNode.detachChild(evening);
         localRootNode.detachChild(morning);
         localRootNode.detachChild(night);
+
+        /*        Geometry morningGeom = (Geometry) morning;
+        matMorning = morningGeom.getMaterial();
+        
+        Geometry dayGeom = (Geometry) day;
+        matDay = dayGeom.getMaterial();
+        
+        Geometry eveningGeom = (Geometry) evening;
+        matEvening = eveningGeom.getMaterial();
+        
+        Geometry nightGeom = (Geometry) night;
+        matNight = nightGeom.getMaterial();*/
     }
 
     @Override
@@ -118,6 +118,7 @@ public class SkyControl extends AbstractControl {
 
                     if (!localRootNode.hasChild(morning)) {
                         localRootNode.attachChild(morning);
+
                     }
                     if (localRootNode.hasChild(night)) {
                         night.removeFromParent();
