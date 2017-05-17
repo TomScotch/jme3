@@ -25,7 +25,7 @@ public class SkyControl extends AbstractControl {
 
     private boolean firstinit = true;
 
-    public SkyControl(AssetManager assetManager, GlobalLightingControl glc) {
+    public SkyControl(AssetManager assetManager, GlobalLightingControl glc, Node localRootNode) {
 
         this.glc = glc;
 
@@ -77,6 +77,15 @@ public class SkyControl extends AbstractControl {
 
         Geometry nightGeom = (Geometry) night;
         matNight = nightGeom.getMaterial();
+
+        localRootNode.attachChild(day);
+        localRootNode.attachChild(night);
+        localRootNode.attachChild(morning);
+        localRootNode.attachChild(evening);
+        localRootNode.detachChild(day);
+        localRootNode.detachChild(evening);
+        localRootNode.detachChild(morning);
+        localRootNode.detachChild(night);
     }
 
     @Override
@@ -109,7 +118,6 @@ public class SkyControl extends AbstractControl {
 
                     if (!localRootNode.hasChild(morning)) {
                         localRootNode.attachChild(morning);
-
                     }
                     if (localRootNode.hasChild(night)) {
                         night.removeFromParent();

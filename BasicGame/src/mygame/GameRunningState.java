@@ -99,7 +99,7 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(sunNode);
 
 //      SKY
-        localRootNode.addControl(new SkyControl(assetManager, glc));
+        localRootNode.addControl(new SkyControl(assetManager, glc, localRootNode));
 
 //      Bloom
         if (bloomEnabled) {
