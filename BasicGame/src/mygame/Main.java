@@ -18,7 +18,7 @@ public class Main extends SimpleApplication {
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
 
-    private final static int antiAlias = 1;
+    private final static int antiAlias = 0;
     private final static int depthBit = 24;
 
     public static void main(String[] args) {
@@ -52,7 +52,6 @@ public class Main extends SimpleApplication {
 
         startScreenState = new StartScreenState(this);
         settingsScreenState = new SettingsScreenState(this);
-        gameRunningState = new GameRunningState(this);
 
         stateManager.attach(startScreenState);
 
@@ -65,28 +64,41 @@ public class Main extends SimpleApplication {
 
     }
 
+    private void loadGame() {
+        if (gameRunningState == null) {
+            gameRunningState = new GameRunningState(this);
+        }
+    }
+
     private final ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
 
             if (name.equals("Game Pause Unpause") && !isPressed) {
 
-                if (gameRunningState.getIsRunning()) {
+                if (gameRunningState == null) {
+                    loadGame();
+                }
+
+                if (stateManager.hasState(gameRunningState)) {
                     stateManager.detach(gameRunningState);
                     stateManager.attach(startScreenState);
                     System.out.println("switching to startscreen...");
                 } else {
                     if (stateManager.hasState(startScreenState)) {
-                        stateManager.detach(startScreenState);
-                        stateManager.attach(gameRunningState);
-                        System.out.println("switching to game...");
+
+                        if (gameRunningState != null) {
+                            stateManager.detach(startScreenState);
+                            stateManager.attach(gameRunningState);
+                            System.out.println("switching to game...");
+                        }
                     }
                 }
             }
 
             if (name.equals("record") && !isPressed) {
 
-                if (gameRunningState.getIsRunning()) {
+                if (stateManager.hasState(gameRunningState)) {
                     if (stateManager.hasState(videoRecorderAppState)) {
                         stateManager.detach(videoRecorderAppState);
                         System.out.println("finished recording");
@@ -99,7 +111,7 @@ public class Main extends SimpleApplication {
                 }
             }
 
-            if (name.equals("Toggle Settings") && !isPressed && !gameRunningState.getIsRunning()) {
+            if (name.equals("Toggle Settings") && !isPressed) {
                 if (stateManager.hasState(startScreenState)) {
                     stateManager.detach(startScreenState);
                     stateManager.attach(settingsScreenState);
