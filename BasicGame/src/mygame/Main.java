@@ -83,6 +83,7 @@ public class Main extends SimpleApplication {
         if (gameRunningState == null) {
             startScreenState.startLoading();
             loadGameState = true;
+            inputManager.setCursorVisible(false);
         }
     }
 
@@ -117,21 +118,18 @@ public class Main extends SimpleApplication {
 
             if (name.equals("Game Pause Unpause") && !isPressed) {
 
-                if (gameRunningState == null) {
-                    loadGame();
-                }
-
                 if (stateManager.hasState(gameRunningState)) {
                     stateManager.detach(gameRunningState);
                     stateManager.attach(startScreenState);
                     System.out.println("switching to startscreen...");
                 } else {
                     if (stateManager.hasState(startScreenState)) {
-
                         if (gameRunningState != null) {
                             stateManager.detach(startScreenState);
                             stateManager.attach(gameRunningState);
                             System.out.println("switching to game...");
+                        } else {
+                            loadGame();
                         }
                     }
                 }
@@ -177,7 +175,7 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
-        //super.update();
+
         if (loadGameState) {
             c += tpf;
             if (c > 0.6f) {

@@ -30,7 +30,7 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.control.LightControl;
 
-public class playerControl extends AbstractControl {
+public class PlayerControl extends AbstractControl {
 
     public boolean isChaseEnabled() {
         return chaseEnabled;
@@ -74,19 +74,20 @@ public class playerControl extends AbstractControl {
     private final AnimControl aniCon;
     private final float scale = 0.45f;
 
-    public playerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
+    public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
         this.viewPort = app.getViewPort();
         this.assetManager = app.getAssetManager();
         this.inputManager = app.getInputManager();
         this.bulletAppState = bulletState;
         this.localRootNode = localRootNode;
+
         characterNode = new Node("player");
+
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
         chaseCam.setChasingSensitivity(1);
         chaseCam.setTrailingEnabled(false);
         chaseCam.setSmoothMotion(false);
-        chaseCam.setDefaultDistance(7.5f);
         chaseCam.setMinDistance(3f);
         chaseCam.setLookAtOffset(new Vector3f(0, 5f, 0));
         chaseCam.setInvertVerticalAxis(true);
@@ -95,12 +96,16 @@ public class playerControl extends AbstractControl {
         chaseCam.setDownRotateOnCloseViewOnly(true);
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        chaseCam.setDefaultDistance(chaseCam.getMaxDistance() - 2f);
+        chaseCam.setDefaultVerticalRotation(FastMath.ONE_THIRD);
+
         camNode = new CameraNode("Camera Node", app.getCamera());
         camNode.setControlDir(CameraControl.ControlDirection.SpatialToCamera);
         characterNode.attachChild(camNode);
         camNode.setLocalTranslation(new Vector3f(0, 4.4f, -18f));
         camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
         camNode.setEnabled(false);
+
         lamp = new SpotLight();
         lamp.setSpotRange(flashLightSpotRange);
         lamp.setSpotInnerAngle(30f * FastMath.DEG_TO_RAD);
@@ -132,15 +137,19 @@ public class playerControl extends AbstractControl {
         characterNode.addControl(physicsCharacter);
         physicsCharacter.setSpatial(characterNode);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
+
         Node ghostNode = new Node("PlayerGhostNode");
         ghostControl = new GhostControl(new BoxCollisionShape(new Vector3f(2f, 0.1f, 3f)));
         bulletAppState.getPhysicsSpace().add(ghostControl);
         ghostNode.addControl(ghostControl);
+
         characterNode.attachChild(ghostNode);
         ghostNode.setLocalTranslation(0, 3, 5);
         this.localRootNode.attachChild(characterNode);
+
         doAnim("player", "Idle", LoopMode.Loop);
         setupKeys();
+        localRootNode.addControl(new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, this));
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -220,6 +229,10 @@ public class playerControl extends AbstractControl {
         chaseCam.setEnabled(!chaseCam.isEnabled());
         chaseEnabled = !chaseEnabled;
         chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
+    }
+
+    public ChaseCamera getChaseCam() {
+        return chaseCam;
     }
 
     public void removeChaseCam() {

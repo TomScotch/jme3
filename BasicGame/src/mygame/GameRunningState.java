@@ -38,7 +38,7 @@ public class GameRunningState extends AbstractAppState {
     private final BulletAppState bulletAppState;
     private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
 
-    private final playerControl playerControl;
+    private final PlayerControl playerControl;
     private boolean isRunning = false;
 
     private final AudioNode bgm = new AudioNode();
@@ -87,7 +87,7 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode, viewPort));
 
 //      PLAYER
-        playerControl = new playerControl(app, bulletAppState, localRootNode);
+        playerControl = new PlayerControl(app, bulletAppState, localRootNode);
         Node player = new Node("playerNode");
         player.addControl(playerControl);
         localRootNode.attachChild(player);
