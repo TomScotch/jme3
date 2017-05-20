@@ -166,7 +166,7 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(spider);
 
         setupKeys();
-
+        app.getRenderManager().preloadScene(localRootNode);
     }
 
     @Override

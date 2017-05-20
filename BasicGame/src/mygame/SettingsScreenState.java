@@ -61,7 +61,7 @@ public class SettingsScreenState extends AbstractAppState {
         Material boxMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         Texture monkeyTex = assetManager.loadTexture("Interface/Logo/Monkey.jpg");
         boxMat.setTexture("ColorMap", monkeyTex);
-        boxMat.setColor("Color", ColorRGBA.Blue);
+        boxMat.setColor("Color", ColorRGBA.White);
         boxGeo.setMaterial(boxMat);
         localRootNode.attachChild(boxGeo);
     }

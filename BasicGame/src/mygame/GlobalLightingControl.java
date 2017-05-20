@@ -34,6 +34,7 @@ public class GlobalLightingControl extends AbstractControl {
     private final DirectionalLight sun;
     private final Node pivotSun;
     private final float sunHeight = 300f;
+    private final int sunSize = 64;
     private final Geometry sphereGeo;
     private final SpotLightShadowRenderer slsr;
     private final SpotLight dummySpotLight;
@@ -56,7 +57,7 @@ public class GlobalLightingControl extends AbstractControl {
         localRootNode.attachChild(pivot);
 
         //Sun Sphere
-        Sphere sphereMesh = new Sphere(32, 32, 20);
+        Sphere sphereMesh = new Sphere(sunSize, sunSize, sunSize);
         sphereGeo = new Geometry("", sphereMesh);
         sphereGeo.setMaterial(assetManager.loadMaterial("Common/Materials/WhiteColor.j3m"));
         sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));

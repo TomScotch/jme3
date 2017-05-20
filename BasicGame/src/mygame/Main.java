@@ -10,12 +10,16 @@ import com.jme3.system.AppSettings;
 
 public class Main extends SimpleApplication {
 
-    private VideoRecorderAppState videoRecorderAppState;
+    private static AppSettings cfg;
+    private static Main app;
+
+    private static VideoRecorderAppState videoRecorderAppState;
 
     private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
     private final Trigger save_trigger = new KeyTrigger(KeyInput.KEY_RETURN);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
-    private final Trigger restart_trigger = new KeyTrigger(KeyInput.KEY_F12);
+    private final Trigger restart_trigger = new KeyTrigger(KeyInput.KEY_F11);
+    private final Trigger exit_trigger = new KeyTrigger(KeyInput.KEY_F12);
 
     private static GameRunningState gameRunningState;
     private static StartScreenState startScreenState;
@@ -25,8 +29,8 @@ public class Main extends SimpleApplication {
     private final static int depthBit = 24;
 
     public static void main(String[] args) {
-        Main app = new Main();
-        AppSettings cfg = new AppSettings(true);
+        app = new Main();
+        cfg = new AppSettings(true);
         //cfg.setFrameRate(60);
         cfg.setVSync(false);
         //cfg.setFrequency(60);
@@ -41,6 +45,7 @@ public class Main extends SimpleApplication {
         app.setSettings(cfg);
         app.start();
     }
+    private boolean loadGameState;
 
     @Override
     public void simpleInitApp() {
@@ -69,12 +74,15 @@ public class Main extends SimpleApplication {
 
         inputManager.addMapping("restart", restart_trigger);
         inputManager.addListener(actionListener, new String[]{"restart"});
+
+        inputManager.addMapping("exit", exit_trigger);
+        inputManager.addListener(actionListener, new String[]{"exit"});
     }
 
     private void loadGame() {
         if (gameRunningState == null) {
-            gameRunningState = new GameRunningState(this);
-            startScreenState.setGameIsLoaded(true);
+            startScreenState.startLoading();
+            loadGameState = true;
         }
     }
 
@@ -96,6 +104,11 @@ public class Main extends SimpleApplication {
         settingsScreenState = new SettingsScreenState(this);
         gameRunningState = null;
         stateManager.attach(startScreenState);
+    }
+
+    public void shutdown() {
+        System.out.println("mygame.Main.shutdown()");
+        app.stop();
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -125,8 +138,11 @@ public class Main extends SimpleApplication {
             }
 
             if (name.equals("restart") && !isPressed) {
-
                 doRestart();
+            }
+
+            if (name.equals("exit") && !isPressed) {
+                shutdown();
             }
 
             if (name.equals("record") && !isPressed) {
@@ -157,9 +173,22 @@ public class Main extends SimpleApplication {
             }
         }
     };
+    private float c = 0f;
 
     @Override
     public void simpleUpdate(float tpf) {
         //super.update();
+        if (loadGameState) {
+            c += tpf;
+            if (c > 0.6f) {
+                loadGameState = false;
+                c = 0f;
+                gameRunningState = new GameRunningState(app);
+                startScreenState.setGameIsLoaded(true);
+                stateManager.detach(startScreenState);
+                stateManager.attach(gameRunningState);
+                System.out.println("switching to game...");
+            }
+        }
     }
 }

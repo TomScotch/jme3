@@ -28,8 +28,11 @@ public class StartScreenState extends AbstractAppState {
     private final Geometry boxGeo;
     private final BitmapText startGame;
     private boolean gameIsLoaded = false;
+    private final BitmapText loading;
+    private final BitmapText options;
 
     public StartScreenState(SimpleApplication app) {
+
         this.rootNode = app.getRootNode();
         this.viewPort = app.getViewPort();
         this.guiNode = app.getGuiNode();
@@ -44,45 +47,56 @@ public class StartScreenState extends AbstractAppState {
                 + "press RETURN to edit Settings.");
         localGuiNode.attachChild(displaytext);
 
-        BitmapText options = new BitmapText(guiFont);
+        options = new BitmapText(guiFont);
         options.setSize(guiFont.getCharSet().getRenderedSize() * 3);
         options.move(options.getLineWidth() + viewPort.getCamera().getWidth() / 10, options.getLineHeight() + viewPort.getCamera().getHeight() / 3, 0);
         options.setText("Options");
         options.setColor(ColorRGBA.Green);
-        localGuiNode.attachChild(options);
 
         startGame = new BitmapText(guiFont);
         startGame.setSize(guiFont.getCharSet().getRenderedSize() * 3);
         startGame.setColor(ColorRGBA.Green);
         startGame.move(startGame.getLineWidth() + viewPort.getCamera().getWidth() / 10, startGame.getLineHeight() + viewPort.getCamera().getHeight() / 2, 0);
 
-        localGuiNode.attachChild(startGame);
-
-        app.getInputManager().setCursorVisible(false);
-
-        Box boxMesh = new Box(1f, 1f, 1f);
-        boxGeo = new Geometry("A Textured Box", boxMesh);
+        Box boxMesh = new Box(1, 1, 1);
+        boxGeo = new Geometry("Box", boxMesh);
         Material boxMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         Texture monkeyTex = assetManager.loadTexture("Interface/Logo/Monkey.jpg");
         boxMat.setTexture("ColorMap", monkeyTex);
-        boxMat.setColor("Color", ColorRGBA.Blue);
+        boxMat.setColor("Color", ColorRGBA.White);
         boxGeo.setMaterial(boxMat);
         this.localRootNode.attachChild(boxGeo);
+
+        loading = new BitmapText(guiFont);
+        loading.setSize(guiFont.getCharSet().getRenderedSize() * 3);
+        loading.move( ( viewPort.getCamera().getWidth() / 2 ) - loading.getLineWidth() , loading.getLineHeight() + viewPort.getCamera().getHeight() / 6, 0);
+        loading.setText("loading");
+        loading.setColor(ColorRGBA.Green);
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         viewPort.setBackgroundColor(backgroundColor);
-        app.getInputManager().setCursorVisible(false);
+        app.getInputManager().setCursorVisible(true);
 
         if (gameIsLoaded) {
             startGame.setText("Continue");
+            localGuiNode.detachChild(loading);
+            localRootNode.attachChild(boxGeo);
         } else {
             startGame.setText("Start Game");
         }
 
         boxGeo.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+
+    }
+
+    public void startLoading() {
+        localGuiNode.attachChild(loading);
+        localRootNode.detachChild(boxGeo);
+        localGuiNode.detachChild(startGame);
+        localGuiNode.detachChild(options);
     }
 
     @Override
@@ -95,12 +109,26 @@ public class StartScreenState extends AbstractAppState {
 
     @Override
     public void stateAttached(AppStateManager stateManager) {
+
+        if (!localGuiNode.hasChild(options)) {
+            localGuiNode.attachChild(options);
+        }
+        if (!localGuiNode.hasChild(startGame)) {
+            localGuiNode.attachChild(startGame);
+        }
+
         this.rootNode.attachChild(this.localRootNode);
         this.guiNode.attachChild(this.localGuiNode);
     }
 
     @Override
     public void stateDetached(AppStateManager stateManager) {
+        if (localGuiNode.hasChild(startGame)) {
+            localGuiNode.detachChild(options);
+        }
+        if (localGuiNode.hasChild(startGame)) {
+            localGuiNode.detachChild(startGame);
+        }
 
         this.rootNode.detachChild(this.localRootNode);
         this.guiNode.detachChild(this.localGuiNode);
