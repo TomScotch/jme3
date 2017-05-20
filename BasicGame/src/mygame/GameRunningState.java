@@ -18,11 +18,9 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
-import com.jme3.post.SceneProcessor;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.util.SafeArrayList;
 import java.io.File;
 import java.io.IOException;
 
@@ -46,7 +44,6 @@ public class GameRunningState extends AbstractAppState {
     private int bgmVolume = 8;
     private int anisotrpy_samples = 4;
     private final GlobalLightingControl glc;
-    private SafeArrayList<SceneProcessor> processors;
 
     private boolean bloomEnabled;
     private boolean fogEnabled;

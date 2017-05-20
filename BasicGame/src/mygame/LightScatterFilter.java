@@ -10,8 +10,17 @@ import com.jme3.scene.control.AbstractControl;
 public class LightScatterFilter extends AbstractControl {
 
     private final LightScatteringFilter sunlight;
-    private final GlobalLightingControl glc;
+    private GlobalLightingControl glc;
     private boolean dynamicLightScatter;
+
+    public LightScatterFilter(FilterPostProcessor fpp) {
+
+        sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
+        sunlight.setLightDensity(0.45f);
+        sunlight.setNbSamples(9);
+        fpp.addFilter(sunlight);
+        dynamicLightScatter = true;
+    }
 
     public LightScatterFilter(FilterPostProcessor fpp, GlobalLightingControl glc) {
 
@@ -27,7 +36,7 @@ public class LightScatterFilter extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (isEnabled()) {
+        if (isEnabled() && dynamicLightScatter) {
             if (glc.getIsSun()) {
                 sunlight.setLightDensity(0.4f);
 

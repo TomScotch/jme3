@@ -2,7 +2,9 @@
 <nifty xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://nifty-gui.lessvoid.com/nifty-gui" xsi:schemaLocation="https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd">
     <screen id="GScreen0" controller="mygame.Main">
         <layer id="GLayer0" childLayout="absolute">
-            <control name="nifty-console" id="GConsole0" width="414px" x="17px" y="454px" height="301px"/>
+            <control name="button" id="GButton0" childLayout="center" width="100px" x="33px" y="63px" label="Start" height="34px"/>
+            <control name="button" id="GButton1" childLayout="center" width="100px" x="33" y="105" label="Options" height="34px"/>
+            <control name="button" id="GButton2" childLayout="center" width="100px" x="33" y="147" label="Exit" height="31px"/>
         </layer>
     </screen>
 </nifty>

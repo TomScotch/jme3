@@ -29,6 +29,7 @@ public class Main extends SimpleApplication {
     private final static int depthBit = 24;
 
     public static void main(String[] args) {
+
         app = new Main();
         cfg = new AppSettings(true);
         //cfg.setFrameRate(60);
@@ -171,6 +172,7 @@ public class Main extends SimpleApplication {
             }
         }
     };
+
     private float c = 0f;
 
     @Override

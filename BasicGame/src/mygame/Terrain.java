@@ -17,7 +17,11 @@ import com.jme3.texture.Texture;
 
 public class Terrain extends AbstractControl {
 
+    private final boolean shadowsEnabled;
+
     public Terrain(AssetManager assetManager, BulletAppState bulletAppState, Node localRootNode, ViewPort vp) {
+
+        shadowsEnabled = true;
 
         Texture heightMapImage = assetManager.loadTexture("Textures/Terrain/splat/mountains512.png");
         TerrainQuad terrain;
@@ -41,7 +45,9 @@ public class Terrain extends AbstractControl {
         TerrainLodControl control = new TerrainLodControl(terrain, vp.getCamera());
         terrain.addControl(control);
         terrain.setLocalTranslation(-164.0f, -3.75f, 8.9f);
-        terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
+        if (shadowsEnabled) {
+            terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
+        }
         terrain.addControl(new RigidBodyControl(0));
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);

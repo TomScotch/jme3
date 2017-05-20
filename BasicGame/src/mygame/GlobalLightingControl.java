@@ -26,8 +26,6 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final static Node pivot = new Node();
-    private final int shadowmapSize = 256;
-    private boolean globalLightning = true;
     private int timeDelay = 12;
     private boolean isSun = true;
     private final SpotLight sl;
@@ -39,6 +37,8 @@ public class GlobalLightingControl extends AbstractControl {
     private final SpotLightShadowRenderer slsr;
     private final SpotLight dummySpotLight;
     private final DirectionalLightShadowRenderer dlsr;
+    private final int shadowmapSize = 256;
+    private boolean globalLightning = true;
 
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
