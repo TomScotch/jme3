@@ -1,11 +1,12 @@
 package mygame;
 
-/*import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.scene.Geometry;*/
+import com.jme3.material.Material;
+import com.jme3.scene.Geometry;
 import com.jme3.asset.AssetManager;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
@@ -20,10 +21,11 @@ public class SkyControl extends AbstractControl {
     private final Spatial morning;
     private final GlobalLightingControl glc;
 
-    /*    private final Material matMorning;
+    private final Material matMorning;
     private final Material matDay;
     private final Material matEvening;
-    private final Material matNight;*/
+    private final Material matNight;
+
     public SkyControl(AssetManager assetManager, GlobalLightingControl glc, Node localRootNode) {
 
         this.glc = glc;
@@ -50,7 +52,7 @@ public class SkyControl extends AbstractControl {
         Texture south2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyFront2048.png");
         Texture up2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyUp2048.png");
         Texture down2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyDown2048.png");
-        day = SkyFactory.createSky(assetManager, west2, east2, north2, south2, up2, down2);
+        evening = SkyFactory.createSky(assetManager, west2, east2, north2, south2, up2, down2);
 
         Texture west3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetLeft2048.png");
         Texture east3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetRight2048.png");
@@ -58,7 +60,7 @@ public class SkyControl extends AbstractControl {
         Texture south3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetFront2048.png");
         Texture up3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetUp2048.png");
         Texture down3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetDown2048.png");
-        evening = SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
+        day = SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
 
         morning.setLocalTranslation(0, -1000, 0);
         evening.setLocalTranslation(0, -1000, 0);
@@ -74,17 +76,33 @@ public class SkyControl extends AbstractControl {
         localRootNode.detachChild(morning);
         localRootNode.detachChild(night);
 
-        /*        Geometry morningGeom = (Geometry) morning;
+        Geometry morningGeom = (Geometry) morning;
         matMorning = morningGeom.getMaterial();
-        
+
+        morningGeom.setQueueBucket(Bucket.Sky);
+        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+
         Geometry dayGeom = (Geometry) day;
         matDay = dayGeom.getMaterial();
-        
+
+        dayGeom.setQueueBucket(Bucket.Sky);
+        matDay.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+
         Geometry eveningGeom = (Geometry) evening;
         matEvening = eveningGeom.getMaterial();
-        
+
+        eveningGeom.setQueueBucket(Bucket.Sky);
+        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+
         Geometry nightGeom = (Geometry) night;
-        matNight = nightGeom.getMaterial();*/
+        matNight = nightGeom.getMaterial();
+
+        nightGeom.setQueueBucket(Bucket.Sky);
+        matNight.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+
+        localRootNode.attachChild(night);
+        localRootNode.attachChild(morning);
+
     }
 
     @Override
@@ -99,25 +117,25 @@ public class SkyControl extends AbstractControl {
             if (glc.getIsSun()) {
 
                 //Morning
-                if (z > 0.45) {
-
+                if (z > 0) {
                     if (!localRootNode.hasChild(morning)) {
                         localRootNode.attachChild(morning);
-
-                    }
-                    if (localRootNode.hasChild(night)) {
-                        night.removeFromParent();
                     }
                 }
 
                 //Day
                 if (z < -0.f && z > -0.38f) {
+
                     if (!localRootNode.hasChild(day)) {
                         localRootNode.attachChild(day);
-
                     }
-                    if (localRootNode.hasChild(morning)) {
-                        morning.removeFromParent();
+                    if (localRootNode.hasChild(night)) {
+                        night.removeFromParent();
+                    }
+                    if (z < -0.19f) {
+                        if (localRootNode.hasChild(morning)) {
+                            morning.removeFromParent();
+                        }
                     }
                 }
 
@@ -125,32 +143,36 @@ public class SkyControl extends AbstractControl {
                 if (z < -0.38f && z > -0.99f) {
                     if (!localRootNode.hasChild(evening)) {
                         localRootNode.attachChild(evening);
-
                     }
-                    if (localRootNode.hasChild(day)) {
-                        day.removeFromParent();
+                    if (z < -0.70f) {
+                        if (localRootNode.hasChild(day)) {
+                            day.removeFromParent();
+                        }
+                    }
+                    if (z < -0.86f) {
+                        if (!localRootNode.hasChild(night)) {
+                            localRootNode.attachChild(night);
+                        }
                     }
                 }
             } else {
 
                 //Night
                 if (z < -0.99f) {
-                    if (!localRootNode.hasChild(night)) {
-                        localRootNode.attachChild(night);
-
-                    }
                     if (localRootNode.hasChild(evening)) {
                         evening.removeFromParent();
+                    }
+                    if (!localRootNode.hasChild(night)) {
+                        localRootNode.attachChild(night);
                     }
                 }
             }
 
-            night.rotate(0, tpf / (glc.getTimeDelay() * 5), 0);
-            day.rotate(0, tpf / (glc.getTimeDelay() * 5), 0);
-            evening.rotate(0, tpf / (glc.getTimeDelay() * 5), 0);
-            morning.rotate(0, tpf / (glc.getTimeDelay() * 5), 0);
+            night.rotate(0, tpf / (glc.getTimeDelay() * 25f), 0);
+            day.rotate(0, tpf / (glc.getTimeDelay() * 2.5f), 0);
+            evening.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
+            morning.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
         }
-
     }
 
     @Override

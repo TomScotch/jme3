@@ -69,7 +69,7 @@ public class StartScreenState extends AbstractAppState {
 
         loading = new BitmapText(guiFont);
         loading.setSize(guiFont.getCharSet().getRenderedSize() * 3);
-        loading.move( ( viewPort.getCamera().getWidth() / 2 ) - loading.getLineWidth() , loading.getLineHeight() + viewPort.getCamera().getHeight() / 6, 0);
+        loading.move((viewPort.getCamera().getWidth() / 2.25f) - loading.getLineWidth(), loading.getLineHeight() + viewPort.getCamera().getHeight() / 6, 0);
         loading.setText("loading");
         loading.setColor(ColorRGBA.Green);
     }
