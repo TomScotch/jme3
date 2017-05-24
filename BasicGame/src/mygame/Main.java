@@ -32,7 +32,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private final static int antiAlias = 0;
     private final static int depthBit = 24;
     private Nifty nifty;
-    
+
     public static void main(String[] args) {
 
         app = new Main();
@@ -83,8 +83,8 @@ public class Main extends SimpleApplication implements ScreenController {
 
         inputManager.addMapping("exit", exit_trigger);
         inputManager.addListener(actionListener, new String[]{"exit"});
-        
-                NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
+
+        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
                 assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
         nifty = niftyDisplay.getNifty();
         nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
@@ -160,20 +160,25 @@ public class Main extends SimpleApplication implements ScreenController {
             }
 
             if (name.equals("Toggle Settings") && !isPressed) {
-                if (stateManager.hasState(startScreenState)) {
-                    stateManager.detach(startScreenState);
-                    stateManager.attach(settingsScreenState);
-                    System.out.println("switching to settings...");
-                } else if (stateManager.hasState(settingsScreenState)) {
-                    stateManager.detach(settingsScreenState);
-                    stateManager.attach(startScreenState);
-                    System.out.println("switching to startscreen...");
-                }
+                switchOptionsState();
             }
         }
     };
 
+    public void switchOptionsState() {
+        if (stateManager.hasState(startScreenState)) {
+            stateManager.detach(startScreenState);
+            stateManager.attach(settingsScreenState);
+            System.out.println("switching to settings...");
+        } else if (stateManager.hasState(settingsScreenState)) {
+            stateManager.detach(settingsScreenState);
+            stateManager.attach(startScreenState);
+            System.out.println("switching to startscreen...");
+        }
+    }
+
     public void switchGameState() {
+        System.out.println("switchting Game State");
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
             stateManager.attach(startScreenState);
@@ -209,7 +214,8 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
     }
-        @Override
+
+    @Override
     public void bind(Nifty nifty, Screen screen) {
         System.out.println("bind( " + screen.getScreenId() + ")");
     }

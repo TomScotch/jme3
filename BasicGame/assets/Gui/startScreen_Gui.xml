@@ -4,8 +4,14 @@
     <useStyles filename="nifty-default-styles.xml"/>
     <screen id="start" controller="mygame.Main">
         <layer id="startLayer" childLayout="absolute">
-            <control name="button" id="GButton0" childLayout="center" x="122" y="109" label="Start" visibleToMouse="true"/>
-            <interact onClick="switchGameState"/>
+            <control name="button" label="Start" id="StartButton" x="122" y="109"  align="center" valign="center" 
+                     visibleToMouse="true" > 
+                <interact onClick="switchGameState()"/>
+            </control>
+            <control name="button" label="Options" id="OptionsButton" x="122" y="125"  align="center" valign="center" 
+                     visibleToMouse="true" > 
+                <interact onClick="switchOptionsState()"/>
+            </control>
         </layer>
     </screen>
 </nifty>
