@@ -5,8 +5,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.font.BitmapFont;
-import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -33,29 +31,6 @@ public class SettingsScreenState extends AbstractAppState {
         this.guiNode = app.getGuiNode();
         this.assetManager = app.getAssetManager();
 
-        BitmapFont guiFont = assetManager.loadFont(
-                "Interface/Fonts/Default.fnt");
-        BitmapText displaytext = new BitmapText(guiFont);
-        displaytext.setSize(guiFont.getCharSet().getRenderedSize());
-        displaytext.move(10, displaytext.getLineHeight() + 20, 0);
-        displaytext.setText("Settings screen. Press RETURN to save "
-                + "and return to start screen.");
-        localGuiNode.attachChild(displaytext);
-        app.getInputManager().setCursorVisible(true);
-        BitmapText options = new BitmapText(guiFont);
-        options.setSize(guiFont.getCharSet().getRenderedSize() * 3);
-        options.move(options.getLineWidth() + viewPort.getCamera().getWidth() / 10, options.getLineHeight() + viewPort.getCamera().getHeight() / 3, 0);
-        options.setText("Graphics");
-        options.setColor(ColorRGBA.Green);
-        localGuiNode.attachChild(options);
-
-        BitmapText startGame = new BitmapText(guiFont);
-        startGame.setSize(guiFont.getCharSet().getRenderedSize() * 3);
-        startGame.move(startGame.getLineWidth() + viewPort.getCamera().getWidth() / 10, startGame.getLineHeight() + viewPort.getCamera().getHeight() / 2, 0);
-        startGame.setText("Control");
-        startGame.setColor(ColorRGBA.Green);
-        localGuiNode.attachChild(startGame);
-
         Box boxMesh = new Box(1f, 1f, 1f);
         boxGeo = new Geometry("A Textured Box", boxMesh);
         Material boxMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -71,7 +46,7 @@ public class SettingsScreenState extends AbstractAppState {
 
         super.initialize(stateManager, app);
         viewPort.setBackgroundColor(backgroundColor);
-        app.getInputManager().setCursorVisible(false);
+        app.getInputManager().setCursorVisible(true);
         boxGeo.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
     }
 

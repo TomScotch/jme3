@@ -52,6 +52,7 @@ public class Main extends SimpleApplication implements ScreenController {
         app.start();
     }
     private boolean loadGameState;
+    private NiftyJmeDisplay niftyDisplay;
 
     @Override
     public void simpleInitApp() {
@@ -84,7 +85,7 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addMapping("exit", exit_trigger);
         inputManager.addListener(actionListener, new String[]{"exit"});
 
-        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
+        niftyDisplay = new NiftyJmeDisplay(
                 assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
         nifty = niftyDisplay.getNifty();
         nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
@@ -123,7 +124,6 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     public void shutdown() {
-        System.out.println("mygame.Main.shutdown()");
         app.stop();
     }
 
@@ -182,13 +182,19 @@ public class Main extends SimpleApplication implements ScreenController {
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
             stateManager.attach(startScreenState);
+            if (!guiViewPort.getProcessors().contains(niftyDisplay)) {
+                guiViewPort.addProcessor(niftyDisplay);
+            }
             System.out.println("switching to startscreen...");
         } else {
             if (stateManager.hasState(startScreenState)) {
                 if (gameRunningState != null) {
                     stateManager.detach(startScreenState);
                     stateManager.attach(gameRunningState);
-                    System.out.println("switching to game...");
+                    if (guiViewPort.getProcessors().contains(niftyDisplay)) {
+                        guiViewPort.removeProcessor(niftyDisplay);
+                        System.out.println("switching to game...");
+                    }
                 } else {
                     loadGame();
                 }
@@ -208,8 +214,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 c = 0f;
                 gameRunningState = new GameRunningState(app);
                 startScreenState.setGameIsLoaded(true);
-                stateManager.detach(startScreenState);
-                stateManager.attach(gameRunningState);
+                switchGameState();
                 System.out.println("switching to game...");
             }
         }
