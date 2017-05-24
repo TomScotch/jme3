@@ -41,7 +41,7 @@ public class SettingsScreenState extends AbstractAppState {
         displaytext.setText("Settings screen. Press RETURN to save "
                 + "and return to start screen.");
         localGuiNode.attachChild(displaytext);
-        app.getInputManager().setCursorVisible(false);
+        app.getInputManager().setCursorVisible(true);
         BitmapText options = new BitmapText(guiFont);
         options.setSize(guiFont.getCharSet().getRenderedSize() * 3);
         options.move(options.getLineWidth() + viewPort.getCamera().getWidth() / 10, options.getLineHeight() + viewPort.getCamera().getHeight() / 3, 0);
