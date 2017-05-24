@@ -6,9 +6,13 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.Trigger;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.system.AppSettings;
+import de.lessvoid.nifty.screen.Screen;
+import de.lessvoid.nifty.screen.ScreenController;
+import de.lessvoid.nifty.Nifty;
 
-public class Main extends SimpleApplication {
+public class Main extends SimpleApplication implements ScreenController {
 
     private static AppSettings cfg;
     private static Main app;
@@ -27,7 +31,8 @@ public class Main extends SimpleApplication {
 
     private final static int antiAlias = 0;
     private final static int depthBit = 24;
-
+    private Nifty nifty;
+    
     public static void main(String[] args) {
 
         app = new Main();
@@ -78,6 +83,15 @@ public class Main extends SimpleApplication {
 
         inputManager.addMapping("exit", exit_trigger);
         inputManager.addListener(actionListener, new String[]{"exit"});
+        
+                NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
+                assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
+        nifty = niftyDisplay.getNifty();
+        nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
+        app.getGuiViewPort().addProcessor(niftyDisplay);
+        nifty.loadStyleFile("nifty-default-styles.xml");
+        nifty.loadControlFile("nifty-default-controls.xml");
+        nifty.gotoScreen("start");
     }
 
     private void loadGame() {
@@ -119,21 +133,7 @@ public class Main extends SimpleApplication {
 
             if (name.equals("Game Pause Unpause") && !isPressed) {
 
-                if (stateManager.hasState(gameRunningState)) {
-                    stateManager.detach(gameRunningState);
-                    stateManager.attach(startScreenState);
-                    System.out.println("switching to startscreen...");
-                } else {
-                    if (stateManager.hasState(startScreenState)) {
-                        if (gameRunningState != null) {
-                            stateManager.detach(startScreenState);
-                            stateManager.attach(gameRunningState);
-                            System.out.println("switching to game...");
-                        } else {
-                            loadGame();
-                        }
-                    }
-                }
+                switchGameState();
             }
 
             if (name.equals("restart") && !isPressed) {
@@ -173,6 +173,24 @@ public class Main extends SimpleApplication {
         }
     };
 
+    public void switchGameState() {
+        if (stateManager.hasState(gameRunningState)) {
+            stateManager.detach(gameRunningState);
+            stateManager.attach(startScreenState);
+            System.out.println("switching to startscreen...");
+        } else {
+            if (stateManager.hasState(startScreenState)) {
+                if (gameRunningState != null) {
+                    stateManager.detach(startScreenState);
+                    stateManager.attach(gameRunningState);
+                    System.out.println("switching to game...");
+                } else {
+                    loadGame();
+                }
+            }
+        }
+    }
+
     private float c = 0f;
 
     @Override
@@ -190,5 +208,23 @@ public class Main extends SimpleApplication {
                 System.out.println("switching to game...");
             }
         }
+    }
+        @Override
+    public void bind(Nifty nifty, Screen screen) {
+        System.out.println("bind( " + screen.getScreenId() + ")");
+    }
+
+    @Override
+    public void onStartScreen() {
+        System.out.println("onStartScreen");
+    }
+
+    @Override
+    public void onEndScreen() {
+        System.out.println("onEndScreen");
+    }
+
+    public void quit() {
+        nifty.gotoScreen("end");
     }
 }
