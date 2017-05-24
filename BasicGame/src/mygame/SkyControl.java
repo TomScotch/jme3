@@ -102,7 +102,6 @@ public class SkyControl extends AbstractControl {
 
         localRootNode.attachChild(night);
         localRootNode.attachChild(morning);
-
     }
 
     @Override
@@ -132,7 +131,7 @@ public class SkyControl extends AbstractControl {
                     if (localRootNode.hasChild(night)) {
                         night.removeFromParent();
                     }
-                    if (z < -0.19f) {
+                    if (z < -0.20f) {
                         if (localRootNode.hasChild(morning)) {
                             morning.removeFromParent();
                         }
@@ -159,6 +158,10 @@ public class SkyControl extends AbstractControl {
 
                 //Night
                 if (z < -0.99f) {
+
+                    if (localRootNode.hasChild(day)) {
+                        day.removeFromParent();
+                    }
                     if (localRootNode.hasChild(evening)) {
                         evening.removeFromParent();
                     }
@@ -168,8 +171,8 @@ public class SkyControl extends AbstractControl {
                 }
             }
 
-            night.rotate(0, tpf / (glc.getTimeDelay() * 25f), 0);
-            day.rotate(0, tpf / (glc.getTimeDelay() * 2.5f), 0);
+            night.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
+            day.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
             evening.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
             morning.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
         }

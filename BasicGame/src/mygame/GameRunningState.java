@@ -134,6 +134,7 @@ public class GameRunningState extends AbstractAppState {
         bgm.setVolume(0);
         }
         bgm.setLooping(bgmOn);*/
+        
 //      TEST GUI TEXT
         displayText("Game running",
                 new Vector2f(10, 20),
@@ -148,17 +149,17 @@ public class GameRunningState extends AbstractAppState {
 
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
-        EntityControl ec1 = new EntityControl(demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
+        EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
         demon.addControl(ec1);
         localRootNode.attachChild(demon);
 
         Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
-        EntityControl ec2 = new EntityControl(forestmonster, bulletAppState, "forestmonster", new Vector3f(-10, 0, 10));
+        EntityControl ec2 = new EntityControl(assetManager, forestmonster, bulletAppState, "forestmonster", new Vector3f(-10, 0, 10));
         forestmonster.addControl(ec2);
         localRootNode.attachChild(forestmonster);
 
         Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
-        EntityControl ec3 = new EntityControl(spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
+        EntityControl ec3 = new EntityControl(assetManager, spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
         spider.addControl(ec3);
         localRootNode.attachChild(spider);
 

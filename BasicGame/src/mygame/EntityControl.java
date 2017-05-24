@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
+import com.jme3.asset.AssetManager;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.math.Vector3f;
@@ -24,11 +25,12 @@ public class EntityControl extends AbstractControl {
     private String targetName = "";
     private Spatial targetSpatial;
     private final BetterCharacterControl bcc;
+    private final AssetManager assetManager;
 
-    public EntityControl(Spatial hostile, BulletAppState bulletState, String name, Vector3f pos) {
+    public EntityControl(AssetManager assetManager, Spatial hostile, BulletAppState bulletState, String name, Vector3f pos) {
 
         this.spatial = hostile;
-        //hostile.scale(3.75f);
+        this.assetManager = assetManager;
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
         bcc = new BetterCharacterControl(3, 7, 3);
         bcc.setSpatial(hostile);
@@ -115,6 +117,7 @@ public class EntityControl extends AbstractControl {
                 hitAnimationDelay = 1.5f;
                 setAnim("Hit", LoopMode.Loop);
                 hitParticles();
+                this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
             }
         }
     }
