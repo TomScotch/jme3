@@ -20,7 +20,6 @@ public class Main extends SimpleApplication implements ScreenController {
     private static VideoRecorderAppState videoRecorderAppState;
 
     private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
-    private final Trigger save_trigger = new KeyTrigger(KeyInput.KEY_RETURN);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
     private final Trigger restart_trigger = new KeyTrigger(KeyInput.KEY_F11);
     private final Trigger exit_trigger = new KeyTrigger(KeyInput.KEY_F12);
@@ -51,7 +50,6 @@ public class Main extends SimpleApplication implements ScreenController {
         app.setSettings(cfg);
         app.start();
     }
-    private boolean loadGameState;
     private NiftyJmeDisplay niftyDisplay;
 
     @Override
@@ -73,9 +71,6 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addMapping("Game Pause Unpause", pause_trigger);
         inputManager.addListener(actionListener, new String[]{"Game Pause Unpause"});
 
-        inputManager.addMapping("Toggle Settings", save_trigger);
-        inputManager.addListener(actionListener, new String[]{"Toggle Settings"});
-
         inputManager.addMapping("record", record_trigger);
         inputManager.addListener(actionListener, new String[]{"record"});
 
@@ -88,18 +83,12 @@ public class Main extends SimpleApplication implements ScreenController {
         niftyDisplay = new NiftyJmeDisplay(
                 assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
         nifty = niftyDisplay.getNifty();
+
+        app.getGuiViewPort().addProcessor(niftyDisplay);
         nifty.loadStyleFile("nifty-default-styles.xml");
         nifty.loadControlFile("nifty-default-controls.xml");
         nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
-        app.getGuiViewPort().addProcessor(niftyDisplay);
-    }
-
-    private void loadGame() {
-        if (gameRunningState == null) {
-            startScreenState.startLoading();
-            loadGameState = true;
-            inputManager.setCursorVisible(false);
-        }
+        nifty.gotoScreen("start");
     }
 
     public void doRestart() {
@@ -157,10 +146,6 @@ public class Main extends SimpleApplication implements ScreenController {
                     System.out.println("start game to begin recording");
                 }
             }
-
-            if (name.equals("Toggle Settings") && !isPressed) {
-                switchOptionsState();
-            }
         }
     };
 
@@ -168,14 +153,12 @@ public class Main extends SimpleApplication implements ScreenController {
         if (stateManager.hasState(startScreenState)) {
             stateManager.detach(startScreenState);
             stateManager.attach(settingsScreenState);
-            nifty.removeScreen("Gui/settingsScreen_Gui.xml");
             nifty.fromXml("Gui/settingsScreen_Gui.xml", "start", this);
             nifty.gotoScreen("start");
             System.out.println("switching to settings...");
         } else if (stateManager.hasState(settingsScreenState)) {
             stateManager.detach(settingsScreenState);
             stateManager.attach(startScreenState);
-            nifty.removeScreen("Gui/settingsScreen_Gui.xml");
             nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
             nifty.gotoScreen("start");
             System.out.println("switching to startscreen...");
@@ -201,28 +184,21 @@ public class Main extends SimpleApplication implements ScreenController {
                         System.out.println("switching to game...");
                     }
                 } else {
-                    loadGame();
+                    gameRunningState = new GameRunningState(app);
+                    stateManager.detach(startScreenState);
+                    stateManager.attach(gameRunningState);
+                    if (guiViewPort.getProcessors().contains(niftyDisplay)) {
+                        guiViewPort.removeProcessor(niftyDisplay);
+                        System.out.println("switching to game...");
+                    }
                 }
             }
         }
     }
 
-    private float c = 0f;
-
     @Override
     public void simpleUpdate(float tpf) {
-
-        if (loadGameState) {
-            c += tpf;
-            if (c > 0.6f) {
-                loadGameState = false;
-                c = 0f;
-                gameRunningState = new GameRunningState(app);
-                startScreenState.setGameIsLoaded(true);
-                switchGameState();
-                System.out.println("switching to game...");
-            }
-        }
+        //
     }
 
     @Override

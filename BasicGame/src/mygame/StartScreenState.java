@@ -22,7 +22,6 @@ public class StartScreenState extends AbstractAppState {
     private final Node localGuiNode = new Node("Start Screen GuiNode");
     private final ColorRGBA backgroundColor = ColorRGBA.Black;
     private final Geometry boxGeo;
-    private boolean gameIsLoaded = false;
 
     public StartScreenState(SimpleApplication app) {
 
@@ -49,23 +48,15 @@ public class StartScreenState extends AbstractAppState {
 
         app.getInputManager().setCursorVisible(true);
 
-        if (gameIsLoaded) {
-
-            localRootNode.attachChild(boxGeo);
-        }
-
+        localRootNode.attachChild(boxGeo);
         boxGeo.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
-
-    }
-
-    public void startLoading() {
-        localRootNode.detachChild(boxGeo);
     }
 
     @Override
     public void update(float tpf) {
 
         boxGeo.rotate(0, tpf, 0);
+
         viewPort.getCamera().setLocation(new Vector3f(0, 0, -5.5f));
         viewPort.getCamera().lookAt(boxGeo.getLocalTranslation(), Vector3f.UNIT_Y);
     }
@@ -83,13 +74,4 @@ public class StartScreenState extends AbstractAppState {
         this.rootNode.detachChild(this.localRootNode);
         this.guiNode.detachChild(this.localGuiNode);
     }
-
-    public boolean isGameIsLoaded() {
-        return gameIsLoaded;
-    }
-
-    public void setGameIsLoaded(boolean gameIsLoaded) {
-        this.gameIsLoaded = gameIsLoaded;
-    }
-
 }

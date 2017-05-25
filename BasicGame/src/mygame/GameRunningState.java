@@ -134,7 +134,6 @@ public class GameRunningState extends AbstractAppState {
         bgm.setVolume(0);
         }
         bgm.setLooping(bgmOn);*/
-        
 //      TEST GUI TEXT
         displayText("Game running",
                 new Vector2f(10, 20),
@@ -165,6 +164,10 @@ public class GameRunningState extends AbstractAppState {
 
         setupKeys();
         app.getRenderManager().preloadScene(localRootNode);
+    }
+
+    public Node getLocalRoot() {
+        return localRootNode;
     }
 
     @Override
