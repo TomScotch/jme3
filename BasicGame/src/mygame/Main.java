@@ -11,6 +11,12 @@ import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.Nifty;
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 public class Main extends SimpleApplication implements ScreenController {
 
@@ -45,12 +51,39 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setFullscreen(true);
         cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
         cfg.setTitle("Serenity");
+        try {
+            cfg.load("com.foo.MyCoolGame3");
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         app.setPauseOnLostFocus(true);
         app.setShowSettings(false);
         app.setSettings(cfg);
         app.start();
     }
     private NiftyJmeDisplay niftyDisplay;
+
+    public void toggleToFullscreen() {
+        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        DisplayMode[] modes = device.getDisplayModes();
+        int i = 0; // note: there are usually several, let's pick the first
+        settings.setResolution(modes[i].getWidth(), modes[i].getHeight());
+        settings.setFrequency(modes[i].getRefreshRate());
+        settings.setBitsPerPixel(modes[i].getBitDepth());
+        settings.setFullscreen(device.isFullScreenSupported());
+        app.setSettings(settings);
+        app.restart(); // restart the context to apply changes
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        try {
+            cfg.save("com.foo.MyCoolGame3");
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     @Override
     public void simpleInitApp() {
@@ -89,11 +122,14 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.loadControlFile("nifty-default-controls.xml");
         nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
         nifty.gotoScreen("start");
+
     }
 
     public void doRestart() {
+        app.getGuiViewPort().removeProcessor(niftyDisplay);
 
         System.out.println("restart");
+        app.getContext().restart();
 
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
@@ -109,6 +145,11 @@ public class Main extends SimpleApplication implements ScreenController {
         settingsScreenState = new SettingsScreenState(this);
         gameRunningState = null;
         stateManager.attach(startScreenState);
+        app.getGuiViewPort().addProcessor(niftyDisplay);
+        nifty.loadStyleFile("nifty-default-styles.xml");
+        nifty.loadControlFile("nifty-default-controls.xml");
+        nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
+        nifty.gotoScreen("start");
     }
 
     public void shutdown() {
