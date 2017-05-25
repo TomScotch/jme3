@@ -171,7 +171,7 @@ public class SkyControl extends AbstractControl {
                 }
             }
 
-            night.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
+            night.rotate(0, -(tpf / (glc.getTimeDelay() * 5f)), 0);
             day.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
             evening.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
             morning.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);

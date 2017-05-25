@@ -60,9 +60,6 @@ public class StartScreenState extends AbstractAppState {
 
     public void startLoading() {
         localRootNode.detachChild(boxGeo);
-
-        //localGuiNode.detachChild(startGame);
-        // localGuiNode.detachChild(options);
     }
 
     @Override

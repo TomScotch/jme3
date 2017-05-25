@@ -88,11 +88,10 @@ public class Main extends SimpleApplication implements ScreenController {
         niftyDisplay = new NiftyJmeDisplay(
                 assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
         nifty = niftyDisplay.getNifty();
-        nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
-        app.getGuiViewPort().addProcessor(niftyDisplay);
         nifty.loadStyleFile("nifty-default-styles.xml");
         nifty.loadControlFile("nifty-default-controls.xml");
-        nifty.gotoScreen("start");
+        nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
+        app.getGuiViewPort().addProcessor(niftyDisplay);
     }
 
     private void loadGame() {
@@ -169,10 +168,16 @@ public class Main extends SimpleApplication implements ScreenController {
         if (stateManager.hasState(startScreenState)) {
             stateManager.detach(startScreenState);
             stateManager.attach(settingsScreenState);
+            nifty.removeScreen("Gui/settingsScreen_Gui.xml");
+            nifty.fromXml("Gui/settingsScreen_Gui.xml", "start", this);
+            nifty.gotoScreen("start");
             System.out.println("switching to settings...");
         } else if (stateManager.hasState(settingsScreenState)) {
             stateManager.detach(settingsScreenState);
             stateManager.attach(startScreenState);
+            nifty.removeScreen("Gui/settingsScreen_Gui.xml");
+            nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
+            nifty.gotoScreen("start");
             System.out.println("switching to startscreen...");
         }
     }
