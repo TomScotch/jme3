@@ -66,13 +66,13 @@ public class Main extends SimpleApplication implements ScreenController {
     public void toggleToFullscreen() {
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode[] modes = device.getDisplayModes();
-        int i = 0; // note: there are usually several, let's pick the first
+        int i = 0;
         settings.setResolution(modes[i].getWidth(), modes[i].getHeight());
         settings.setFrequency(modes[i].getRefreshRate());
         settings.setBitsPerPixel(modes[i].getBitDepth());
         settings.setFullscreen(device.isFullScreenSupported());
         app.setSettings(settings);
-        app.restart(); // restart the context to apply changes
+        app.restart();
     }
 
     @Override
@@ -216,22 +216,22 @@ public class Main extends SimpleApplication implements ScreenController {
             }
             System.out.println("switching to startscreen...");
         } else {
-            if (stateManager.hasState(startScreenState)) {
-                if (gameRunningState != null) {
+
+            if (gameRunningState == null) {
+                gameRunningState = new GameRunningState(app);
+                stateManager.detach(startScreenState);
+                stateManager.attach(gameRunningState);
+                if (guiViewPort.getProcessors().contains(niftyDisplay)) {
+                    guiViewPort.removeProcessor(niftyDisplay);
+                }
+            } else {
+                if (stateManager.hasState(startScreenState)) {
                     stateManager.detach(startScreenState);
                     stateManager.attach(gameRunningState);
                     if (guiViewPort.getProcessors().contains(niftyDisplay)) {
                         guiViewPort.removeProcessor(niftyDisplay);
-                        System.out.println("switching to game...");
                     }
-                } else {
-                    gameRunningState = new GameRunningState(app);
-                    stateManager.detach(startScreenState);
-                    stateManager.attach(gameRunningState);
-                    if (guiViewPort.getProcessors().contains(niftyDisplay)) {
-                        guiViewPort.removeProcessor(niftyDisplay);
-                        System.out.println("switching to game...");
-                    }
+                    System.out.println("switching to game...");
                 }
             }
         }

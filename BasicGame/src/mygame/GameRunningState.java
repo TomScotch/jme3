@@ -161,7 +161,6 @@ public class GameRunningState extends AbstractAppState {
         EntityControl ec3 = new EntityControl(assetManager, spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
         spider.addControl(ec3);
         localRootNode.attachChild(spider);
-
         setupKeys();
         app.getRenderManager().preloadScene(localRootNode);
     }

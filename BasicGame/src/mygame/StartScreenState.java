@@ -24,11 +24,9 @@ public class StartScreenState extends AbstractAppState {
     private final Geometry boxGeo;
 
     public StartScreenState(SimpleApplication app) {
-
         this.rootNode = app.getRootNode();
         this.viewPort = app.getViewPort();
         this.guiNode = app.getGuiNode();
-
         Box boxMesh = new Box(1, 1, 1);
         boxGeo = new Geometry("Box", boxMesh);
         Material boxMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -41,36 +39,28 @@ public class StartScreenState extends AbstractAppState {
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-
         super.initialize(stateManager, app);
-
         viewPort.setBackgroundColor(backgroundColor);
-
         app.getInputManager().setCursorVisible(true);
-
         localRootNode.attachChild(boxGeo);
         boxGeo.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
     }
 
     @Override
     public void update(float tpf) {
-
-        boxGeo.rotate(0, tpf, 0);
-
+        boxGeo.rotate(0, -tpf, 0);
         viewPort.getCamera().setLocation(new Vector3f(0, 0, -5.5f));
         viewPort.getCamera().lookAt(boxGeo.getLocalTranslation(), Vector3f.UNIT_Y);
     }
 
     @Override
     public void stateAttached(AppStateManager stateManager) {
-
         this.rootNode.attachChild(this.localRootNode);
         this.guiNode.attachChild(this.localGuiNode);
     }
 
     @Override
     public void stateDetached(AppStateManager stateManager) {
-
         this.rootNode.detachChild(this.localRootNode);
         this.guiNode.detachChild(this.localGuiNode);
     }

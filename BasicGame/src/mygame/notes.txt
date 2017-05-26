@@ -23,6 +23,7 @@
         }
     };
 
+loadFuture = exec.submit(loadingCallable);
             if (loadFuture.isDone()) {
 
             }
