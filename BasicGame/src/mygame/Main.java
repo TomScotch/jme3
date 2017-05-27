@@ -17,8 +17,6 @@ import java.awt.GraphicsEnvironment;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 public class Main extends SimpleApplication implements ScreenController {
@@ -38,11 +36,12 @@ public class Main extends SimpleApplication implements ScreenController {
     private static SettingsScreenState settingsScreenState;
 
     private final static int antiAlias = 0;
-    private final static int depthBit = 24;
     private Nifty nifty;
 
     private Future loadFuture = null;
     private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(2);
+    public static final boolean isVsync = false;
+    private NiftyJmeDisplay niftyDisplay;
 
     @SuppressWarnings("Convert2Lambda")
     Callable<Void> loadingCallable = new Callable<Void>() {
@@ -57,57 +56,33 @@ public class Main extends SimpleApplication implements ScreenController {
 
         app = new Main();
         cfg = new AppSettings(true);
+        cfg.setTitle("Serenity");
 
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode[] modes = device.getDisplayModes();
-
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
-
-        //cfg.setFrameRate(60);
-        cfg.setVSync(false);
-        //cfg.setFrequency(60);
-        //cfg.setResolution(1600, 900);
+        cfg.setVSync(isVsync);
         cfg.setSamples(antiAlias);
-        cfg.setDepthBits(depthBit);
-        //cfg.setFullscreen(true);
+        cfg.setDepthBits(24);
         cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
-        cfg.setTitle("Serenity");
-        try {
-            cfg.load(cfg.getTitle());
-        } catch (BackingStoreException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        app.setPauseOnLostFocus(true);
+        app.setDisplayFps(false);
+        app.setDisplayStatView(false);
         app.setShowSettings(false);
+        app.setPauseOnLostFocus(true);
         app.setSettings(cfg);
         app.start();
-    }
-    private NiftyJmeDisplay niftyDisplay;
-
-    public void toggleToFullscreen() {
-        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        DisplayMode[] modes = device.getDisplayModes();
-        settings.setResolution(modes[0].getWidth(), modes[0].getHeight());
-        settings.setFullscreen(device.isFullScreenSupported());
-        app.setSettings(settings);
-        app.restart();
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-        try {
-            cfg.save(cfg.getTitle());
-        } catch (BackingStoreException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @Override
     public void destroy() {
         super.destroy();
         exec.shutdown();
+        try {
+            cfg.save("de.polymatrix.serenity");
+        } catch (BackingStoreException ex) {
+            System.out.println("error while saving settings cfg" + ex.toString());
+        }
     }
 
     @Override
@@ -117,9 +92,6 @@ public class Main extends SimpleApplication implements ScreenController {
         flyCam.setEnabled(false);
 
         videoRecorderAppState = new VideoRecorderAppState();
-
-        setDisplayFps(true);
-        setDisplayStatView(false);
 
         startScreenState = new StartScreenState(this);
         settingsScreenState = new SettingsScreenState(this);
@@ -244,17 +216,14 @@ public class Main extends SimpleApplication implements ScreenController {
 
             if (gameRunningState == null) {
 
-                loadFuture = exec.submit(loadingCallable);
-
-                /*                gameRunningState = new GameRunningState(app);
-                stateManager.detach(startScreenState);
-                stateManager.attach(gameRunningState);
                 if (guiViewPort.getProcessors().contains(niftyDisplay)) {
-                guiViewPort.removeProcessor(niftyDisplay);
-                }*/
+                    guiViewPort.removeProcessor(niftyDisplay);
+                }
+
+                loadFuture = exec.submit(loadingCallable);
             } else {
                 if (stateManager.hasState(startScreenState)) {
-                    //app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
+                    app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                     stateManager.detach(startScreenState);
                     stateManager.attach(gameRunningState);
                     if (guiViewPort.getProcessors().contains(niftyDisplay)) {
@@ -284,11 +253,8 @@ public class Main extends SimpleApplication implements ScreenController {
 
             if (gameRunningState != null) {
                 app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
-                stateManager.attach(gameRunningState);
                 stateManager.detach(startScreenState);
-                if (guiViewPort.getProcessors().contains(niftyDisplay)) {
-                    guiViewPort.removeProcessor(niftyDisplay);
-                }
+                stateManager.attach(gameRunningState);
                 loadFuture = null;
             }
         }
