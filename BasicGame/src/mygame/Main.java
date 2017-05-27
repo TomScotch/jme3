@@ -75,14 +75,23 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
-        exec.shutdown();
+    public void stop() {
+
         try {
             cfg.save("de.polymatrix.serenity");
         } catch (BackingStoreException ex) {
-            System.out.println("error while saving settings cfg" + ex.toString());
+            //
         }
+
+        super.stop();
+    }
+
+    @Override
+    public void destroy() {
+
+        exec.shutdown();
+
+        super.destroy();
     }
 
     @Override
@@ -215,6 +224,8 @@ public class Main extends SimpleApplication implements ScreenController {
         } else {
 
             if (gameRunningState == null) {
+
+                inputManager.setCursorVisible(false);
 
                 if (guiViewPort.getProcessors().contains(niftyDisplay)) {
                     guiViewPort.removeProcessor(niftyDisplay);
