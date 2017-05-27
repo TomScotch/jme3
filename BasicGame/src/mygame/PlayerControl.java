@@ -161,6 +161,7 @@ public class PlayerControl extends AbstractControl {
                 case "flashlight":
                     if (value && isEnabled()) {
                         getLamp().setEnabled(!lamp.isEnabled());
+                        //spatial.getParent().getControl(GlobalLightingControl.class).switchFlashlight();
                     }
                     break;
                 case "rightRotate":

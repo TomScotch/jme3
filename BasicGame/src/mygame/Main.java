@@ -14,6 +14,9 @@ import de.lessvoid.nifty.Nifty;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -37,6 +40,18 @@ public class Main extends SimpleApplication implements ScreenController {
     private final static int antiAlias = 0;
     private final static int depthBit = 24;
     private Nifty nifty;
+
+    private Future loadFuture = null;
+    private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(2);
+
+    @SuppressWarnings("Convert2Lambda")
+    Callable<Void> loadingCallable = new Callable<Void>() {
+        @Override
+        public Void call() {
+            gameRunningState = new GameRunningState(app);
+            return null;
+        }
+    };
 
     public static void main(String[] args) {
 
@@ -83,6 +98,12 @@ public class Main extends SimpleApplication implements ScreenController {
         } catch (BackingStoreException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        exec.shutdown();
     }
 
     @Override
@@ -218,14 +239,18 @@ public class Main extends SimpleApplication implements ScreenController {
         } else {
 
             if (gameRunningState == null) {
-                gameRunningState = new GameRunningState(app);
+
+                loadFuture = exec.submit(loadingCallable);
+
+                /*                gameRunningState = new GameRunningState(app);
                 stateManager.detach(startScreenState);
                 stateManager.attach(gameRunningState);
                 if (guiViewPort.getProcessors().contains(niftyDisplay)) {
-                    guiViewPort.removeProcessor(niftyDisplay);
-                }
+                guiViewPort.removeProcessor(niftyDisplay);
+                }*/
             } else {
                 if (stateManager.hasState(startScreenState)) {
+                    //app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                     stateManager.detach(startScreenState);
                     stateManager.attach(gameRunningState);
                     if (guiViewPort.getProcessors().contains(niftyDisplay)) {
@@ -239,7 +264,30 @@ public class Main extends SimpleApplication implements ScreenController {
 
     @Override
     public void simpleUpdate(float tpf) {
-        //
+
+        if (loadFuture != null) {
+
+            if (stateManager.hasState(startScreenState)) {
+                enqueue(new Callable() {
+                    @Override
+                    public Object call() throws Exception {
+
+                        startScreenState.getBoxGeo().rotate(0, -tpf, 0);
+                        return null;
+                    }
+                });
+            }
+
+            if (gameRunningState != null) {
+                app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
+                stateManager.attach(gameRunningState);
+                stateManager.detach(startScreenState);
+                if (guiViewPort.getProcessors().contains(niftyDisplay)) {
+                    guiViewPort.removeProcessor(niftyDisplay);
+                }
+                loadFuture = null;
+            }
+        }
     }
 
     @Override

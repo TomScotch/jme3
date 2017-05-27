@@ -39,11 +39,12 @@ public class GlobalLightingControl extends AbstractControl {
     private final DirectionalLightShadowRenderer dlsr;
     private final int shadowmapSize = 256;
     private boolean globalLightning = true;
+    private final ViewPort vp;
 
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
         this.localRootNode = localRootNode;
-
+        this.vp = vp;
         //Player FlashLight
         this.sl = sl;
 
@@ -87,23 +88,32 @@ public class GlobalLightingControl extends AbstractControl {
         //Spot Light Shadow Renderer
         slsr = new SpotLightShadowRenderer(assetManager, shadowmapSize);
         slsr.setLight(dummySpotLight);
-        slsr.setShadowCompareMode(CompareMode.Hardware);
+        slsr.setShadowCompareMode(CompareMode.Software);
         slsr.setShadowIntensity(0.45f);
         slsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
         slsr.setEdgesThickness(10);
         vp.addProcessor(slsr);
+    }
 
+    public void switchFlashlight() {
+        sl.setEnabled(!sl.isEnabled());
     }
 
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (isEnabled()) {
+        if (this.isEnabled()) {
 
-            if (sl.isEnabled()) {
-                slsr.setLight(sl);
-            } else {
-                slsr.setLight(dummySpotLight);
+            if (slsr.getShadowCompareMode() == CompareMode.Software) {
+                slsr.setShadowCompareMode(CompareMode.Hardware);
+            }
+
+            if (this.isEnabled()) {
+                if (sl.isEnabled()) {
+                    slsr.setLight(sl);
+                } else {
+                    slsr.setLight(dummySpotLight);
+                }
             }
 
             if (globalLightning) {
@@ -123,7 +133,9 @@ public class GlobalLightingControl extends AbstractControl {
                     sun.getColor().interpolateLocal(ColorRGBA.White, 0.01f / timeDelay);
 
                     if (isSun == false) {
-                        slsr.setShadowIntensity(0.35f);
+                        if (sl.isEnabled()) {
+                            slsr.setShadowIntensity(0.35f);
+                        }
                         localRootNode.addLight(sun);
                         sun.setColor(ColorRGBA.Orange);
                         isSun = true;
@@ -132,7 +144,9 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (z < -0.25f && z > -0.99f) {
                     sun.getColor().interpolateLocal(ColorRGBA.Blue, 0.01f / timeDelay);
-                    slsr.setShadowIntensity(0.25f);
+                    if (sl.isEnabled()) {
+                        slsr.setShadowIntensity(0.25f);
+                    }
                 }
 
                 if (z < -0.999f) {
@@ -140,7 +154,9 @@ public class GlobalLightingControl extends AbstractControl {
                     if (isSun == true) {
                         localRootNode.removeLight(sun);
                         isSun = false;
-                        slsr.setShadowIntensity(0.5f);
+                        if (sl.isEnabled()) {
+                            slsr.setShadowIntensity(0.5f);
+                        }
                     }
                 }
             } else {

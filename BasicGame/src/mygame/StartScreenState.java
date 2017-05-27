@@ -15,6 +15,13 @@ import com.jme3.texture.Texture;
 
 public class StartScreenState extends AbstractAppState {
 
+    /**
+     * @return the boxGeo
+     */
+    public Geometry getBoxGeo() {
+        return boxGeo;
+    }
+
     private final ViewPort viewPort;
     private final Node rootNode;
     private final Node guiNode;
@@ -48,7 +55,7 @@ public class StartScreenState extends AbstractAppState {
 
     @Override
     public void update(float tpf) {
-        boxGeo.rotate(0, -tpf, 0);
+        //boxGeo.rotate(0, -tpf, 0);
         viewPort.getCamera().setLocation(new Vector3f(0, 0, -5.5f));
         viewPort.getCamera().lookAt(boxGeo.getLocalTranslation(), Vector3f.UNIT_Y);
     }

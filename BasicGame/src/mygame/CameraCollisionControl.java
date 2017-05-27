@@ -44,7 +44,9 @@ public class CameraCollisionControl extends AbstractControl {
     }
 
     public void setNewCamPos() {
-        pc.getChaseCam().setMaxDistance(pc.getChaseCam().getMaxDistance() - 10);
+        if (pc.getChaseCam() != null) {
+            pc.getChaseCam().setMaxDistance(pc.getChaseCam().getMaxDistance() - 10);
+        }
     }
 
     @Override

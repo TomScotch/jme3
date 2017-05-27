@@ -162,7 +162,6 @@ public class GameRunningState extends AbstractAppState {
         spider.addControl(ec3);
         localRootNode.attachChild(spider);
         setupKeys();
-        app.getRenderManager().preloadScene(localRootNode);
     }
 
     public Node getLocalRoot() {
