@@ -176,7 +176,6 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being initialized");
 
         viewPort.setBackgroundColor(backgroundColor);
-
         inputManager.setCursorVisible(false);
     }
 
@@ -332,7 +331,9 @@ public class GameRunningState extends AbstractAppState {
                 //localRootNode.getControl(WaterPostFilter.class).start();
             }
         }
-
+        if (!viewPort.getProcessors().contains(glc.getSlsr())) {
+            viewPort.addProcessor(glc.getSlsr());
+        }
         if (!viewPort.getProcessors().contains(fpp)) {
             viewPort.addProcessor(fpp);
         }
@@ -352,6 +353,9 @@ public class GameRunningState extends AbstractAppState {
         //bgm.stop();
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
+        }
+        if (viewPort.getProcessors().contains(glc.getSlsr())) {
+            viewPort.removeProcessor(glc.getSlsr());
         }
         rootNode.detachChild(localRootNode);
         guiNode.detachChild(localGuiNode);

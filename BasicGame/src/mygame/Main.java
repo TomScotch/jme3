@@ -57,17 +57,24 @@ public class Main extends SimpleApplication implements ScreenController {
 
         app = new Main();
         cfg = new AppSettings(true);
+
+        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        DisplayMode[] modes = device.getDisplayModes();
+
+        cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
+        cfg.setFullscreen(device.isFullScreenSupported());
+
         //cfg.setFrameRate(60);
         cfg.setVSync(false);
         //cfg.setFrequency(60);
-        cfg.setResolution(1600, 900);
+        //cfg.setResolution(1600, 900);
         cfg.setSamples(antiAlias);
         cfg.setDepthBits(depthBit);
-        cfg.setFullscreen(true);
+        //cfg.setFullscreen(true);
         cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
         cfg.setTitle("Serenity");
         try {
-            cfg.load("com.foo.MyCoolGame3");
+            cfg.load(cfg.getTitle());
         } catch (BackingStoreException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -81,10 +88,7 @@ public class Main extends SimpleApplication implements ScreenController {
     public void toggleToFullscreen() {
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode[] modes = device.getDisplayModes();
-        int i = 0;
-        settings.setResolution(modes[i].getWidth(), modes[i].getHeight());
-        settings.setFrequency(modes[i].getRefreshRate());
-        settings.setBitsPerPixel(modes[i].getBitDepth());
+        settings.setResolution(modes[0].getWidth(), modes[0].getHeight());
         settings.setFullscreen(device.isFullScreenSupported());
         app.setSettings(settings);
         app.restart();
@@ -94,7 +98,7 @@ public class Main extends SimpleApplication implements ScreenController {
     public void stop() {
         super.stop();
         try {
-            cfg.save("com.foo.MyCoolGame3");
+            cfg.save(cfg.getTitle());
         } catch (BackingStoreException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -39,12 +39,10 @@ public class GlobalLightingControl extends AbstractControl {
     private final DirectionalLightShadowRenderer dlsr;
     private final int shadowmapSize = 256;
     private boolean globalLightning = true;
-    private final ViewPort vp;
 
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
         this.localRootNode = localRootNode;
-        this.vp = vp;
         //Player FlashLight
         this.sl = sl;
 
@@ -92,11 +90,7 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setShadowIntensity(0.45f);
         slsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
         slsr.setEdgesThickness(10);
-        vp.addProcessor(slsr);
-    }
-
-    public void switchFlashlight() {
-        sl.setEnabled(!sl.isEnabled());
+        //vp.addProcessor(slsr);
     }
 
     @Override
@@ -202,5 +196,9 @@ public class GlobalLightingControl extends AbstractControl {
 
     public boolean getIsSun() {
         return isSun;
+    }
+
+    public SpotLightShadowRenderer getSlsr() {
+        return slsr;
     }
 }
