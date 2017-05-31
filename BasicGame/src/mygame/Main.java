@@ -11,12 +11,18 @@ import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.builder.ElementBuilder;
+import de.lessvoid.nifty.builder.LayerBuilder;
+import de.lessvoid.nifty.builder.ScreenBuilder;
+import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 public class Main extends SimpleApplication implements ScreenController {
@@ -35,12 +41,9 @@ public class Main extends SimpleApplication implements ScreenController {
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
 
-    private final static int antiAlias = 0;
-    private Nifty nifty;
-
     private Future loadFuture = null;
     private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(2);
-    public static final boolean isVsync = false;
+    private Nifty nifty;
     private NiftyJmeDisplay niftyDisplay;
 
     @SuppressWarnings("Convert2Lambda")
@@ -57,19 +60,30 @@ public class Main extends SimpleApplication implements ScreenController {
         app = new Main();
         cfg = new AppSettings(true);
         cfg.setTitle("Serenity");
+        app.setShowSettings(false);
 
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode[] modes = device.getDisplayModes();
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
-        cfg.setVSync(isVsync);
-        cfg.setSamples(antiAlias);
-        cfg.setDepthBits(24);
-        cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
+        cfg.setVSync(false);
+        cfg.setSamples(0);
+
+        try {
+            cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
+        } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+            cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
+        }
+
+        try {
+            cfg.load(cfg.getTitle());
+        } catch (BackingStoreException ex) {
+            // config load is always true 
+        }
+
         app.setDisplayFps(false);
         app.setDisplayStatView(false);
-        app.setShowSettings(false);
-        app.setPauseOnLostFocus(true);
         app.setSettings(cfg);
         app.start();
     }
@@ -77,21 +91,15 @@ public class Main extends SimpleApplication implements ScreenController {
     @Override
     public void stop() {
 
+        exec.shutdown();
+
         try {
-            cfg.save("de.polymatrix.serenity");
+            cfg.save(cfg.getTitle());
         } catch (BackingStoreException ex) {
-            //
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         super.stop();
-    }
-
-    @Override
-    public void destroy() {
-
-        exec.shutdown();
-
-        super.destroy();
     }
 
     @Override
@@ -124,16 +132,11 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty = niftyDisplay.getNifty();
 
         app.getGuiViewPort().addProcessor(niftyDisplay);
-        nifty.loadStyleFile("nifty-default-styles.xml");
-        nifty.loadControlFile("nifty-default-controls.xml");
-        nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
-        nifty.gotoScreen("start");
-
+        initStartGui();
     }
 
     public void doRestart() {
         app.getGuiViewPort().removeProcessor(niftyDisplay);
-
         System.out.println("restart");
         app.getContext().restart();
 
@@ -154,12 +157,7 @@ public class Main extends SimpleApplication implements ScreenController {
         app.getGuiViewPort().addProcessor(niftyDisplay);
         nifty.loadStyleFile("nifty-default-styles.xml");
         nifty.loadControlFile("nifty-default-controls.xml");
-        nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
         nifty.gotoScreen("start");
-    }
-
-    public void shutdown() {
-        app.stop();
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -176,7 +174,7 @@ public class Main extends SimpleApplication implements ScreenController {
             }
 
             if (name.equals("exit") && !isPressed) {
-                shutdown();
+                app.stop();
             }
 
             if (name.equals("record") && !isPressed) {
@@ -200,16 +198,84 @@ public class Main extends SimpleApplication implements ScreenController {
         if (stateManager.hasState(startScreenState)) {
             stateManager.detach(startScreenState);
             stateManager.attach(settingsScreenState);
-            nifty.fromXml("Gui/settingsScreen_Gui.xml", "start", this);
-            nifty.gotoScreen("start");
+            nifty.gotoScreen("settings");
             System.out.println("switching to settings...");
         } else if (stateManager.hasState(settingsScreenState)) {
             stateManager.detach(settingsScreenState);
             stateManager.attach(startScreenState);
-            nifty.fromXml("Gui/startScreen_Gui.xml", "start", this);
             nifty.gotoScreen("start");
             System.out.println("switching to startscreen...");
         }
+    }
+
+    public void initStartGui() {
+
+        nifty.loadStyleFile("nifty-default-styles.xml");
+        nifty.loadControlFile("nifty-default-controls.xml");
+
+        nifty.addScreen("start", new ScreenBuilder("Start Screen") {
+            {
+                controller(app);
+
+                layer(new LayerBuilder("Layer_ID") {
+                    {
+                        childLayoutHorizontal();
+
+                        control(new ButtonBuilder("StartButton", "Start Continue") {
+                            {
+                                align(ElementBuilder.Align.Left);
+                                height("5%");
+                                width("10%");
+                                visibleToMouse(true);
+                                interactOnClick("switchGameState()");
+                            }
+                        });
+                        control(new ButtonBuilder("SettingsButton", "Settings") {
+                            {
+                                align(ElementBuilder.Align.Center);
+                                height("5%");
+                                width("10%");
+                                visibleToMouse(true);
+                                interactOnClick("switchOptionsState()");
+                            }
+                        });
+                        control(new ButtonBuilder("QuitButton", "Quit") {
+                            {
+                                align(ElementBuilder.Align.Right);
+                                height("5%");
+                                width("10%");
+                                visibleToMouse(true);
+                                interactOnClick("doShutdown()");
+                            }
+                        });
+                    }
+                });
+            }
+        }.build(nifty));
+
+        nifty.addScreen("settings", new ScreenBuilder("Settings Screen") {
+            {
+                controller(app);
+
+                layer(new LayerBuilder("Layer_ID") {
+                    {
+                        childLayoutHorizontal();
+
+                        control(new ButtonBuilder("BackButton", "Back") {
+                            {
+                                align(ElementBuilder.Align.Left);
+                                height("5%");
+                                width("10%");
+                                visibleToMouse(true);
+                                interactOnClick("switchOptionsState()");
+                            }
+                        });
+                    }
+                });
+            }
+        }.build(nifty));
+
+        nifty.gotoScreen("start");
     }
 
     public void switchGameState() {
@@ -252,6 +318,7 @@ public class Main extends SimpleApplication implements ScreenController {
         if (loadFuture != null) {
 
             if (stateManager.hasState(startScreenState)) {
+                startScreenState.attachBox();
                 enqueue(new Callable() {
                     @Override
                     public Object call() throws Exception {
@@ -288,5 +355,9 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public void quit() {
         nifty.gotoScreen("end");
+    }
+
+    public void doShutdown() {
+        app.stop();
     }
 }

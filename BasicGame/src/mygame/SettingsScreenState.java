@@ -16,7 +16,6 @@ public class SettingsScreenState extends AbstractAppState {
     private final ColorRGBA backgroundColor = ColorRGBA.Black;
 
     public SettingsScreenState(SimpleApplication app) {
-
         this.rootNode = app.getRootNode();
         this.guiNode = app.getGuiNode();
     }
@@ -28,6 +27,7 @@ public class SettingsScreenState extends AbstractAppState {
 
         app.getViewPort().setBackgroundColor(backgroundColor);
         app.getInputManager().setCursorVisible(true);
+
     }
 
     @Override

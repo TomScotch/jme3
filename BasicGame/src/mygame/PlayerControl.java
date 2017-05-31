@@ -328,8 +328,6 @@ public class PlayerControl extends AbstractControl {
                 viewDirection.set(camDir);
             }
 
-            physicsCharacter.setViewDirection(viewDirection);
-
             walkDirection.set(0, 0, 0);
 
             if (leftStrafe) {
@@ -343,8 +341,10 @@ public class PlayerControl extends AbstractControl {
             } else if (backward) {
                 walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
             }
-
+            
+            physicsCharacter.setViewDirection(viewDirection);
             physicsCharacter.setWalkDirection(walkDirection);
+            
 
             //lamp.setPosition(viewPort.getCamera().getLocation());
             lamp.setDirection(viewPort.getCamera().getDirection());

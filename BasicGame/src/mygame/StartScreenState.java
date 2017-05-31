@@ -38,7 +38,12 @@ public class StartScreenState extends AbstractAppState {
         boxMat.setTexture("ColorMap", monkeyTex);
         boxMat.setColor("Color", ColorRGBA.White);
         boxGeo.setMaterial(boxMat);
-        this.localRootNode.attachChild(boxGeo);
+    }
+
+    public void attachBox() {
+        if (!localRootNode.hasChild(boxGeo)) {
+            localRootNode.attachChild(boxGeo);
+        }
     }
 
     @Override
@@ -46,8 +51,6 @@ public class StartScreenState extends AbstractAppState {
         super.initialize(stateManager, app);
         viewPort.setBackgroundColor(backgroundColor);
         app.getInputManager().setCursorVisible(true);
-        localRootNode.attachChild(boxGeo);
-        boxGeo.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
     }
 
     @Override
