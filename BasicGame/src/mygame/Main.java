@@ -320,7 +320,7 @@ public class Main extends SimpleApplication implements ScreenController {
         int value = (int) nifty.getScreen("settings").findNiftyControl("sliderA", Slider.class).getValue();
         nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
         cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
-        app.setSettings(cfg); 
+        app.setSettings(cfg);
         doRestart();
     }
 
