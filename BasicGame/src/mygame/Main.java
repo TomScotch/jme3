@@ -14,7 +14,10 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.builder.ElementBuilder;
 import de.lessvoid.nifty.builder.LayerBuilder;
 import de.lessvoid.nifty.builder.ScreenBuilder;
+import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
+import de.lessvoid.nifty.controls.checkbox.builder.CheckboxBuilder;
+import de.lessvoid.nifty.controls.label.builder.LabelBuilder;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -138,7 +141,7 @@ public class Main extends SimpleApplication implements ScreenController {
     public void doRestart() {
         app.getGuiViewPort().removeProcessor(niftyDisplay);
         System.out.println("restart");
-        app.getContext().restart();
+        app.restart();
 
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
@@ -270,12 +273,28 @@ public class Main extends SimpleApplication implements ScreenController {
                                 interactOnClick("switchOptionsState()");
                             }
                         });
+                        control(new LabelBuilder("keyEventLabelId", "FullScreen:"));
+
+                        control(new CheckboxBuilder("fullscreenCheckbox") {
+                            {
+                                checked(cfg.isFullscreen());
+                                interactOnClick("switchFullScreen()");
+                            }
+                        });
                     }
                 });
             }
         }.build(nifty));
-
         nifty.gotoScreen("start");
+    }
+
+    public void switchFullScreen() {
+        nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).setChecked(!nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
+
+        System.out.println("FUllScreen is now : " + !nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
+        cfg.setFullscreen(nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
+        app.setSettings(cfg);
+        doRestart();
     }
 
     public void switchGameState() {
