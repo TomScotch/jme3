@@ -162,6 +162,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
         System.out.println("restart");
 
+        app.getContext().restart();
         app.restart();
 
         if (stateManager.hasState(gameRunningState)) {
@@ -307,13 +308,23 @@ public class Main extends SimpleApplication implements ScreenController {
                                 interactOnClick("switchVsync()");
                             }
                         });
-                        SliderBuilder sliderBuilder = new SliderBuilder("sliderA", false);
-                        sliderBuilder.max(modes.length);
-                        sliderBuilder.stepSize(1);
-                        sliderBuilder.initial(getDisplayMode());
-                        sliderBuilder.buttonStepSize(1);
-                        control(sliderBuilder);
+
+                        SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
+                        sliderBuilderA.max(modes.length);
+                        sliderBuilderA.stepSize(1);
+                        sliderBuilderA.initial(getDisplayMode());
+                        sliderBuilderA.buttonStepSize(1);
+                        control(sliderBuilderA);
                         control(new LabelBuilder("resolutionLabel", cfg.getWidth() + " x " + cfg.getHeight()));
+
+                        SliderBuilder sliderBuilderB = new SliderBuilder("sliderB", false);
+                        sliderBuilderB.max(8);
+                        sliderBuilderB.stepSize(2);
+                        sliderBuilderB.initial(cfg.getSamples());
+                        sliderBuilderB.buttonStepSize(2);
+                        control(sliderBuilderB);
+                        control(new LabelBuilder("sampleLabel", "AAx" + Integer.toString(cfg.getSamples())));
+
                         control(new ButtonBuilder("ApplyButton", "Apply") {
                             {
                                 align(ElementBuilder.Align.Right);
@@ -332,20 +343,35 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public void applyResolution() {
         int value = (int) nifty.getScreen("settings").findNiftyControl("sliderA", Slider.class).getValue();
-        nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
+        int samples = (int) nifty.getScreen("settings").findNiftyControl("sliderB", Slider.class).getValue();
+
+        //nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
         cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
-        app.setSettings(cfg);
-        nifty.resolutionChanged();
-        nifty.update();
-        doRestart();
+
+        if (cfg.getSamples() != samples) {
+            System.out.println("will Stop because samples");
+            cfg.setSamples(samples);
+            app.setSettings(cfg);
+            app.stop();
+        } else {
+            app.setSettings(cfg);
+            doRestart();
+        }
+
     }
 
-    @NiftyEventSubscriber(pattern = "sliderA") // use can use whatever you want really. It goes with the control's ID
+    @NiftyEventSubscriber(pattern = "slider*.")
     public void onSliderChangedEvent(final String id, final SliderChangedEvent event) {
-        int height = (int) modes[(int) event.getValue()].getHeight();
-        int width = (int) modes[(int) event.getValue()].getWidth();
-        nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(width + " x " + height);
-
+        System.out.println(id);
+        if (id.equals("sliderA")) {
+            int height = (int) modes[(int) event.getValue()].getHeight();
+            int width = (int) modes[(int) event.getValue()].getWidth();
+            nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(width + " x " + height);
+        }
+        if (id.equals("sliderB")) {
+            String val = Float.toString(event.getValue());
+            nifty.getScreen("settings").findNiftyControl("sampleLabel", Label.class).setText("AAx" + val);
+        }
     }
 
     public void switchVsync() {
@@ -452,9 +478,5 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public void doShutdown() {
         app.stop();
-    }
-
-    private void foreach(DisplayMode[] modes) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
