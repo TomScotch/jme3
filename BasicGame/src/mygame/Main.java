@@ -73,6 +73,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = device.getDisplayModes();
+
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
         cfg.setVSync(false);
@@ -141,7 +142,20 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty = niftyDisplay.getNifty();
 
         app.getGuiViewPort().addProcessor(niftyDisplay);
+
         initStartGui();
+    }
+
+    public int getDisplayMode() {
+        int c = 0;
+        for (DisplayMode dm : modes) {
+            if (dm.getHeight() == cfg.getHeight() && dm.getWidth() == cfg.getWidth()) {
+                break;
+            } else {
+                c += 1;
+            }
+        }
+        return c;
     }
 
     public void doRestart() {
@@ -296,7 +310,7 @@ public class Main extends SimpleApplication implements ScreenController {
                         SliderBuilder sliderBuilder = new SliderBuilder("sliderA", false);
                         sliderBuilder.max(modes.length);
                         sliderBuilder.stepSize(1);
-                        sliderBuilder.initial(0);
+                        sliderBuilder.initial(getDisplayMode());
                         sliderBuilder.buttonStepSize(1);
                         control(sliderBuilder);
                         control(new LabelBuilder("resolutionLabel", cfg.getWidth() + " x " + cfg.getHeight()));
@@ -438,5 +452,9 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public void doShutdown() {
         app.stop();
+    }
+
+    private void foreach(DisplayMode[] modes) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
