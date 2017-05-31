@@ -274,7 +274,6 @@ public class Main extends SimpleApplication implements ScreenController {
                             }
                         });
                         control(new LabelBuilder("keyEventLabelId", "FullScreen:"));
-
                         control(new CheckboxBuilder("fullscreenCheckbox") {
                             {
                                 checked(cfg.isFullscreen());
@@ -289,10 +288,17 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     public void switchFullScreen() {
-        nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).setChecked(!nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
 
-        System.out.println("FUllScreen is now : " + !nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
+        nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).setChecked(!nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
         cfg.setFullscreen(nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
+
+        if (nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked()) {
+            if (!GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()) {
+                nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).setChecked(false);
+                cfg.setFullscreen(false);
+            }
+        }
+
         app.setSettings(cfg);
         doRestart();
     }
