@@ -11,13 +11,18 @@ import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.builder.ElementBuilder;
 import de.lessvoid.nifty.builder.LayerBuilder;
 import de.lessvoid.nifty.builder.ScreenBuilder;
 import de.lessvoid.nifty.controls.CheckBox;
+import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.Slider;
+import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
 import de.lessvoid.nifty.controls.checkbox.builder.CheckboxBuilder;
 import de.lessvoid.nifty.controls.label.builder.LabelBuilder;
+import de.lessvoid.nifty.controls.slider.builder.SliderBuilder;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -34,6 +39,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private static Main app;
 
     private static VideoRecorderAppState videoRecorderAppState;
+    private static DisplayMode[] modes;
 
     private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
@@ -66,7 +72,7 @@ public class Main extends SimpleApplication implements ScreenController {
         app.setShowSettings(false);
 
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        DisplayMode[] modes = device.getDisplayModes();
+        modes = device.getDisplayModes();
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
         cfg.setVSync(false);
@@ -267,8 +273,8 @@ public class Main extends SimpleApplication implements ScreenController {
                         control(new ButtonBuilder("BackButton", "Back") {
                             {
                                 align(ElementBuilder.Align.Left);
-                                height("5%");
-                                width("10%");
+                                height("2.5%");
+                                width("5%");
                                 visibleToMouse(true);
                                 interactOnClick("switchOptionsState()");
                             }
@@ -287,11 +293,43 @@ public class Main extends SimpleApplication implements ScreenController {
                                 interactOnClick("switchVsync()");
                             }
                         });
+                        SliderBuilder sliderBuilder = new SliderBuilder("sliderA", false);
+                        sliderBuilder.max(modes.length);
+                        sliderBuilder.stepSize(1);
+                        sliderBuilder.initial(0);
+                        sliderBuilder.buttonStepSize(1);
+                        control(sliderBuilder);
+                        control(new LabelBuilder("resolutionLabel", cfg.getWidth() + " x " + cfg.getHeight()));
+                        control(new ButtonBuilder("ApplyButton", "Apply") {
+                            {
+                                align(ElementBuilder.Align.Right);
+                                height("2.5%");
+                                width("5%");
+                                visibleToMouse(true);
+                                interactOnClick("applyResolution()");
+                            }
+                        });
                     }
                 });
             }
         }.build(nifty));
         nifty.gotoScreen("start");
+    }
+
+    public void applyResolution() {
+        int value = (int) nifty.getScreen("settings").findNiftyControl("sliderA", Slider.class).getValue();
+        nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
+        cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
+        app.setSettings(cfg); 
+        doRestart();
+    }
+
+    @NiftyEventSubscriber(pattern = "sliderA") // use can use whatever you want really. It goes with the control's ID
+    public void onSliderChangedEvent(final String id, final SliderChangedEvent event) {
+        int height = (int) modes[(int) event.getValue()].getHeight();
+        int width = (int) modes[(int) event.getValue()].getWidth();
+        nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(width + " x " + height);
+
     }
 
     public void switchVsync() {
