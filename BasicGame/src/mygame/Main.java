@@ -273,11 +273,18 @@ public class Main extends SimpleApplication implements ScreenController {
                                 interactOnClick("switchOptionsState()");
                             }
                         });
-                        control(new LabelBuilder("keyEventLabelId", "FullScreen:"));
+                        control(new LabelBuilder("keyEventLabelIdFullScreen", "FullScreen:"));
                         control(new CheckboxBuilder("fullscreenCheckbox") {
                             {
                                 checked(cfg.isFullscreen());
                                 interactOnClick("switchFullScreen()");
+                            }
+                        });
+                        control(new LabelBuilder("keyEventLabelIdVSync", "VSync:"));
+                        control(new CheckboxBuilder("vSyncCheckbox") {
+                            {
+                                checked(cfg.isVSync());
+                                interactOnClick("switchVsync()");
                             }
                         });
                     }
@@ -285,6 +292,13 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }.build(nifty));
         nifty.gotoScreen("start");
+    }
+
+    public void switchVsync() {
+        nifty.getScreen("settings").findNiftyControl("vSyncCheckbox", CheckBox.class).setChecked(!nifty.getScreen("settings").findNiftyControl("vSyncCheckbox", CheckBox.class).isChecked());
+        cfg.setVSync(nifty.getScreen("settings").findNiftyControl("vSyncCheckbox", CheckBox.class).isChecked());
+        app.setSettings(cfg);
+        doRestart();
     }
 
     public void switchFullScreen() {
