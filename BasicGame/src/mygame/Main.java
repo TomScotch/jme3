@@ -145,8 +145,9 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     public void doRestart() {
-        app.getGuiViewPort().removeProcessor(niftyDisplay);
+
         System.out.println("restart");
+
         app.restart();
 
         if (stateManager.hasState(gameRunningState)) {
@@ -161,12 +162,11 @@ public class Main extends SimpleApplication implements ScreenController {
 
         startScreenState = new StartScreenState(this);
         settingsScreenState = new SettingsScreenState(this);
-        gameRunningState = null;
+
         stateManager.attach(startScreenState);
-        app.getGuiViewPort().addProcessor(niftyDisplay);
-        nifty.loadStyleFile("nifty-default-styles.xml");
-        nifty.loadControlFile("nifty-default-controls.xml");
-        nifty.gotoScreen("start");
+        nifty.gotoScreen("settings");
+        nifty.resolutionChanged();
+        nifty.update();
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -321,6 +321,8 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
         cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
         app.setSettings(cfg);
+        nifty.resolutionChanged();
+        nifty.update();
         doRestart();
     }
 
