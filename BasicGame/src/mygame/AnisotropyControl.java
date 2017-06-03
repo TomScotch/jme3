@@ -12,7 +12,7 @@ public class AnisotropyControl extends AbstractControl {
 
     private final AssetEventListener asl;
 
-    public AnisotropyControl(AssetManager assetManager, int samples) {
+    public AnisotropyControl(AssetManager assetManager, final int samples) {
 
         asl = new AssetEventListener() {
             @Override

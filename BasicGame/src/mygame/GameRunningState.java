@@ -7,6 +7,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
@@ -19,8 +20,10 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.ViewPort;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.terrain.geomipmap.TerrainPatch;
 import java.io.File;
 import java.io.IOException;
 
@@ -219,21 +222,43 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void treeoutroot(Node node) {
+
         int n = node.getQuantity();
-        if (node.getName() != null) {
-            if (!node.getName().equals("null")) {
-                if (n > 0) {
-                    System.out.println("+ " + node.getName() + " " + n);
-                } else {
-                    System.out.println(node.getName());
+
+        String name = node.getName();
+
+        if (n > 0) {
+            System.out.println("+ " + name + " " + n);
+        } else {
+            System.out.println(name);
+        }
+
+        for (Spatial spat : node.getChildren()) {
+            int c = spat.getParent().getChildIndex(spat);
+            if (c > 0) {
+                System.out.println("-" + name + " " + c);
+            } else {
+                System.out.println(name);
+            }
+            if (!spat.getClass().equals(TerrainPatch.class)) {
+                if (!spat.getClass().equals(Geometry.class)) {
+                    if (!spat.getClass().equals(ParticleEmitter.class)) {
+                        treeoutroot((Node) spat);
+                    }
                 }
             }
-        }
-        node.getChildren().stream().filter((spat) -> (spat.getClass() == Node.class | spat.getClass() == Spatial.class)).map((spat) -> {
-            int c = spat.getParent().getChildIndex(spat);
 
-            if (node.getName() != null) {
-                if (!node.getName().equals("null")) {
+        }
+
+    }
+
+    public Node treeOutOuter(Spatial spat) {
+
+        int c = spat.getParent().getChildIndex(spat);
+
+        if (spat.getClass().equals(Spatial.class) | spat.getClass().equals(Node.class)) {
+            if (spat.getName() != null) {
+                if (!spat.getName().equals("null")) {
                     if (c > 0) {
                         System.out.println("-" + spat.getName() + " " + c);
                     } else {
@@ -241,17 +266,9 @@ public class GameRunningState extends AbstractAppState {
                     }
                 }
             }
+        }
 
-            return spat;
-        }).map((spat) -> (Node) spat).forEachOrdered((children) -> {
-            children.getChildren().stream().map((child) -> child).forEachOrdered((spn) -> {
-                if (spn.getClass().equals(Spatial.class) | spn.getClass().equals(Node.class)) {
-                    Node s = (Node) spn;
-                    treeoutroot(s);
-                }
-            });
-        });
-
+        return (Node) spat;
     }
 
     private final ActionListener actionListener = new ActionListener() {

@@ -341,10 +341,9 @@ public class PlayerControl extends AbstractControl {
             } else if (backward) {
                 walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
             }
-            
+
             physicsCharacter.setViewDirection(viewDirection);
             physicsCharacter.setWalkDirection(walkDirection);
-            
 
             //lamp.setPosition(viewPort.getCamera().getLocation());
             lamp.setDirection(viewPort.getCamera().getDirection());
@@ -357,37 +356,41 @@ public class PlayerControl extends AbstractControl {
         }
     }
 
-    private void hit(String name) {
-        SceneGraphVisitor visitor = (Spatial spat) -> {
-            if (spat.getName() != null) {
-                if (spat.getName().equals(name)) {
-                    if (spat.getControl(EntityControl.class) != null) {
-                        spat.getControl(EntityControl.class).hit(playerDmg, "player");
+    private void hit(final String name) {
+        SceneGraphVisitor visitor = new SceneGraphVisitor() {
+            @Override
+            public void visit(Spatial spat) {
+                if (spat.getName() != null) {
+                    if (spat.getName().equals(name)) {
+                        if (spat.getControl(EntityControl.class) != null) {
+                            spat.getControl(EntityControl.class).hit(playerDmg, "player");
+                        }
                     }
                 }
-
             }
-
         };
+
         localRootNode.depthFirstTraversal(visitor);
     }
 
-    private void doAnim(String name, String animation, LoopMode lop) {
+    private void doAnim(final String name, final String animation, final LoopMode lop) {
+        SceneGraphVisitor visitor = new SceneGraphVisitor() {
+            @Override
+            public void visit(Spatial spat) {
 
-        SceneGraphVisitor visitor = (Spatial spat) -> {
+                if (spat.getName() != null) {
+                    if (spat.getName().equals(name)) {
 
-            if (spat.getName() != null) {
-                if (spat.getName().equals(name)) {
-
-                    if (aniCon.getClass() != null) {
-                        aniCon.clearChannels();
-                        aniCon.createChannel();
-                        aniCon.getChannel(0).setAnim(animation);
-                        aniCon.getChannel(0).setLoopMode(lop);
-                    } else {
-                        aniCon.createChannel();
-                        aniCon.getChannel(0).setAnim(animation);
-                        aniCon.getChannel(0).setLoopMode(lop);
+                        if (aniCon.getClass() != null) {
+                            aniCon.clearChannels();
+                            aniCon.createChannel();
+                            aniCon.getChannel(0).setAnim(animation);
+                            aniCon.getChannel(0).setLoopMode(lop);
+                        } else {
+                            aniCon.createChannel();
+                            aniCon.getChannel(0).setAnim(animation);
+                            aniCon.getChannel(0).setLoopMode(lop);
+                        }
                     }
                 }
             }

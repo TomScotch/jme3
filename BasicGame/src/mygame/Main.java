@@ -2,11 +2,14 @@ package mygame;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.VideoRecorderAppState;
+import com.jme3.export.binary.BinaryExporter;
+import com.jme3.export.binary.BinaryImporter;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.Trigger;
 import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -26,6 +29,8 @@ import de.lessvoid.nifty.controls.slider.builder.SliderBuilder;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -64,7 +69,39 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     };
 
-    public static void main(String[] args) {
+    public boolean saveNode(Node node) {
+        String userHome = System.getProperty("user.home");
+        BinaryExporter exporter = BinaryExporter.getInstance();
+        File file = new File(userHome + "/somefile.j3o");
+        boolean x;
+        try {
+            exporter.save(rootNode, file);
+            x = true;
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Failed to save node!", ex);
+            x = false;
+        }
+        return x;
+    }
+    
+    public Node loadNode(String fileName) {
+
+        Node loadedNode = new Node(fileName);
+        String userHome = System.getProperty("user.home");
+        BinaryImporter importer = BinaryImporter.getInstance();
+        importer.setAssetManager(assetManager);
+        File file = new File(userHome + "/somefile.j3o");
+
+        try {
+            loadedNode = (Node) importer.load(file);
+            loadedNode.setName(fileName);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "No saved node loaded.", ex);
+        }
+        return loadedNode;
+    }
+
+    public static void main(String[] args) throws BackingStoreException {
 
         app = new Main();
         cfg = new AppSettings(true);
@@ -79,20 +116,11 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setVSync(false);
         cfg.setSamples(0);
 
-        try {
-            cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
-        } catch (NullPointerException e) {
-            System.out.println(e.getMessage());
-            cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
-        }
+        cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
 
-        try {
-            cfg.load(cfg.getTitle());
-        } catch (BackingStoreException ex) {
-            // config load is always true 
-        }
+        cfg.load(cfg.getTitle());
 
-        app.setDisplayFps(false);
+        app.setDisplayFps(true);
         app.setDisplayStatView(false);
         app.setSettings(cfg);
         app.start();
@@ -114,7 +142,6 @@ public class Main extends SimpleApplication implements ScreenController {
 
     @Override
     public void simpleInitApp() {
-
         inputManager.setCursorVisible(false);
         flyCam.setEnabled(false);
 
@@ -432,7 +459,7 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     @Override
-    public void simpleUpdate(float tpf) {
+    public void simpleUpdate(final float tpf) {
 
         if (loadFuture != null) {
 
