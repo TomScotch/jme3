@@ -102,7 +102,7 @@ public class GameRunningState extends AbstractAppState {
         glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
-        glc.setGlobalLightning(globalLightningEnabled);
+        glc.setGlobalLightning(this.globalLightningEnabled);
 
 //      SKY
         localRootNode.addControl(new SkyControl(assetManager, glc, localRootNode));
@@ -129,12 +129,7 @@ public class GameRunningState extends AbstractAppState {
             }
         }
 
-//      WATER
-        if (localRootNode.getControl(WaterPostFilter.class) == null) {
-            localRootNode.addControl(new WaterPostFilter(fpp, true, true, true, true, true, true, true));
-        }
-
-//      BGM
+        //      BGM
         // Node bgmNode = (Node) localRootNode.getChild("terrain");
         //  bgm = (AudioNode) bgmNode.getChild("AudioNode");
 
@@ -142,8 +137,10 @@ public class GameRunningState extends AbstractAppState {
         if (bgmOn == false) {
         bgm.setVolume(0);
         }
-        bgm.setLooping(bgmOn);*/
-//      TEST GUI TEXT
+        bgm.setLooping(bgmOn);
+        
+         */
+        //      TEST GUI TEXT
         displayText("Game running",
                 new Vector2f(10, 20),
                 1.8f,
@@ -186,6 +183,18 @@ public class GameRunningState extends AbstractAppState {
 
         viewPort.setBackgroundColor(backgroundColor);
         inputManager.setCursorVisible(false);
+
+        //      WATER
+        if (waterPostProcessing) {
+            if (localRootNode.getControl(WaterPostFilter.class) == null) {
+                localRootNode.addControl(new WaterPostFilter(fpp, true, true, true, true, true, true, true));
+            }
+        } else {
+            if (localRootNode.getControl(simpleWaterControl.class) == null) {
+                localRootNode.addControl(new simpleWaterControl((SimpleApplication) app, localRootNode));
+            }
+        }
+
     }
 
     private void displayText(String txt, Vector2f pos, float size, ColorRGBA color, float lifetime) {

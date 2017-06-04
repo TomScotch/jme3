@@ -26,4 +26,28 @@ public class WeatherControl extends AbstractControl {
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //
     }
+
+    public boolean isIsRaining() {
+        return isRaining;
+    }
+
+    public void setIsRaining(boolean isRaining) {
+        this.isRaining = isRaining;
+    }
+
+    public boolean isIsSnowing() {
+        return isSnowing;
+    }
+
+    public void setIsSnowing(boolean isSnowing) {
+        this.isSnowing = isSnowing;
+    }
+
+    public boolean isIsStorming() {
+        return isStorming;
+    }
+
+    public void setIsStorming(boolean isStorming) {
+        this.isStorming = isStorming;
+    }
 }

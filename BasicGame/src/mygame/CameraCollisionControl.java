@@ -13,7 +13,6 @@ public class CameraCollisionControl extends AbstractControl {
 
     private final Camera cam;
     private final Node localRootNode;
-    private CollisionResults results;
     private final PlayerControl pc;
 
     public CameraCollisionControl(BulletAppState bulletAppState, Camera cam, Node localRootNode, PlayerControl pc) {
@@ -25,27 +24,30 @@ public class CameraCollisionControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        Ray ray = new Ray(cam.getLocation(), cam.getDirection());
-        results = new CollisionResults();
-        localRootNode.collideWith(ray, results);
-        if (results.size() > 0) {
-            if (results.getClosestCollision().getGeometry().getName().contains("terrain")) {
-                setNewCamPos();
+        Ray ray1 = new Ray(cam.getLocation(), cam.getDirection());
+        CollisionResults results1 = new CollisionResults();
+        localRootNode.collideWith(ray1, results1);
+        if (results1.size() > 0) {
+            if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+                float distance = results1.getClosestCollision().getGeometry().getWorldTranslation().distance(cam.getLocation());
+                if (distance < 57) {
+                    setNewCamPos();
+                }
             } else {
-                if (pc.getChaseCam().getMaxDistance() != 40) {
-                    pc.getChaseCam().setMaxDistance(40);
+                if (pc.getChaseCam().getMaxDistance() != 50) {
+                    pc.getChaseCam().setMaxDistance(50);
                 }
             }
         } else {
-            if (pc.getChaseCam().getMaxDistance() != 40) {
-                pc.getChaseCam().setMaxDistance(40);
+            if (pc.getChaseCam().getMaxDistance() != 50) {
+                pc.getChaseCam().setMaxDistance(50);
             }
         }
     }
 
     public void setNewCamPos() {
         if (pc.getChaseCam() != null) {
-            pc.getChaseCam().setMaxDistance(pc.getChaseCam().getMaxDistance() - 10);
+            pc.getChaseCam().setMaxDistance(pc.getChaseCam().getMaxDistance() - 15);
         }
     }
 
