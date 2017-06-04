@@ -1,4 +1,4 @@
-Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+Material monster : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         Diffuse : 0.64000005 0.64000005 0.64000005 1.0
         UseMaterialColors : false

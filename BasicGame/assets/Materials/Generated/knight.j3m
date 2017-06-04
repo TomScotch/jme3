@@ -1,4 +1,4 @@
-Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+Material knight : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         LightMap : Flip Models/npc/knight_texture.png
     }

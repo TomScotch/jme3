@@ -1,4 +1,4 @@
-Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+Material Spider : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         Diffuse : 1.0 1.0 1.0 1.0
         UseMaterialColors : false
@@ -10,7 +10,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Specular : 0.1 0.1 0.1 1.0
         Shininess : 60.0
         NumberOfBones : 50
-        LightMap : Flip Models/hostile/Spider/Spinnen_Bein_tex.jpg
+        LightMap : Flip Models/hostile/spider/Spinnen_Bein_tex_COLOR_.png
     }
     AdditionalRenderState {
       PointSprite On

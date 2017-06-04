@@ -173,6 +173,7 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
         cfg.setVSync(false);
+        cfg.setFrameRate(30);
         cfg.setSamples(0);
         app.setDisplayFps(false);
         app.setDisplayStatView(false);

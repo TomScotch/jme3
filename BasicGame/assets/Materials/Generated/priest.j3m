@@ -1,4 +1,4 @@
-Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+Material Priest : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         LightMap : Flip Models/npc/priest_texture.png
         HardwareShadows : false
