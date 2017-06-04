@@ -17,9 +17,11 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.builder.ElementBuilder;
 import de.lessvoid.nifty.builder.LayerBuilder;
+import de.lessvoid.nifty.builder.PanelBuilder;
 import de.lessvoid.nifty.builder.ScreenBuilder;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.Button;
 import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
@@ -60,6 +62,8 @@ public class Main extends SimpleApplication implements ScreenController {
     private Nifty nifty;
     private NiftyJmeDisplay niftyDisplay;
 
+    private boolean isBloom;
+
     @SuppressWarnings("Convert2Lambda")
     Callable<Void> loadingCallable = new Callable<Void>() {
         @Override
@@ -83,7 +87,7 @@ public class Main extends SimpleApplication implements ScreenController {
         }
         return x;
     }
-    
+
     public Node loadNode(String fileName) {
 
         Node loadedNode = new Node(fileName);
@@ -310,57 +314,87 @@ public class Main extends SimpleApplication implements ScreenController {
 
                 layer(new LayerBuilder("Layer_ID") {
                     {
-                        childLayoutHorizontal();
-
+                        childLayoutVertical();
                         control(new ButtonBuilder("BackButton", "Back") {
                             {
                                 align(ElementBuilder.Align.Left);
-                                height("2.5%");
+                                height("5%");
                                 width("5%");
                                 visibleToMouse(true);
                                 interactOnClick("switchOptionsState()");
                             }
                         });
-                        control(new LabelBuilder("keyEventLabelIdFullScreen", "FullScreen:"));
-                        control(new CheckboxBuilder("fullscreenCheckbox") {
-                            {
-                                checked(cfg.isFullscreen());
-                                interactOnClick("switchFullScreen()");
-                            }
-                        });
-                        control(new LabelBuilder("keyEventLabelIdVSync", "VSync:"));
-                        control(new CheckboxBuilder("vSyncCheckbox") {
-                            {
-                                checked(cfg.isVSync());
-                                interactOnClick("switchVsync()");
-                            }
-                        });
-
-                        SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
-                        sliderBuilderA.max(modes.length);
-                        sliderBuilderA.stepSize(1);
-                        sliderBuilderA.initial(getDisplayMode());
-                        sliderBuilderA.buttonStepSize(1);
-                        control(sliderBuilderA);
-                        control(new LabelBuilder("resolutionLabel", cfg.getWidth() + " x " + cfg.getHeight()));
-
-                        SliderBuilder sliderBuilderB = new SliderBuilder("sliderB", false);
-                        sliderBuilderB.max(8);
-                        sliderBuilderB.stepSize(2);
-                        sliderBuilderB.initial(cfg.getSamples());
-                        sliderBuilderB.buttonStepSize(2);
-                        control(sliderBuilderB);
-                        control(new LabelBuilder("sampleLabel", "AAx" + Integer.toString(cfg.getSamples())));
-
                         control(new ButtonBuilder("ApplyButton", "Apply") {
                             {
                                 align(ElementBuilder.Align.Right);
-                                height("2.5%");
+                                height("5%");
                                 width("5%");
                                 visibleToMouse(true);
                                 interactOnClick("applyResolution()");
                             }
                         });
+                        // panel added
+                        panel(new PanelBuilder("panel_top") {
+                            {
+                                childLayoutHorizontal();
+                                alignCenter();
+                                backgroundColor("#f008");
+                                height("25%");
+                                width("75%");
+
+                                control(new LabelBuilder("keyEventLabelIdFullScreen", "FullScreen:"));
+                                control(new CheckboxBuilder("fullscreenCheckbox") {
+                                    {
+                                        checked(cfg.isFullscreen());
+                                        interactOnClick("switchFullScreen()");
+                                    }
+                                });
+                                control(new LabelBuilder("keyEventLabelIdVSync", "VSync:"));
+                                control(new CheckboxBuilder("vSyncCheckbox") {
+                                    {
+                                        checked(cfg.isVSync());
+                                        interactOnClick("switchVsync()");
+                                    }
+                                });
+
+                                SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
+                                sliderBuilderA.max(modes.length);
+                                sliderBuilderA.stepSize(1);
+                                sliderBuilderA.initial(getDisplayMode());
+                                sliderBuilderA.buttonStepSize(1);
+                                control(sliderBuilderA);
+                                control(new LabelBuilder("resolutionLabel", cfg.getWidth() + " x " + cfg.getHeight()));
+
+                                SliderBuilder sliderBuilderB = new SliderBuilder("sliderB", false);
+                                sliderBuilderB.max(8);
+                                sliderBuilderB.stepSize(2);
+                                sliderBuilderB.initial(cfg.getSamples());
+                                sliderBuilderB.buttonStepSize(2);
+                                control(sliderBuilderB);
+                                control(new LabelBuilder("sampleLabel", "AAx" + Integer.toString(cfg.getSamples())));
+                            }
+                        });
+
+                        panel(new PanelBuilder("panel_bottom") {
+                            {
+                                childLayoutHorizontal();
+                                alignCenter();
+                                backgroundColor("#00f8");
+                                height("25%");
+                                width("75%");
+                                // LightScatter GlobalLighting Shadows Water Anisotropy
+                                control(new ButtonBuilder("BloomButton", "Bloom : " + isBloom) {
+                                    {
+                                        align(ElementBuilder.Align.Right);
+                                        height("5%");
+                                        width("10%");
+                                        visibleToMouse(true);
+                                        interactOnClick("switchBloom()");
+                                    }
+                                });
+                            }
+                        }); // panel added
+
                     }
                 });
             }
@@ -368,11 +402,17 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.gotoScreen("start");
     }
 
+    public void switchBloom() {
+        this.isBloom = !this.isBloom;
+        nifty.getScreen("settings").findNiftyControl("BloomButton", Button.class).setText("Bloom : " + isBloom);
+
+    }
+
     public void applyResolution() {
         int value = (int) nifty.getScreen("settings").findNiftyControl("sliderA", Slider.class).getValue();
         int samples = (int) nifty.getScreen("settings").findNiftyControl("sliderB", Slider.class).getValue();
 
-        //nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
+        nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
         cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
 
         if (cfg.getSamples() != samples) {
