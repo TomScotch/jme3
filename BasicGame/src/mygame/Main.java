@@ -62,22 +62,26 @@ public class Main extends SimpleApplication implements ScreenController {
     private Nifty nifty;
     private NiftyJmeDisplay niftyDisplay;
 
-    private boolean bloomEnabled;
-    private boolean fogEnabled;
-    private boolean lightScatterEnabled;
-    private boolean anisotropyEnabled;
-    private boolean waterPostProcessing;
-    private boolean globalLightningEnabled;
-    private boolean isGl3;
-    private boolean shadows;
+    private boolean bloomEnabled = false;
+    private boolean fogEnabled = false;
+    private boolean lightScatterEnabled = false;
+    private boolean anisotropyEnabled = false;
+    private boolean waterPostProcessing = false;
+    private boolean globalLightningEnabled = true;
+    private boolean isGl3 = false;
+    private boolean shadows = false;
+
+    private Node settingsNode;
 
     public void switchShadows() {
-        this.shadows = !this.shadows;
+        shadows = !shadows;
+        settingsNode.setUserData("shadows", shadows);
         nifty.getScreen("settings").findNiftyControl("shadowsButton", Button.class).setText("Shadows : " + shadows);
     }
 
     public void switchBloom() {
-        this.bloomEnabled = !this.bloomEnabled;
+        bloomEnabled = !bloomEnabled;
+        settingsNode.setUserData("bloomEnabled", bloomEnabled);
         nifty.getScreen("settings").findNiftyControl("BloomButton", Button.class).setText("Bloom : " + bloomEnabled);
     }
 
@@ -90,31 +94,39 @@ public class Main extends SimpleApplication implements ScreenController {
         } else {
             cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
         }
+
+        settingsNode.setUserData("isGl3", isGl3);
         nifty.getScreen("settings").findNiftyControl("openglButton", Button.class).setText("OpenGL = " + isGl3);
     }
 
     public void switchPostProcessWater() {
         waterPostProcessing = !waterPostProcessing;
+        settingsNode.setUserData("waterPostProcessing", waterPostProcessing);
         nifty.getScreen("settings").findNiftyControl("waterButton", Button.class).setText("WaterPP = " + waterPostProcessing);
     }
 
     public void switchAnisotropy() {
         anisotropyEnabled = !anisotropyEnabled;
+        settingsNode.setUserData("anisotropyEnabled", anisotropyEnabled);
         nifty.getScreen("settings").findNiftyControl("anisotropyButton", Button.class).setText("anisotropy = " + anisotropyEnabled);
     }
 
     public void switchLightScatter() {
+
         lightScatterEnabled = !lightScatterEnabled;
+        settingsNode.setUserData("lightScatterEnabled", lightScatterEnabled);
         nifty.getScreen("settings").findNiftyControl("lightScatterButton", Button.class).setText("lightScatter = " + lightScatterEnabled);
     }
 
     public void switchFog() {
         fogEnabled = !fogEnabled;
+        settingsNode.setUserData("fogEnabled", fogEnabled);
         nifty.getScreen("settings").findNiftyControl("fogButton", Button.class).setText("fog = " + fogEnabled);
     }
 
     public void switchGlobalLightning() {
         globalLightningEnabled = !globalLightningEnabled;
+        settingsNode.setUserData("globalLightningEnabled", globalLightningEnabled);
         nifty.getScreen("settings").findNiftyControl("globalLightningButton", Button.class).setText("globalLightning = " + globalLightningEnabled);
     }
 
@@ -122,7 +134,7 @@ public class Main extends SimpleApplication implements ScreenController {
     Callable<Void> loadingCallable = new Callable<Void>() {
         @Override
         public Void call() {
-            gameRunningState = new GameRunningState(app);
+            gameRunningState = new GameRunningState(app, fogEnabled, bloomEnabled, lightScatterEnabled, anisotropyEnabled, waterPostProcessing, shadows, globalLightningEnabled);
             return null;
         }
     };
@@ -130,10 +142,10 @@ public class Main extends SimpleApplication implements ScreenController {
     public boolean saveNode(Node node) {
         String userHome = System.getProperty("user.home");
         BinaryExporter exporter = BinaryExporter.getInstance();
-        File file = new File(userHome + "/somefile.j3o");
+        File file = new File(userHome + "/" + node.getName() + ".j3o");
         boolean x;
         try {
-            exporter.save(rootNode, file);
+            exporter.save(node, file);
             x = true;
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Failed to save node!", ex);
@@ -144,17 +156,19 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public Node loadNode(String fileName) {
 
-        Node loadedNode = new Node(fileName);
+        Node loadedNode = null;
         String userHome = System.getProperty("user.home");
         BinaryImporter importer = BinaryImporter.getInstance();
         importer.setAssetManager(assetManager);
-        File file = new File(userHome + "/somefile.j3o");
-
-        try {
-            loadedNode = (Node) importer.load(file);
-            loadedNode.setName(fileName);
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "No saved node loaded.", ex);
+        File file = new File(userHome + "/" + fileName + ".j3o");
+        if (file.exists()) {
+            try {
+                loadedNode = (Node) importer.load(file);
+                loadedNode.setName(fileName);
+                System.out.println("Successfully Loaded Node " + fileName);
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "No saved node loaded.", ex);
+            }
         }
         return loadedNode;
     }
@@ -181,6 +195,7 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.load(cfg.getTitle());
         //
         app.setSettings(cfg);
+        //
         app.start();
     }
 
@@ -195,11 +210,39 @@ public class Main extends SimpleApplication implements ScreenController {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        saveNode(settingsNode);
+
         super.stop();
     }
 
     @Override
     public void simpleInitApp() {
+
+        settingsNode = loadNode("settings");
+
+        if (settingsNode != null) {
+            bloomEnabled = settingsNode.getUserData("bloomEnabled");
+            fogEnabled = settingsNode.getUserData("fogEnabled");
+            lightScatterEnabled = settingsNode.getUserData("lightScatterEnabled");
+            anisotropyEnabled = settingsNode.getUserData("anisotropyEnabled");
+            waterPostProcessing = settingsNode.getUserData("waterPostProcessing");
+            globalLightningEnabled = settingsNode.getUserData("globalLightningEnabled");
+            isGl3 = settingsNode.getUserData("isGl3");
+            shadows = settingsNode.getUserData("shadows");
+        } else {
+            settingsNode = new Node("settings");
+            settingsNode.setUserData("bloomEnabled", true);
+            settingsNode.setUserData("fogEnabled", true);
+            settingsNode.setUserData("lightScatterEnabled", true);
+            settingsNode.setUserData("anisotropyEnabled", true);
+            settingsNode.setUserData("waterPostProcessing", true);
+            settingsNode.setUserData("globalLightningEnabled", true);
+            settingsNode.setUserData("isGl3", false);
+            settingsNode.setUserData("shadows", true);
+
+            saveNode(settingsNode);
+        }
+
         inputManager.setCursorVisible(false);
         flyCam.setEnabled(false);
 

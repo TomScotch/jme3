@@ -53,17 +53,22 @@ public class GameRunningState extends AbstractAppState {
     private boolean lightScatterEnabled;
     private boolean anisotropyEnabled;
     private boolean waterPostProcessing;
+    private final boolean globalLightningEnabled;
+    private final boolean shadows;
+
     private static FilterPostProcessor fpp;
 
-    public GameRunningState(SimpleApplication app) {
+    public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
         System.out.println("Game State is being constructed");
 
-        fogEnabled = true;
-        bloomEnabled = true;
-        lightScatterEnabled = true;
-        anisotropyEnabled = true;
-        waterPostProcessing = true;
+        this.fogEnabled = fogEnabled;
+        this.bloomEnabled = bloomEnabled;
+        this.lightScatterEnabled = lightScatterEnabled;
+        this.anisotropyEnabled = anisotropyEnabled;
+        this.waterPostProcessing = waterPostProcessing;
+        this.globalLightningEnabled = globalLightningEnabled;
+        this.shadows = shadows;
 
 //      CONSTRUKTOR
         this.rootNode = app.getRootNode();
@@ -97,6 +102,7 @@ public class GameRunningState extends AbstractAppState {
         glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
+        glc.setGlobalLightning(globalLightningEnabled);
 
 //      SKY
         localRootNode.addControl(new SkyControl(assetManager, glc, localRootNode));
@@ -348,9 +354,13 @@ public class GameRunningState extends AbstractAppState {
                 //localRootNode.getControl(WaterPostFilter.class).start();
             }
         }
-        if (!viewPort.getProcessors().contains(glc.getSlsr())) {
-            viewPort.addProcessor(glc.getSlsr());
+
+        if (shadows) {
+            if (!viewPort.getProcessors().contains(glc.getSlsr())) {
+                viewPort.addProcessor(glc.getSlsr());
+            }
         }
+
         if (!viewPort.getProcessors().contains(fpp)) {
             viewPort.addProcessor(fpp);
         }
@@ -368,12 +378,17 @@ public class GameRunningState extends AbstractAppState {
         //localRootNode.getControl(WaterPostFilter.class).stop();
         playerControl.setEnabled(false);
         //bgm.stop();
+
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
         }
-        if (viewPort.getProcessors().contains(glc.getSlsr())) {
-            viewPort.removeProcessor(glc.getSlsr());
+
+        if (shadows) {
+            if (viewPort.getProcessors().contains(glc.getSlsr())) {
+                viewPort.removeProcessor(glc.getSlsr());
+            }
         }
+
         rootNode.detachChild(localRootNode);
         guiNode.detachChild(localGuiNode);
         setIsRunning(false);

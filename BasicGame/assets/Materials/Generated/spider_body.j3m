@@ -1,16 +1,14 @@
 Material Spider : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        Diffuse : 1.0 1.0 1.0 1.0
         UseMaterialColors : false
-        SpecularMap : returned null key
-        ParallaxHeight : 0.05
         Ambient : 1.0 1.0 1.0 1.0
-        BackfaceShadows : false
-        DiffuseMap : returned null key
+        Diffuse : 1.0 1.0 1.0 1.0
         Specular : 0.1 0.1 0.1 1.0
         Shininess : 60.0
+        ParallaxHeight : 0.05
+        LightMap : Flip Models/hostile/spider/Spinnen_Bein_tex.jpg
         NumberOfBones : 50
-        LightMap : Flip Models/hostile/spider/Spinnen_Bein_tex_COLOR_.png
+        HardwareShadows : false
     }
     AdditionalRenderState {
       PointSprite On
