@@ -46,6 +46,12 @@ public class StartScreenState extends AbstractAppState {
         }
     }
 
+    public void detachBox() {
+        if (localRootNode.hasChild(boxGeo)) {
+            boxGeo.removeFromParent();
+        }
+    }
+
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);

@@ -62,7 +62,61 @@ public class Main extends SimpleApplication implements ScreenController {
     private Nifty nifty;
     private NiftyJmeDisplay niftyDisplay;
 
-    private boolean isBloom;
+    private boolean bloomEnabled;
+    private boolean fogEnabled;
+    private boolean lightScatterEnabled;
+    private boolean anisotropyEnabled;
+    private boolean waterPostProcessing;
+    private boolean globalLightningEnabled;
+    private boolean isGl3;
+    private boolean shadows;
+
+    public void switchShadows() {
+        this.shadows = !this.shadows;
+        nifty.getScreen("settings").findNiftyControl("shadowsButton", Button.class).setText("Shadows : " + shadows);
+    }
+
+    public void switchBloom() {
+        this.bloomEnabled = !this.bloomEnabled;
+        nifty.getScreen("settings").findNiftyControl("BloomButton", Button.class).setText("Bloom : " + bloomEnabled);
+    }
+
+    public void switchOpenGl() {
+
+        isGl3 = !isGl3;
+
+        if (isGl3) {
+            cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
+        } else {
+            cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
+        }
+        nifty.getScreen("settings").findNiftyControl("openglButton", Button.class).setText("OpenGL = " + isGl3);
+    }
+
+    public void switchPostProcessWater() {
+        waterPostProcessing = !waterPostProcessing;
+        nifty.getScreen("settings").findNiftyControl("waterButton", Button.class).setText("WaterPP = " + waterPostProcessing);
+    }
+
+    public void switchAnisotropy() {
+        anisotropyEnabled = !anisotropyEnabled;
+        nifty.getScreen("settings").findNiftyControl("anisotropyButton", Button.class).setText("anisotropy = " + anisotropyEnabled);
+    }
+
+    public void switchLightScatter() {
+        lightScatterEnabled = !lightScatterEnabled;
+        nifty.getScreen("settings").findNiftyControl("lightScatterButton", Button.class).setText("lightScatter = " + lightScatterEnabled);
+    }
+
+    public void switchFog() {
+        fogEnabled = !fogEnabled;
+        nifty.getScreen("settings").findNiftyControl("fogButton", Button.class).setText("fog = " + fogEnabled);
+    }
+
+    public void switchGlobalLightning() {
+        globalLightningEnabled = !globalLightningEnabled;
+        nifty.getScreen("settings").findNiftyControl("globalLightningButton", Button.class).setText("globalLightning = " + globalLightningEnabled);
+    }
 
     @SuppressWarnings("Convert2Lambda")
     Callable<Void> loadingCallable = new Callable<Void>() {
@@ -115,17 +169,16 @@ public class Main extends SimpleApplication implements ScreenController {
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = device.getDisplayModes();
 
+        cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
         cfg.setVSync(false);
         cfg.setSamples(0);
-
-        cfg.setRenderer(AppSettings.LWJGL_OPENGL3);
-
-        cfg.load(cfg.getTitle());
-
-        app.setDisplayFps(true);
+        app.setDisplayFps(false);
         app.setDisplayStatView(false);
+        //
+        cfg.load(cfg.getTitle());
+        //
         app.setSettings(cfg);
         app.start();
     }
@@ -376,14 +429,15 @@ public class Main extends SimpleApplication implements ScreenController {
                         });
 
                         panel(new PanelBuilder("panel_bottom") {
+
                             {
                                 childLayoutHorizontal();
                                 alignCenter();
                                 backgroundColor("#00f8");
                                 height("25%");
                                 width("75%");
-                                // LightScatter GlobalLighting Shadows Water Anisotropy
-                                control(new ButtonBuilder("BloomButton", "Bloom : " + isBloom) {
+
+                                control(new ButtonBuilder("BloomButton", "Bloom : " + bloomEnabled) {
                                     {
                                         align(ElementBuilder.Align.Right);
                                         height("5%");
@@ -392,20 +446,74 @@ public class Main extends SimpleApplication implements ScreenController {
                                         interactOnClick("switchBloom()");
                                     }
                                 });
+
+                                control(new ButtonBuilder("openglButton", "OpenGL = " + isGl3) {
+                                    {
+                                        align(ElementBuilder.Align.Right);
+                                        height("5%");
+                                        width("10%");
+                                        visibleToMouse(true);
+                                        interactOnClick("switchOpenGl()");
+                                    }
+                                });
+
+                                control(new ButtonBuilder("lightScatterButton", "LightScatter = " + isGl3) {
+                                    {
+                                        align(ElementBuilder.Align.Right);
+                                        height("5%");
+                                        width("10%");
+                                        visibleToMouse(true);
+                                        interactOnClick("switchLightScatter()");
+                                    }
+                                });
+
+                                control(new ButtonBuilder("globalLightningButton", "globalLighting = " + globalLightningEnabled) {
+                                    {
+                                        align(ElementBuilder.Align.Right);
+                                        height("5%");
+                                        width("10%");
+                                        visibleToMouse(true);
+                                        interactOnClick("switchGlobalLightning()");
+                                    }
+                                });
+
+                                control(new ButtonBuilder("shadowsButton", "shadows = " + shadows) {
+                                    {
+                                        align(ElementBuilder.Align.Right);
+                                        height("5%");
+                                        width("10%");
+                                        visibleToMouse(true);
+                                        interactOnClick("switchShadows()");
+                                    }
+                                });
+
+                                control(new ButtonBuilder("anisotropyButton", "Anisotropy = " + anisotropyEnabled) {
+                                    {
+                                        align(ElementBuilder.Align.Right);
+                                        height("5%");
+                                        width("10%");
+                                        visibleToMouse(true);
+                                        interactOnClick("switchAnisotropy()");
+                                    }
+                                });
+
+                                control(new ButtonBuilder("waterButton", "WaterPP = " + waterPostProcessing) {
+                                    {
+                                        align(ElementBuilder.Align.Right);
+                                        height("5%");
+                                        width("10%");
+                                        visibleToMouse(true);
+                                        interactOnClick("switchPostProcessWater()");
+                                    }
+                                });
                             }
-                        }); // panel added
+                        });
 
                     }
                 });
             }
         }.build(nifty));
         nifty.gotoScreen("start");
-    }
-
-    public void switchBloom() {
-        this.isBloom = !this.isBloom;
-        nifty.getScreen("settings").findNiftyControl("BloomButton", Button.class).setText("Bloom : " + isBloom);
-
     }
 
     public void applyResolution() {
@@ -517,6 +625,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
             if (gameRunningState != null) {
                 app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
+                startScreenState.detachBox();
                 stateManager.detach(startScreenState);
                 stateManager.attach(gameRunningState);
                 loadFuture = null;
