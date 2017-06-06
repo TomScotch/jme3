@@ -12,65 +12,44 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
 import java.util.Random;
-import org.w3c.dom.css.RGBColor;
 
 public class WeatherControl extends AbstractControl {
 
     private final ParticleEmitter rain;
-    private final ParticleEmitter lightning;
 
     public WeatherControl(AssetManager am, Node localRoot) {
 
-        lightning = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 50000);
-        Material lightningMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        lightningMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/lightning/1.png"));
-        lightning.setMaterial(lightningMat);
-        lightning.setEndColor(ColorRGBA.White);
-        lightning.setStartColor(ColorRGBA.Gray);
-        lightning.setStartSize(1f);
-        lightning.setEndSize(0.75f);
-        lightning.setGravity(0, 500, 0);
-        lightning.setLowLife(1);
-        lightning.setHighLife(2);
-        lightning.setInWorldSpace(false);
-        lightning.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
-        lightning.setLocalTranslation(new Vector3f(0, 300, 0));
-        lightning.setNumParticles(50000);
-        lightning.setParticlesPerSec(0);
-        localRoot.attachChild(lightning);
-
-        rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 32000);
+        rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/Clouds/SmallCloud.png"));
+        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/raindrop-icon.png"));
         rain.setMaterial(rainMat);
-
-        rain.setEndColor(ColorRGBA.Blue);
-        rain.setStartColor(ColorRGBA.Blue);
-        rain.setStartSize(0.5f);
-        rain.setEndSize(0.1f);
-        rain.setGravity(0, 400, 0);
-        rain.setLowLife(3);
-        rain.setHighLife(10);
-        rain.setInWorldSpace(false);
-        rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
-        rain.setLocalTranslation(new Vector3f(0, 300, 0));
-        rain.setNumParticles(32000);
+        //rain.setEndColor(rainColorEnd);
+        //rain.setStartColor(rainColorStart);
+        rain.setStartSize(0.18f);
+        rain.setEndSize(0.054f);
+        rain.setImagesX(1);
+        rain.setImagesY(3);
+        rain.setGravity(0, 120, 0);
+        rain.setHighLife(2.5f);
+        rain.setLowLife(1.25f);
+        rain.setInWorldSpace(true);
+        rain.setShape(new EmitterBoxShape(new Vector3f(-128, -15f, -128), new Vector3f(128, 15f, 128)));
         rain.setParticlesPerSec(0);
+        rain.setFacingVelocity(true);
+        rain.getParticleInfluencer().setVelocityVariation(3f);
+        rain.setLocalTranslation(0, 32f, 0);
         localRoot.attachChild(rain);
+        rain.center();
     }
 
-    private boolean suny;
-    private boolean clouded;
-    private boolean raining;
+    private boolean suny = false;
+    private boolean clouded = false;
+    private boolean raining = false;
 
-    private float rainStrength;
-    private float rainThickness;
-    private RGBColor rainColor;
-
-    private float lightningIntervall;
-    private int maxLightningStrikes;
-    private float lightningDistance;
-    private RGBColor lightningColor;
+    private float rainStrength = 2000;
+    private float rainThickness = 80000;
+    private ColorRGBA rainColorStart = new ColorRGBA(0.85f, 0.85f, 0.85f, 1f);
+    private ColorRGBA rainColorEnd = new ColorRGBA(0f, 0f, 0, 0.5f);
 
     public final void startRandomWeather() {
 
@@ -78,39 +57,53 @@ public class WeatherControl extends AbstractControl {
 
             case 1:
 
-                suny = true;
-                clouded = false;
-                raining = false;
-                rain.setParticlesPerSec(0);
-                lightning.setParticlesPerSec(0);
-                System.out.println("sunny");
+                makeSuny();
+                break;
 
             case 2:
 
-                suny = false;
-                clouded = true;
-                raining = false;
-                rain.setParticlesPerSec(0);
-                lightning.setParticlesPerSec(0);
-                System.out.println("cloudy");
+                makeCloudy();
+                break;
 
             case 3:
-                if (getRandomNumberInRange(1, 9) > 3) {
-                    suny = false;
-                    clouded = false;
-                    raining = true;
-                    rain.setParticlesPerSec(5000);
-                    lightning.setParticlesPerSec(0);
-                    System.out.println("raining");
+
+                if (getRandomNumberInRange(1, 6) > 3) {
+
+                    makeRain();
                 }
+                break;
         }
+
+    }
+
+    public void makeRain() {
+        suny = false;
+        clouded = false;
+        raining = true;
+        System.out.println("raining");
+    }
+
+    public void makeCloudy() {
+        suny = false;
+        clouded = true;
+        raining = false;
+        System.out.println("cloudy");
+    }
+
+    public void makeSuny() {
+        suny = true;
+        clouded = false;
+        raining = false;
+        System.out.println("sunny");
     }
 
     @Override
     protected void controlUpdate(float tpf) {
 
         if (raining) {
-            //
+            rain.setParticlesPerSec(rainStrength);
+        } else {
+            rain.setParticlesPerSec(0);
         }
     }
 
@@ -121,7 +114,7 @@ public class WeatherControl extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //
+        //rain.getWorldTranslation().set(vp.getCamera().getLocation()).addLocal(0, 45, 0);
     }
 
     public boolean isSuny() {
@@ -164,43 +157,19 @@ public class WeatherControl extends AbstractControl {
         this.rainThickness = rainThickness;
     }
 
-    public RGBColor getRainColor() {
-        return rainColor;
+    public ColorRGBA getRainColorStart() {
+        return rainColorStart;
     }
 
-    public void setRainColor(RGBColor rainColor) {
-        this.rainColor = rainColor;
+    public void setRainColorStart(ColorRGBA rainColorStart) {
+        this.rainColorStart = rainColorStart;
     }
 
-    public float getLightningIntervall() {
-        return lightningIntervall;
+    public ColorRGBA getRainColorEnd() {
+        return rainColorEnd;
     }
 
-    public void setLightningIntervall(float lightningIntervall) {
-        this.lightningIntervall = lightningIntervall;
-    }
-
-    public int getMaxLightningStrikes() {
-        return maxLightningStrikes;
-    }
-
-    public void setMaxLightningStrikes(int maxLightningStrikes) {
-        this.maxLightningStrikes = maxLightningStrikes;
-    }
-
-    public float getLightningDistance() {
-        return lightningDistance;
-    }
-
-    public void setLightningDistance(float lightningDistance) {
-        this.lightningDistance = lightningDistance;
-    }
-
-    public RGBColor getLightningColor() {
-        return lightningColor;
-    }
-
-    public void setLightningColor(RGBColor lightningColor) {
-        this.lightningColor = lightningColor;
+    public void setRainColorEnd(ColorRGBA rainColorEnd) {
+        this.rainColorEnd = rainColorEnd;
     }
 }

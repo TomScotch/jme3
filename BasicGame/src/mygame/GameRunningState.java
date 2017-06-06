@@ -332,14 +332,10 @@ public class GameRunningState extends AbstractAppState {
 
     @Override
     public void stateAttached(AppStateManager stateManager) {
-        System.out.println("Game State is being attached");
-        playerControl.setEnabled(true);
 
-        if (waterPostProcessing) {
-            if (localRootNode.getControl(WeatherControl.class) != null) {
-                weatherControl.startRandomWeather();
-            }
-        }
+        System.out.println("Game State is being attached");
+
+        playerControl.setEnabled(true);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {

@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.bullet.BulletAppState;
 import com.jme3.collision.CollisionResults;
+import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
@@ -24,23 +25,20 @@ public class CameraCollisionControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        Ray ray1 = new Ray(cam.getLocation(), cam.getDirection());
+        Ray ray1 = new Ray(cam.getLocation().subtract(0, 1.5f, 0), cam.getDirection());
         CollisionResults results1 = new CollisionResults();
         localRootNode.collideWith(ray1, results1);
         if (results1.size() > 0) {
             if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
-                setNewCamPos();
+                if (pc.getChaseCam() != null) {
+                    pc.getChaseCam().setMaxDistance(((pc.getChaseCam().getMaxDistance() - FastMath.PI) * tpf));
+
+                }
             } else {
-                pc.getChaseCam().setMaxDistance(50);
+                pc.getChaseCam().setMaxDistance(60);
             }
         } else {
-            pc.getChaseCam().setMaxDistance(50);
-        }
-    }
-
-    public void setNewCamPos() {
-        if (pc.getChaseCam() != null) {
-            pc.getChaseCam().setMaxDistance(pc.getChaseCam().getMaxDistance() - 25);
+            pc.getChaseCam().setMaxDistance(60);
         }
     }
 

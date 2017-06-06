@@ -56,6 +56,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger restart_trigger = new KeyTrigger(KeyInput.KEY_F11);
     private final Trigger exit_trigger = new KeyTrigger(KeyInput.KEY_F12);
     private final Trigger superDebug_trigger = new KeyTrigger(KeyInput.KEY_F1);
+    private final Trigger fpsSwitch_trigger = new KeyTrigger(KeyInput.KEY_F2);
 
     private static GameRunningState gameRunningState;
     private static StartScreenState startScreenState;
@@ -74,6 +75,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private boolean globalLightningEnabled = true;
     private boolean isGl3 = false;
     private boolean shadows = false;
+    private static boolean showFps = false;
 
     private boolean wireframe = false;
 
@@ -195,7 +197,7 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setVSync(false);
         cfg.setFrameRate(30);
         cfg.setSamples(0);
-        app.setDisplayFps(false);
+        app.setDisplayFps(showFps);
         app.setDisplayStatView(false);
 
         //
@@ -265,6 +267,9 @@ public class Main extends SimpleApplication implements ScreenController {
 
         stateManager.attach(startScreenState);
 
+        inputManager.addMapping("fpsSwitch_trigger", fpsSwitch_trigger);
+        inputManager.addListener(actionListener, new String[]{"fpsSwitch_trigger"});
+
         inputManager.addMapping("superDebug", superDebug_trigger);
         inputManager.addListener(actionListener, new String[]{"superDebug"});
 
@@ -331,6 +336,11 @@ public class Main extends SimpleApplication implements ScreenController {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
 
+            if (name.equals("fpsSwitch_trigger") && !isPressed) {
+
+                switchFps();
+            }
+
             if (name.equals("superDebug") && !isPressed) {
                 wireframe = !wireframe;
                 rootNode.depthFirstTraversal(new SceneGraphVisitor() {
@@ -372,6 +382,11 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
     };
+
+    private void switchFps() {
+        showFps = !showFps;
+        app.setDisplayFps(showFps);
+    }
 
     public void switchOptionsState() {
         if (stateManager.hasState(startScreenState)) {
@@ -725,5 +740,13 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public void doShutdown() {
         app.stop();
+    }
+
+    public static boolean isShowFps() {
+        return showFps;
+    }
+
+    public static void setShowFps(boolean aShowFps) {
+        showFps = aShowFps;
     }
 }
