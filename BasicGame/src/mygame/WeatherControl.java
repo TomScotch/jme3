@@ -17,23 +17,43 @@ import org.w3c.dom.css.RGBColor;
 public class WeatherControl extends AbstractControl {
 
     private final ParticleEmitter rain;
+    private final ParticleEmitter lightning;
 
     public WeatherControl(AssetManager am, Node localRoot) {
 
+        lightning = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 50000);
+        Material lightningMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
+        lightningMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/lightning/1.png"));
+        lightning.setMaterial(lightningMat);
+        lightning.setEndColor(ColorRGBA.White);
+        lightning.setStartColor(ColorRGBA.Gray);
+        lightning.setStartSize(1f);
+        lightning.setEndSize(0.75f);
+        lightning.setGravity(0, 500, 0);
+        lightning.setLowLife(1);
+        lightning.setHighLife(2);
+        lightning.setInWorldSpace(false);
+        lightning.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
+        lightning.setLocalTranslation(new Vector3f(0, 300, 0));
+        lightning.setNumParticles(50000);
+        lightning.setParticlesPerSec(0);
+        localRoot.attachChild(lightning);
+
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 32000);
-        Material mat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        mat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/Clouds/SmallCloud.png"));
-        rain.setMaterial(mat);
+        Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
+        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/Clouds/SmallCloud.png"));
+        rain.setMaterial(rainMat);
+
         rain.setEndColor(ColorRGBA.Blue);
         rain.setStartColor(ColorRGBA.Blue);
-        rain.setStartSize(5f);
-        rain.setEndSize(2.5f);
-        rain.setGravity(0, 150, 0);
-        rain.setLowLife(5);
+        rain.setStartSize(0.5f);
+        rain.setEndSize(0.1f);
+        rain.setGravity(0, 400, 0);
+        rain.setLowLife(3);
         rain.setHighLife(10);
         rain.setInWorldSpace(false);
         rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
-        rain.setLocalTranslation(new Vector3f(0, 100, 0));
+        rain.setLocalTranslation(new Vector3f(0, 300, 0));
         rain.setNumParticles(32000);
         rain.setParticlesPerSec(0);
         localRoot.attachChild(rain);
@@ -52,10 +72,6 @@ public class WeatherControl extends AbstractControl {
     private float lightningDistance;
     private RGBColor lightningColor;
 
-    private float cloudDensity;
-    private int cloudNumbers;
-    private RGBColor cloudColor;
-
     public final void startRandomWeather() {
 
         switch (getRandomNumberInRange(1, 3)) {
@@ -66,6 +82,7 @@ public class WeatherControl extends AbstractControl {
                 clouded = false;
                 raining = false;
                 rain.setParticlesPerSec(0);
+                lightning.setParticlesPerSec(0);
                 System.out.println("sunny");
 
             case 2:
@@ -74,6 +91,7 @@ public class WeatherControl extends AbstractControl {
                 clouded = true;
                 raining = false;
                 rain.setParticlesPerSec(0);
+                lightning.setParticlesPerSec(0);
                 System.out.println("cloudy");
 
             case 3:
@@ -81,7 +99,8 @@ public class WeatherControl extends AbstractControl {
                     suny = false;
                     clouded = false;
                     raining = true;
-                    rain.setParticlesPerSec(1000);
+                    rain.setParticlesPerSec(5000);
+                    lightning.setParticlesPerSec(0);
                     System.out.println("raining");
                 }
         }
@@ -90,8 +109,8 @@ public class WeatherControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (isEnabled()) {
-            System.out.println("\n clouded : " + clouded + "\n raining : " + raining + " \n sunny : " + suny);
+        if (raining) {
+            //
         }
     }
 
@@ -183,29 +202,5 @@ public class WeatherControl extends AbstractControl {
 
     public void setLightningColor(RGBColor lightningColor) {
         this.lightningColor = lightningColor;
-    }
-
-    public float getCloudDensity() {
-        return cloudDensity;
-    }
-
-    public void setCloudDensity(float cloudDensity) {
-        this.cloudDensity = cloudDensity;
-    }
-
-    public int getCloudNumbers() {
-        return cloudNumbers;
-    }
-
-    public void setCloudNumbers(int cloudNumbers) {
-        this.cloudNumbers = cloudNumbers;
-    }
-
-    public RGBColor getCloudColor() {
-        return cloudColor;
-    }
-
-    public void setCloudColor(RGBColor cloudColor) {
-        this.cloudColor = cloudColor;
     }
 }
