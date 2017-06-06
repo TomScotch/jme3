@@ -9,14 +9,11 @@ import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
-import com.jme3.font.BitmapFont;
-import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.ViewPort;
@@ -57,6 +54,7 @@ public class GameRunningState extends AbstractAppState {
     private final boolean shadows;
 
     private static FilterPostProcessor fpp;
+    private boolean weatherEnabled;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -129,23 +127,12 @@ public class GameRunningState extends AbstractAppState {
             }
         }
 
-        //      BGM
-        // Node bgmNode = (Node) localRootNode.getChild("terrain");
-        //  bgm = (AudioNode) bgmNode.getChild("AudioNode");
-
-        /*        bgm.setVolume(bgm.getVolume() / bgmVolume);
-        if (bgmOn == false) {
-        bgm.setVolume(0);
+        //      Weather
+        if (weatherEnabled) {
+            if (localRootNode.getControl(WeatherControl.class) == null) {
+                localRootNode.addControl(new WeatherControl(app, localRootNode));
+            }
         }
-        bgm.setLooping(bgmOn);
-        
-         */
-        //      TEST GUI TEXT
-        displayText("Game running",
-                new Vector2f(10, 20),
-                1.8f,
-                ColorRGBA.Blue,
-                4f);
 
 //      ANISOTROPY
         if (anisotropyEnabled) {
@@ -195,27 +182,6 @@ public class GameRunningState extends AbstractAppState {
             }
         }
 
-    }
-
-    private void displayText(String txt, Vector2f pos, float size, ColorRGBA color, float lifetime) {
-
-        BitmapFont guiFont = assetManager.loadFont(
-                "Interface/Fonts/Default.fnt");
-        BitmapText displaytext = new BitmapText(guiFont);
-
-        TimedActionControl tc = new TimedActionControl(lifetime) {
-            @Override
-            void action() {
-                this.spatial.removeFromParent();
-            }
-        };
-
-        displaytext.setText(txt);
-        displaytext.setColor(color);
-        displaytext.setSize(guiFont.getCharSet().getRenderedSize() * size);
-        displaytext.move(pos.x, displaytext.getLineHeight() + pos.y, 0);
-        localGuiNode.attachChild(displaytext);
-        displaytext.addControl(tc);
     }
 
     private void setupKeys() {

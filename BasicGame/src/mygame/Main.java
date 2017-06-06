@@ -148,7 +148,7 @@ public class Main extends SimpleApplication implements ScreenController {
             exporter.save(node, file);
             x = true;
         } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Failed to save node!", ex);
+            // Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Failed to save node!", ex);
             x = false;
         }
         return x;
@@ -210,7 +210,11 @@ public class Main extends SimpleApplication implements ScreenController {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        saveNode(settingsNode);
+        try {
+            saveNode(settingsNode);
+        } catch (Exception ex) {
+            // Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         super.stop();
     }
