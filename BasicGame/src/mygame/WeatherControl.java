@@ -1,88 +1,103 @@
 package mygame;
 
-import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
+import com.jme3.effect.shapes.EmitterBoxShape;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
+import java.util.Random;
 import org.w3c.dom.css.RGBColor;
 
 public class WeatherControl extends AbstractControl {
 
-    //Weather Types
-    //
-    // Sunny
+    private final ParticleEmitter rain;
+
+    public WeatherControl(AssetManager am, Node localRoot) {
+
+        rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 32000);
+        Material mat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
+        mat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/Clouds/SmallCloud.png"));
+        rain.setMaterial(mat);
+        rain.setEndColor(ColorRGBA.Blue);
+        rain.setStartColor(ColorRGBA.Blue);
+        rain.setStartSize(5f);
+        rain.setEndSize(2.5f);
+        rain.setGravity(0, 150, 0);
+        rain.setLowLife(5);
+        rain.setHighLife(10);
+        rain.setInWorldSpace(false);
+        rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
+        rain.setLocalTranslation(new Vector3f(0, 100, 0));
+        rain.setNumParticles(32000);
+        rain.setParticlesPerSec(0);
+        localRoot.attachChild(rain);
+    }
+
     private boolean suny;
-    // Clouded
     private boolean clouded;
-    // Storming    
-    private boolean storming;
-    // Rainy
     private boolean raining;
 
-    //Rain
-    private boolean isRaining;
     private float rainStrength;
     private float rainThickness;
     private RGBColor rainColor;
-    private float randomRain;
 
-    //Lightning
-    private boolean isLightning;
     private float lightningIntervall;
     private int maxLightningStrikes;
     private float lightningDistance;
     private RGBColor lightningColor;
-    private float randomLightning;
 
-    //Clouds
-    private boolean isCloudy;
     private float cloudDensity;
     private int cloudNumbers;
     private RGBColor cloudColor;
-    private float randomCouds;
 
-    @SuppressWarnings("FieldMayBeFinal")
-    private ParticleEmitter rainEmitter;
+    public final void startRandomWeather() {
 
-    public WeatherControl(SimpleApplication app, Node localRootNode) {
-        rainEmitter = (ParticleEmitter) app.getAssetManager().loadAsset("/ParticleEmitter/rain.j30");
-        localRootNode.attachChild(rainEmitter);
-        rainEmitter.getWorldTranslation().set(new Vector3f(0, 0, 0));
+        switch (getRandomNumberInRange(1, 3)) {
+
+            case 1:
+
+                suny = true;
+                clouded = false;
+                raining = false;
+                rain.setParticlesPerSec(0);
+                System.out.println("sunny");
+
+            case 2:
+
+                suny = false;
+                clouded = true;
+                raining = false;
+                rain.setParticlesPerSec(0);
+                System.out.println("cloudy");
+
+            case 3:
+                if (getRandomNumberInRange(1, 9) > 3) {
+                    suny = false;
+                    clouded = false;
+                    raining = true;
+                    rain.setParticlesPerSec(1000);
+                    System.out.println("raining");
+                }
+        }
     }
 
     @Override
     protected void controlUpdate(float tpf) {
 
-        // no weather effects at all 
-        if (suny) {
-            isRaining = false;
-            isLightning = false;
-            isCloudy = false;
+        if (isEnabled()) {
+            System.out.println("\n clouded : " + clouded + "\n raining : " + raining + " \n sunny : " + suny);
         }
+    }
 
-        // some white clouds 
-        if (clouded) {
-            isRaining = false;
-            isLightning = false;
-            isCloudy = true;
-        }
-
-        // dark clouds with heavy rain thunder and lightning 
-        if (storming) {
-            isRaining = true;
-            isLightning = true;
-            isCloudy = true;
-        }
-
-        // white clouds with normal rain fall
-        if (raining) {
-            isRaining = true;
-            isLightning = false;
-            isCloudy = true;
-        }
+    private static int getRandomNumberInRange(int min, int max) {
+        Random r = new Random();
+        return r.ints(min, (max + 1)).findFirst().getAsInt();
     }
 
     @Override
@@ -106,28 +121,12 @@ public class WeatherControl extends AbstractControl {
         this.clouded = clouded;
     }
 
-    public boolean isStorming() {
-        return storming;
-    }
-
-    public void setStorming(boolean storming) {
-        this.storming = storming;
-    }
-
     public boolean isRaining() {
         return raining;
     }
 
     public void setRaining(boolean raining) {
         this.raining = raining;
-    }
-
-    public boolean isIsRaining() {
-        return isRaining;
-    }
-
-    public void setIsRaining(boolean isRaining) {
-        this.isRaining = isRaining;
     }
 
     public float getRainStrength() {
@@ -152,22 +151,6 @@ public class WeatherControl extends AbstractControl {
 
     public void setRainColor(RGBColor rainColor) {
         this.rainColor = rainColor;
-    }
-
-    public float getRandomRain() {
-        return randomRain;
-    }
-
-    public void setRandomRain(float randomRain) {
-        this.randomRain = randomRain;
-    }
-
-    public boolean isIsLightning() {
-        return isLightning;
-    }
-
-    public void setIsLightning(boolean isLightning) {
-        this.isLightning = isLightning;
     }
 
     public float getLightningIntervall() {
@@ -202,22 +185,6 @@ public class WeatherControl extends AbstractControl {
         this.lightningColor = lightningColor;
     }
 
-    public float getRandomLightning() {
-        return randomLightning;
-    }
-
-    public void setRandomLightning(float randomLightning) {
-        this.randomLightning = randomLightning;
-    }
-
-    public boolean isIsCloudy() {
-        return isCloudy;
-    }
-
-    public void setIsCloudy(boolean isCloudy) {
-        this.isCloudy = isCloudy;
-    }
-
     public float getCloudDensity() {
         return cloudDensity;
     }
@@ -240,21 +207,5 @@ public class WeatherControl extends AbstractControl {
 
     public void setCloudColor(RGBColor cloudColor) {
         this.cloudColor = cloudColor;
-    }
-
-    public float getRandomCouds() {
-        return randomCouds;
-    }
-
-    public void setRandomCouds(float randomCouds) {
-        this.randomCouds = randomCouds;
-    }
-
-    public ParticleEmitter getRainEmitter() {
-        return rainEmitter;
-    }
-
-    public void setRainEmitter(ParticleEmitter rainEmitter) {
-        this.rainEmitter = rainEmitter;
     }
 }

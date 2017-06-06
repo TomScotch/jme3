@@ -29,25 +29,18 @@ public class CameraCollisionControl extends AbstractControl {
         localRootNode.collideWith(ray1, results1);
         if (results1.size() > 0) {
             if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
-                float distance = results1.getClosestCollision().getGeometry().getWorldTranslation().distance(cam.getLocation());
-                if (distance < 57) {
-                    setNewCamPos();
-                }
+                setNewCamPos();
             } else {
-                if (pc.getChaseCam().getMaxDistance() != 50) {
-                    pc.getChaseCam().setMaxDistance(50);
-                }
-            }
-        } else {
-            if (pc.getChaseCam().getMaxDistance() != 50) {
                 pc.getChaseCam().setMaxDistance(50);
             }
+        } else {
+            pc.getChaseCam().setMaxDistance(50);
         }
     }
 
     public void setNewCamPos() {
         if (pc.getChaseCam() != null) {
-            pc.getChaseCam().setMaxDistance(pc.getChaseCam().getMaxDistance() - 15);
+            pc.getChaseCam().setMaxDistance(pc.getChaseCam().getMaxDistance() - 25);
         }
     }
 

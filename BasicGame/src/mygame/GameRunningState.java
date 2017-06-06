@@ -26,6 +26,16 @@ import java.io.IOException;
 
 public class GameRunningState extends AbstractAppState {
 
+    private WeatherControl weatherControl;
+
+    public boolean isWeatherEnabled() {
+        return weatherEnabled;
+    }
+
+    public void setWeatherEnabled(boolean weatherEnabled) {
+        this.weatherEnabled = weatherEnabled;
+    }
+
     private final ViewPort viewPort;
     private final Node rootNode;
     private final Node guiNode;
@@ -67,6 +77,7 @@ public class GameRunningState extends AbstractAppState {
         this.waterPostProcessing = waterPostProcessing;
         this.globalLightningEnabled = globalLightningEnabled;
         this.shadows = shadows;
+        weatherEnabled = true;
 
 //      CONSTRUKTOR
         this.rootNode = app.getRootNode();
@@ -130,7 +141,8 @@ public class GameRunningState extends AbstractAppState {
         //      Weather
         if (weatherEnabled) {
             if (localRootNode.getControl(WeatherControl.class) == null) {
-                localRootNode.addControl(new WeatherControl(app, localRootNode));
+                weatherControl = new WeatherControl(assetManager, localRootNode);
+                localRootNode.addControl(weatherControl);
             }
         }
 
@@ -322,11 +334,10 @@ public class GameRunningState extends AbstractAppState {
     public void stateAttached(AppStateManager stateManager) {
         System.out.println("Game State is being attached");
         playerControl.setEnabled(true);
-        //bgm.play();
 
         if (waterPostProcessing) {
-            if (localRootNode.getControl(WaterPostFilter.class) != null) {
-                //localRootNode.getControl(WaterPostFilter.class).start();
+            if (localRootNode.getControl(WeatherControl.class) != null) {
+                weatherControl.startRandomWeather();
             }
         }
 
@@ -350,9 +361,7 @@ public class GameRunningState extends AbstractAppState {
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
-        //localRootNode.getControl(WaterPostFilter.class).stop();
         playerControl.setEnabled(false);
-        //bgm.stop();
 
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);

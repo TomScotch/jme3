@@ -9,7 +9,10 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.Trigger;
 import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.SceneGraphVisitor;
+import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -52,6 +55,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
     private final Trigger restart_trigger = new KeyTrigger(KeyInput.KEY_F11);
     private final Trigger exit_trigger = new KeyTrigger(KeyInput.KEY_F12);
+    private final Trigger superDebug_trigger = new KeyTrigger(KeyInput.KEY_F1);
 
     private static GameRunningState gameRunningState;
     private static StartScreenState startScreenState;
@@ -70,6 +74,8 @@ public class Main extends SimpleApplication implements ScreenController {
     private boolean globalLightningEnabled = true;
     private boolean isGl3 = false;
     private boolean shadows = false;
+
+    private boolean wireframe = false;
 
     private Node settingsNode;
 
@@ -191,9 +197,11 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setSamples(0);
         app.setDisplayFps(false);
         app.setDisplayStatView(false);
+
         //
         cfg.load(cfg.getTitle());
         //
+        app.setPauseOnLostFocus(true);
         app.setSettings(cfg);
         //
         app.start();
@@ -257,6 +265,9 @@ public class Main extends SimpleApplication implements ScreenController {
 
         stateManager.attach(startScreenState);
 
+        inputManager.addMapping("superDebug", superDebug_trigger);
+        inputManager.addListener(actionListener, new String[]{"superDebug"});
+
         inputManager.addMapping("Game Pause Unpause", pause_trigger);
         inputManager.addListener(actionListener, new String[]{"Game Pause Unpause"});
 
@@ -319,6 +330,18 @@ public class Main extends SimpleApplication implements ScreenController {
     private final ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
+
+            if (name.equals("superDebug") && !isPressed) {
+                wireframe = !wireframe;
+                rootNode.depthFirstTraversal(new SceneGraphVisitor() {
+                    @Override
+                    public void visit(Spatial spatial) {
+                        if (spatial instanceof Geometry) {
+                            ((Geometry) spatial).getMaterial().getAdditionalRenderState().setWireframe(wireframe);
+                        }
+                    }
+                });
+            }
 
             if (name.equals("Game Pause Unpause") && !isPressed) {
 

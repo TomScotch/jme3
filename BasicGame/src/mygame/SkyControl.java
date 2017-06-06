@@ -119,6 +119,9 @@ public class SkyControl extends AbstractControl {
                 if (z > 0) {
                     if (!localRootNode.hasChild(morning)) {
                         localRootNode.attachChild(morning);
+                        if (localRootNode.getControl(WeatherControl.class) != null) {
+                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
+                        }
                     }
                 }
 
@@ -127,10 +130,15 @@ public class SkyControl extends AbstractControl {
 
                     if (!localRootNode.hasChild(day)) {
                         localRootNode.attachChild(day);
+                        if (localRootNode.getControl(WeatherControl.class) != null) {
+                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
+                        }
                     }
+
                     if (localRootNode.hasChild(night)) {
                         night.removeFromParent();
                     }
+
                     if (z < -0.20f) {
                         if (localRootNode.hasChild(morning)) {
                             morning.removeFromParent();
@@ -142,12 +150,17 @@ public class SkyControl extends AbstractControl {
                 if (z < -0.38f && z > -0.99f) {
                     if (!localRootNode.hasChild(evening)) {
                         localRootNode.attachChild(evening);
+                        if (localRootNode.getControl(WeatherControl.class) != null) {
+                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
+                        }
                     }
+
                     if (z < -0.70f) {
                         if (localRootNode.hasChild(day)) {
                             day.removeFromParent();
                         }
                     }
+
                     if (z < -0.86f) {
                         if (!localRootNode.hasChild(night)) {
                             localRootNode.attachChild(night);
@@ -161,10 +174,15 @@ public class SkyControl extends AbstractControl {
 
                     if (localRootNode.hasChild(day)) {
                         day.removeFromParent();
+                        if (localRootNode.getControl(WeatherControl.class) != null) {
+                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
+                        }
                     }
+
                     if (localRootNode.hasChild(evening)) {
                         evening.removeFromParent();
                     }
+
                     if (!localRootNode.hasChild(night)) {
                         localRootNode.attachChild(night);
                     }
