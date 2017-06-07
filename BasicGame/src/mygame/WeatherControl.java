@@ -16,8 +16,34 @@ import java.util.Random;
 public class WeatherControl extends AbstractControl {
 
     private final ParticleEmitter rain;
+    private final ParticleEmitter flash;
 
     public WeatherControl(AssetManager am, Node localRoot) {
+
+        flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness / 12);
+        Material flash_mat = new Material(
+                am, "Common/MatDefs/Misc/Particle.j3md");
+        flash_mat.setTexture("Texture",
+                am.loadTexture("Textures/weatherSprites/lightning/Xz2ctMGg_5c2UF-vqdqT3dMZLvs.png"));
+        flash.setMaterial(flash_mat);
+        flash.setShape(new EmitterBoxShape(new Vector3f(-512, -1.5f, -512), new Vector3f(512, 1.5f, 512)));
+        flash.setParticlesPerSec(0);
+        flash.setLocalTranslation(0, 23f, 0);
+        flash.center();
+        localRoot.attachChild(flash);
+
+        flash.setEndColor(ColorRGBA.Blue);
+        flash.setStartColor(ColorRGBA.White);
+
+        flash.setStartSize(3);
+        flash.setEndSize(35);
+
+        flash.setHighLife(0.5f);
+        flash.setLowLife(0.1f);
+
+        flash.setFacingVelocity(false);
+        flash.setInWorldSpace(false);
+        flash.setGravity(1, 0, 1);
 
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
@@ -28,28 +54,28 @@ public class WeatherControl extends AbstractControl {
         rain.setStartSize(0.18f);
         rain.setEndSize(0.054f);
         rain.setImagesX(1);
-        rain.setImagesY(3);
-        rain.setGravity(0, 120, 0);
-        rain.setHighLife(2.5f);
-        rain.setLowLife(1.25f);
+        rain.setImagesY(4);
+        rain.setGravity(0, 145, 0);
+        rain.setHighLife(2f);
+        rain.setLowLife(1f);
         rain.setInWorldSpace(true);
         rain.setShape(new EmitterBoxShape(new Vector3f(-128, -15f, -128), new Vector3f(128, 15f, 128)));
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(true);
         rain.getParticleInfluencer().setVelocityVariation(3f);
-        rain.setLocalTranslation(0, 32f, 0);
-        localRoot.attachChild(rain);
+        rain.setLocalTranslation(0, 28f, 0);
         rain.center();
+        localRoot.attachChild(rain);
     }
-
+    int lightningFrequency = 20;
     private boolean suny = false;
     private boolean clouded = false;
     private boolean raining = false;
 
     private float rainStrength = 2000;
     private float rainThickness = 80000;
-    private ColorRGBA rainColorStart = new ColorRGBA(0.85f, 0.85f, 0.85f, 1f);
-    private ColorRGBA rainColorEnd = new ColorRGBA(0f, 0f, 0, 0.5f);
+    private ColorRGBA rainColorStart = new ColorRGBA(0.85f, 0.85f, 0.85f, 2f);
+    private ColorRGBA rainColorEnd = new ColorRGBA(0f, 0f, 0, 1f);
 
     public final void startRandomWeather() {
 
@@ -99,8 +125,10 @@ public class WeatherControl extends AbstractControl {
 
         if (raining) {
             rain.setParticlesPerSec(rainStrength);
+            flash.setParticlesPerSec(lightningFrequency);
         } else {
             rain.setParticlesPerSec(0);
+            flash.setParticlesPerSec(0);
         }
     }
 
