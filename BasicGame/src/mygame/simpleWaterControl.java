@@ -33,7 +33,6 @@ public class simpleWaterControl extends AbstractControl {
         Vector3f waterLocation = new Vector3f(0, -4f, 0);
         waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
         waterProcessor.setRenderSize(256, 256);
-        app.getViewPort().addProcessor(waterProcessor);
 
         Quad quad = new Quad(4096, 4096);
         quad.scaleTextureCoordinates(new Vector2f(6f, 6f));
@@ -82,5 +81,12 @@ public class simpleWaterControl extends AbstractControl {
 
     public void setWaterDepth(int waterDepth) {
         this.waterDepth = waterDepth;
+    }
+
+    /**
+     * @return the waterProcessor
+     */
+    public SimpleWaterProcessor getWaterProcessor() {
+        return waterProcessor;
     }
 }

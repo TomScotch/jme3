@@ -347,6 +347,11 @@ public class GameRunningState extends AbstractAppState {
             viewPort.addProcessor(fpp);
         }
 
+        if (!waterPostProcessing) {
+            if (localRootNode.getControl(simpleWaterControl.class) != null) {
+                viewPort.addProcessor(localRootNode.getControl(simpleWaterControl.class).getWaterProcessor());
+            }
+        }
         attachLocalGuiNode();
         attachLocalRootNode();
 
@@ -366,6 +371,12 @@ public class GameRunningState extends AbstractAppState {
         if (shadows) {
             if (viewPort.getProcessors().contains(glc.getSlsr())) {
                 viewPort.removeProcessor(glc.getSlsr());
+            }
+        }
+
+        if (!waterPostProcessing) {
+            if (viewPort.getProcessors().contains(localRootNode.getControl(simpleWaterControl.class).getWaterProcessor())) {
+                viewPort.removeProcessor(localRootNode.getControl(simpleWaterControl.class).getWaterProcessor());
             }
         }
 
