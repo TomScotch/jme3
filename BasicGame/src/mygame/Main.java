@@ -50,7 +50,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
     private static VideoRecorderAppState videoRecorderAppState;
     private static DisplayMode[] modes;
-
+    private final Trigger rain_trigger = new KeyTrigger(KeyInput.KEY_R);
     private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
     private final Trigger restart_trigger = new KeyTrigger(KeyInput.KEY_F11);
@@ -268,6 +268,9 @@ public class Main extends SimpleApplication implements ScreenController {
 
         stateManager.attach(startScreenState);
 
+        inputManager.addMapping("rain_trigger", rain_trigger);
+        inputManager.addListener(actionListener, new String[]{"rain_trigger"});
+
         inputManager.addMapping("fpsSwitch_trigger", fpsSwitch_trigger);
         inputManager.addListener(actionListener, new String[]{"fpsSwitch_trigger"});
 
@@ -336,6 +339,12 @@ public class Main extends SimpleApplication implements ScreenController {
     private final ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
+
+            if (name.equals("rain_trigger") && !isPressed) {
+                if (!gameRunningState.getLocalRoot().getControl(WeatherControl.class).isRaining()) {
+                    gameRunningState.getLocalRoot().getControl(WeatherControl.class).makeRain();
+                }
+            }
 
             if (name.equals("fpsSwitch_trigger") && !isPressed) {
 

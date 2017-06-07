@@ -23,8 +23,8 @@ public class WeatherControl extends AbstractControl {
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/raindrop-icon.png"));
         rain.setMaterial(rainMat);
-        //rain.setEndColor(rainColorEnd);
-        //rain.setStartColor(rainColorStart);
+        rain.setEndColor(rainColorEnd);
+        rain.setStartColor(rainColorStart);
         rain.setStartSize(0.18f);
         rain.setEndSize(0.054f);
         rain.setImagesX(1);
@@ -67,10 +67,7 @@ public class WeatherControl extends AbstractControl {
 
             case 3:
 
-                if (getRandomNumberInRange(1, 6) > 3) {
-
-                    makeRain();
-                }
+                makeRain();
                 break;
         }
 
