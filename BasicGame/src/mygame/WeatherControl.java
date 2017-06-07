@@ -47,7 +47,7 @@ public class WeatherControl extends AbstractControl {
 
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/raindrop-icon.png"));
+        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/raindrop.png"));
         rain.setMaterial(rainMat);
         rain.setEndColor(rainColorEnd);
         rain.setStartColor(rainColorStart);
