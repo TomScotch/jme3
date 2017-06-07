@@ -21,6 +21,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
+import com.jme3.water.SimpleWaterProcessor;
 import java.io.File;
 import java.io.IOException;
 
@@ -349,7 +350,7 @@ public class GameRunningState extends AbstractAppState {
 
         if (!waterPostProcessing) {
             if (localRootNode.getControl(simpleWaterControl.class) != null) {
-                viewPort.addProcessor(localRootNode.getControl(simpleWaterControl.class).getWaterProcessor());
+                viewPort.addProcessor((SimpleWaterProcessor) localRootNode.getControl(simpleWaterControl.class).getWaterProcessor());
             }
         }
         attachLocalGuiNode();
@@ -376,7 +377,8 @@ public class GameRunningState extends AbstractAppState {
 
         if (!waterPostProcessing) {
             if (viewPort.getProcessors().contains(localRootNode.getControl(simpleWaterControl.class).getWaterProcessor())) {
-                viewPort.removeProcessor(localRootNode.getControl(simpleWaterControl.class).getWaterProcessor());
+                SimpleWaterProcessor swp = localRootNode.getControl(simpleWaterControl.class).getWaterProcessor();
+                viewPort.removeProcessor(swp);
             }
         }
 

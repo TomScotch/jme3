@@ -191,6 +191,7 @@ public class Main extends SimpleApplication implements ScreenController {
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = device.getDisplayModes();
 
+        cfg.setGammaCorrection(true);
         cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());

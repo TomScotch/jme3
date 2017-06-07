@@ -36,16 +36,15 @@ public class simpleWaterControl extends AbstractControl {
 
         Quad quad = new Quad(4096, 4096);
         quad.scaleTextureCoordinates(new Vector2f(6f, 6f));
-
+        app.getViewPort().addProcessor(waterProcessor);
         Geometry water = new Geometry("water", quad);
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
         water.setLocalTranslation(-1024, -4f, 1024);
         water.setShadowMode(ShadowMode.Off);
-
         water.setMaterial(waterProcessor.getMaterial());
         localRootNode.attachChild(water);
     }
-
+    
     @Override
     protected void controlUpdate(float tpf) {
         waterProcessor.setWaterDepth(waterDepth);
