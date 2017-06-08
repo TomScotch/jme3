@@ -43,7 +43,7 @@ public class WeatherControl extends AbstractControl {
 
         flash.setFacingVelocity(false);
         flash.setInWorldSpace(false);
-        flash.setGravity(-1, 0, -1);
+        flash.setGravity(0, 0, 0);
 
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
