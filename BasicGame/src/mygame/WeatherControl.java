@@ -47,15 +47,15 @@ public class WeatherControl extends AbstractControl {
 
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/raindrop.png"));
+        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/raindrop-icon.png"));
         rain.setMaterial(rainMat);
-        rain.setEndColor(rainColorEnd);
-        rain.setStartColor(rainColorStart);
+       // rain.setEndColor(rainColorEnd);
+        //rain.setStartColor(rainColorStart);
         rain.setStartSize(0.18f);
-        rain.setEndSize(0.054f);
+        rain.setEndSize(0.075f);
         rain.setImagesX(1);
-        rain.setImagesY(4);
-        rain.setGravity(0, 145, 0);
+        rain.setImagesY(3);
+        rain.setGravity(0, 160, 0);
         rain.setHighLife(2f);
         rain.setLowLife(1f);
         rain.setInWorldSpace(true);
@@ -72,7 +72,7 @@ public class WeatherControl extends AbstractControl {
     private boolean clouded = false;
     private boolean raining = false;
 
-    private float rainStrength = 2000;
+    private float rainStrength = 3500;
     private float rainThickness = 80000;
     private ColorRGBA rainColorStart = new ColorRGBA(0.85f, 0.85f, 0.85f, 2f);
     private ColorRGBA rainColorEnd = new ColorRGBA(0f, 0f, 0, 1f);
