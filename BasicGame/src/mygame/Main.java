@@ -43,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
+@SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
 
     private static AppSettings cfg;
@@ -191,7 +192,6 @@ public class Main extends SimpleApplication implements ScreenController {
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = device.getDisplayModes();
 
-        cfg.setGammaCorrection(true);
         cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
@@ -200,6 +200,8 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setSamples(0);
         app.setDisplayFps(showFps);
         app.setDisplayStatView(false);
+        cfg.setDepthBits(24);
+        cfg.setGammaCorrection(false);
 
         //
         cfg.load(cfg.getTitle());
@@ -338,6 +340,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
     private final ActionListener actionListener = new ActionListener() {
         @Override
+        @SuppressWarnings("Convert2Lambda")
         public void onAction(String name, boolean isPressed, float tpf) {
 
             if (name.equals("rain_trigger") && !isPressed) {
@@ -703,6 +706,7 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     @Override
+    @SuppressWarnings("Convert2Lambda")
     public void simpleUpdate(final float tpf) {
 
         if (loadFuture != null) {

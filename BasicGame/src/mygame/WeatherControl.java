@@ -20,15 +20,15 @@ public class WeatherControl extends AbstractControl {
 
     public WeatherControl(AssetManager am, Node localRoot) {
 
-        flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness / 12);
+        flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness / 10);
         Material flash_mat = new Material(
                 am, "Common/MatDefs/Misc/Particle.j3md");
         flash_mat.setTexture("Texture",
                 am.loadTexture("Textures/weatherSprites/lightning/Xz2ctMGg_5c2UF-vqdqT3dMZLvs.png"));
         flash.setMaterial(flash_mat);
-        flash.setShape(new EmitterBoxShape(new Vector3f(-512, -1.5f, -512), new Vector3f(512, 1.5f, 512)));
+        flash.setShape(new EmitterBoxShape(new Vector3f(-496, -1.5f, -496), new Vector3f(496, 1.5f, 496)));
         flash.setParticlesPerSec(0);
-        flash.setLocalTranslation(0, 23f, 0);
+        flash.setLocalTranslation(0, 35, 0);
         flash.center();
         localRoot.attachChild(flash);
 
@@ -43,14 +43,14 @@ public class WeatherControl extends AbstractControl {
 
         flash.setFacingVelocity(false);
         flash.setInWorldSpace(false);
-        flash.setGravity(1, 0, 1);
+        flash.setGravity(-1, 0, -1);
 
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/raindrop-icon.png"));
         rain.setMaterial(rainMat);
-       // rain.setEndColor(rainColorEnd);
-        //rain.setStartColor(rainColorStart);
+        rain.setEndColor(rainColorEnd);
+        rain.setStartColor(rainColorStart);
         rain.setStartSize(0.18f);
         rain.setEndSize(0.075f);
         rain.setImagesX(1);
@@ -63,11 +63,11 @@ public class WeatherControl extends AbstractControl {
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(true);
         rain.getParticleInfluencer().setVelocityVariation(3f);
-        rain.setLocalTranslation(0, 28f, 0);
+        rain.setLocalTranslation(0, 40, 0);
         rain.center();
         localRoot.attachChild(rain);
     }
-    int lightningFrequency = 20;
+    int lightningFrequency = 25;
     private boolean suny = false;
     private boolean clouded = false;
     private boolean raining = false;
