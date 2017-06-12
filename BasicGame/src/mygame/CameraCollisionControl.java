@@ -26,7 +26,7 @@ public class CameraCollisionControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
 
         if (this.isEnabled()) {
-            Ray ray1 = new Ray(cam.getLocation().subtract(0, 0.1f, 0), cam.getDirection());
+            Ray ray1 = new Ray(cam.getLocation().subtract(0, 0.15f, 0), cam.getDirection());
             CollisionResults results1 = new CollisionResults();
             localRootNode.collideWith(ray1, results1);
             if (results1.size() > 0) {

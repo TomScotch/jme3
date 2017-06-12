@@ -38,6 +38,10 @@ public class ShowDamage extends AbstractControl {
                 //txt.removeFromParent();
                 //this.spatial.removeControl(this);
             }
+            if (txt.getWorldTranslation().y > 15) {
+                txt.removeFromParent();
+                spatial.removeControl(this);
+            }
         }
     }
 

@@ -47,7 +47,7 @@ public class PlayerControl extends AbstractControl {
     private boolean chaseEnabled = true;
     private final float jump_Speed = 35f;
     private final CameraNode camNode;
-    private final float gravity = 100f;
+    private final float gravity = 120f;
     private final float playerMass = 4.2f;
     private final float chaseCamRotationSpeed = 0.5f;
     private final SpotLight lamp;
@@ -133,7 +133,7 @@ public class PlayerControl extends AbstractControl {
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("anim");
         aniCon = n1.getControl(AnimControl.class);
-        physicsCharacter = new BetterCharacterControl(3, 6, playerMass);
+        physicsCharacter = new BetterCharacterControl(0.5f, 6, playerMass);
         physicsCharacter.warp(new Vector3f(0, 2, 0));
         physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
         physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
@@ -289,9 +289,9 @@ public class PlayerControl extends AbstractControl {
 
         if (isEnabled()) {
 
-            if (ghostControl.getOverlappingObjects().size() > 2) {
+            if (ghostControl.getOverlappingObjects().size() > 1) {
 
-                Node overlap = (Node) ghostControl.getOverlapping(2).getUserObject();
+                Node overlap = (Node) ghostControl.getOverlapping(1).getUserObject();
 
                 if (!overlap.getName().equals("terrain")) {
                     collisionTarget = overlap.getName();

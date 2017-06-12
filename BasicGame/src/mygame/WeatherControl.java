@@ -67,7 +67,7 @@ public class WeatherControl extends AbstractControl {
         rain.center();
         localRoot.attachChild(rain);
     }
-    int lightningFrequency = 18;
+    int lightningFrequency = 22;
     int lightningVoloume = 80000;
     private boolean suny = false;
     private boolean clouded = false;

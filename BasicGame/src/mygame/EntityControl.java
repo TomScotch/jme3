@@ -32,7 +32,7 @@ public class EntityControl extends AbstractControl {
         this.spatial = hostile;
         this.assetManager = assetManager;
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
-        bcc = new BetterCharacterControl(3, 7, 3);
+        bcc = new BetterCharacterControl(3, 7, 100);
         bcc.setSpatial(hostile);
         hostile.addControl(bcc);
         bulletState.getPhysicsSpace().add(bcc);
