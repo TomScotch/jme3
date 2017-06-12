@@ -303,7 +303,7 @@ public class Main extends SimpleApplication implements ScreenController {
     public int getDisplayMode() {
         int c = 0;
         for (DisplayMode dm : modes) {
-            
+
             if (dm.getHeight() == cfg.getHeight() && dm.getWidth() == cfg.getWidth()) {
                 break;
             } else {
@@ -511,7 +511,13 @@ public class Main extends SimpleApplication implements ScreenController {
                                 });
 
                                 SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
-                                sliderBuilderA.max(modes.length / 2);
+
+                                if (modes.length > 8) {
+                                    sliderBuilderA.max(8);
+                                } else {
+                                    sliderBuilderA.max(modes.length);
+                                }
+
                                 sliderBuilderA.stepSize(1);
                                 sliderBuilderA.initial(getDisplayMode());
                                 sliderBuilderA.buttonStepSize(1);
@@ -637,7 +643,6 @@ public class Main extends SimpleApplication implements ScreenController {
 
     @NiftyEventSubscriber(pattern = "slider*.")
     public void onSliderChangedEvent(final String id, final SliderChangedEvent event) {
-        System.out.println(id);
         if (id.equals("sliderA")) {
             int height = (int) modes[(int) event.getValue()].getHeight();
             int width = (int) modes[(int) event.getValue()].getWidth();
@@ -736,17 +741,17 @@ public class Main extends SimpleApplication implements ScreenController {
 
     @Override
     public void bind(Nifty nifty, Screen screen) {
-        System.out.println("bind( " + screen.getScreenId() + ")");
+        // System.out.println("bind( " + screen.getScreenId() + ")");
     }
 
     @Override
     public void onStartScreen() {
-        System.out.println("onStartScreen");
+        // System.out.println("onStartScreen");
     }
 
     @Override
     public void onEndScreen() {
-        System.out.println("onEndScreen");
+        // System.out.println("onEndScreen");
     }
 
     public void quit() {
