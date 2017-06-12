@@ -514,6 +514,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
                                 if (modes.length < 6) {
                                     sliderBuilderA.max(modes.length);
+
                                 } else {
                                     sliderBuilderA.max(5);
                                 }
