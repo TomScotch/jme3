@@ -512,11 +512,10 @@ public class Main extends SimpleApplication implements ScreenController {
 
                                 SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
 
-                                if (modes.length <= 8) {
+                                if (modes.length < 6) {
                                     sliderBuilderA.max(modes.length);
-
                                 } else {
-                                    sliderBuilderA.max(8);
+                                    sliderBuilderA.max(5);
                                 }
 
                                 sliderBuilderA.stepSize(1);
