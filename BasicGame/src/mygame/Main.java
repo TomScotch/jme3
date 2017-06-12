@@ -510,7 +510,7 @@ public class Main extends SimpleApplication implements ScreenController {
                                 });
 
                                 SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
-                                sliderBuilderA.max(modes.length);
+                                sliderBuilderA.max(modes.length -4);
                                 sliderBuilderA.stepSize(1);
                                 sliderBuilderA.initial(getDisplayMode());
                                 sliderBuilderA.buttonStepSize(1);
