@@ -107,7 +107,7 @@ public class SkyControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (isEnabled()) {
+        if (this.isEnabled()) {
 
             Node localRootNode = (Node) this.spatial;
 

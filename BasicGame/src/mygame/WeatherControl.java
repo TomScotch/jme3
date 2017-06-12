@@ -20,7 +20,7 @@ public class WeatherControl extends AbstractControl {
 
     public WeatherControl(AssetManager am, Node localRoot) {
 
-        flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness / 10);
+        flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) lightningVoloume / 10);
         Material flash_mat = new Material(
                 am, "Common/MatDefs/Misc/Particle.j3md");
         flash_mat.setTexture("Texture",
@@ -53,7 +53,7 @@ public class WeatherControl extends AbstractControl {
         rain.setStartColor(rainColorStart);
         rain.setStartSize(0.18f);
         rain.setEndSize(0.075f);
-        rain.setImagesX(1);
+        //rain.setImagesX(1);
         rain.setImagesY(3);
         rain.setGravity(0, 160, 0);
         rain.setHighLife(2f);
@@ -67,7 +67,8 @@ public class WeatherControl extends AbstractControl {
         rain.center();
         localRoot.attachChild(rain);
     }
-    int lightningFrequency = 25;
+    int lightningFrequency = 18;
+    int lightningVoloume = 80000;
     private boolean suny = false;
     private boolean clouded = false;
     private boolean raining = false;
@@ -123,12 +124,14 @@ public class WeatherControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (raining) {
-            rain.setParticlesPerSec(rainStrength);
-            flash.setParticlesPerSec(lightningFrequency);
-        } else {
-            rain.setParticlesPerSec(0);
-            flash.setParticlesPerSec(0);
+        if (this.isEnabled()) {
+            if (raining) {
+                rain.setParticlesPerSec(rainStrength);
+                flash.setParticlesPerSec(lightningFrequency);
+            } else {
+                rain.setParticlesPerSec(0);
+                flash.setParticlesPerSec(0);
+            }
         }
     }
 

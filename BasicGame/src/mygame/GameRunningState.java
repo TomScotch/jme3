@@ -28,6 +28,7 @@ import java.io.IOException;
 public class GameRunningState extends AbstractAppState {
 
     private WeatherControl weatherControl;
+    private final SkyControl sc;
 
     public boolean isWeatherEnabled() {
         return weatherEnabled;
@@ -115,7 +116,8 @@ public class GameRunningState extends AbstractAppState {
         glc.setGlobalLightning(this.globalLightningEnabled);
 
 //      SKY
-        localRootNode.addControl(new SkyControl(assetManager, glc, localRootNode));
+        sc = new SkyControl(assetManager, glc, localRootNode);
+        localRootNode.addControl(sc);
 
 //      Bloom
         if (bloomEnabled) {
@@ -314,8 +316,18 @@ public class GameRunningState extends AbstractAppState {
 
     @Override
     public void update(float tpf) {
+
         if (isRunning) {
             super.update(tpf);
+            playerControl.setEnabled(true);
+            sc.setEnabled(true);
+            glc.setEnabled(true);
+            weatherControl.setEnabled(true);
+        } else {
+            playerControl.setEnabled(false);
+            sc.setEnabled(false);
+            glc.setEnabled(false);
+            weatherControl.setEnabled(false);
         }
     }
 
@@ -337,6 +349,9 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being attached");
 
         playerControl.setEnabled(true);
+        sc.setEnabled(true);
+        glc.setEnabled(true);
+        weatherControl.setEnabled(true);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
@@ -364,7 +379,9 @@ public class GameRunningState extends AbstractAppState {
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
         playerControl.setEnabled(false);
-
+        sc.setEnabled(false);
+        glc.setEnabled(false);
+        weatherControl.setEnabled(false);
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
         }

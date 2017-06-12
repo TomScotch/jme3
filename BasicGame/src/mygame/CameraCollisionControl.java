@@ -25,20 +25,22 @@ public class CameraCollisionControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        Ray ray1 = new Ray(cam.getLocation().subtract(0, 1.5f, 0), cam.getDirection());
-        CollisionResults results1 = new CollisionResults();
-        localRootNode.collideWith(ray1, results1);
-        if (results1.size() > 0) {
-            if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
-                if (pc.getChaseCam() != null) {
-                    pc.getChaseCam().setMaxDistance(((pc.getChaseCam().getMaxDistance() - FastMath.PI) * tpf));
+        if (this.isEnabled()) {
+            Ray ray1 = new Ray(cam.getLocation().subtract(0, 0.1f, 0), cam.getDirection());
+            CollisionResults results1 = new CollisionResults();
+            localRootNode.collideWith(ray1, results1);
+            if (results1.size() > 0) {
+                if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+                    if (pc.getChaseCam() != null) {
+                        pc.getChaseCam().setMaxDistance(((pc.getChaseCam().getMaxDistance() - FastMath.PI) * tpf));
 
+                    }
+                } else {
+                    pc.getChaseCam().setMaxDistance(50);
                 }
             } else {
-                pc.getChaseCam().setMaxDistance(60);
+                pc.getChaseCam().setMaxDistance(50);
             }
-        } else {
-            pc.getChaseCam().setMaxDistance(60);
         }
     }
 

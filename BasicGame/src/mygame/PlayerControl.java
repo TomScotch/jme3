@@ -73,6 +73,7 @@ public class PlayerControl extends AbstractControl {
     private final Node localRootNode;
     private final AnimControl aniCon;
     private final float scale = 0.45f;
+    private final int maxDistance = 50;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -97,6 +98,7 @@ public class PlayerControl extends AbstractControl {
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
         chaseCam.setMinVerticalRotation(FastMath.QUARTER_PI / 6);
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        chaseCam.setMaxDistance(maxDistance);
         chaseCam.setDefaultDistance(chaseCam.getMaxDistance());
         chaseCam.setDefaultVerticalRotation(FastMath.INV_PI - FastMath.ONE_THIRD);
 
@@ -358,6 +360,7 @@ public class PlayerControl extends AbstractControl {
     }
 
     private void hit(final String name) {
+        @SuppressWarnings("Convert2Lambda")
         SceneGraphVisitor visitor = new SceneGraphVisitor() {
             @Override
             public void visit(Spatial spat) {
@@ -375,6 +378,7 @@ public class PlayerControl extends AbstractControl {
     }
 
     private void doAnim(final String name, final String animation, final LoopMode lop) {
+        @SuppressWarnings("Convert2Lambda")
         SceneGraphVisitor visitor = new SceneGraphVisitor() {
             @Override
             public void visit(Spatial spat) {
