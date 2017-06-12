@@ -303,6 +303,7 @@ public class Main extends SimpleApplication implements ScreenController {
     public int getDisplayMode() {
         int c = 0;
         for (DisplayMode dm : modes) {
+            
             if (dm.getHeight() == cfg.getHeight() && dm.getWidth() == cfg.getWidth()) {
                 break;
             } else {
@@ -510,7 +511,7 @@ public class Main extends SimpleApplication implements ScreenController {
                                 });
 
                                 SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
-                                sliderBuilderA.max(modes.length -4);
+                                sliderBuilderA.max(modes.length / 2);
                                 sliderBuilderA.stepSize(1);
                                 sliderBuilderA.initial(getDisplayMode());
                                 sliderBuilderA.buttonStepSize(1);
