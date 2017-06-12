@@ -34,7 +34,7 @@ public class StartScreenState extends AbstractAppState {
         Box boxMesh = new Box(1, 1, 1);
         boxGeo = new Geometry("Box", boxMesh);
         Material boxMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        Texture monkeyTex = app.getAssetManager().loadTexture("Interface/Logo/Monkey.jpg");
+        Texture monkeyTex = app.getAssetManager().loadTexture("Textures/gloemtoi.png");
         boxMat.setTexture("ColorMap", monkeyTex);
         boxMat.setColor("Color", ColorRGBA.White);
         boxGeo.setMaterial(boxMat);
