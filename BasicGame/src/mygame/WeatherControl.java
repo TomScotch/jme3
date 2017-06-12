@@ -17,6 +17,7 @@ public class WeatherControl extends AbstractControl {
 
     private final ParticleEmitter rain;
     private final ParticleEmitter flash;
+    private final ParticleEmitter clouds;
 
     public WeatherControl(AssetManager am, Node localRoot) {
 
@@ -66,7 +67,26 @@ public class WeatherControl extends AbstractControl {
         rain.setLocalTranslation(0, 40, 0);
         rain.center();
         localRoot.attachChild(rain);
+
+        clouds = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, cloudThickness);
+        Material cloudMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
+        cloudMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/Clouds/SmallCloud.png"));
+        clouds.setMaterial(cloudMat);
+        clouds.setStartSize(25);
+        clouds.setEndSize(25);
+        clouds.setGravity(0.015f, 0, 0.015f);
+        clouds.setHighLife(200f);
+        clouds.setLowLife(200f);
+        clouds.setInWorldSpace(true);
+        clouds.setShape(new EmitterBoxShape(new Vector3f(-256, -10f, -256), new Vector3f(256, 10f, 256)));
+        clouds.setParticlesPerSec(0);
+        clouds.setFacingVelocity(false);
+        clouds.getParticleInfluencer().setVelocityVariation(3f);
+        clouds.setLocalTranslation(0, 150, 0);
+        clouds.center();
+        localRoot.attachChild(clouds);
     }
+    private final int cloudThickness = 400;
     int lightningFrequency = 22;
     int lightningVoloume = 80000;
     private boolean suny = false;
@@ -102,8 +122,9 @@ public class WeatherControl extends AbstractControl {
 
     public void makeRain() {
         suny = false;
-        clouded = false;
+        clouded = true;
         raining = true;
+        clouds.emitParticles(cloudThickness);
         System.out.println("raining");
     }
 
@@ -111,6 +132,7 @@ public class WeatherControl extends AbstractControl {
         suny = false;
         clouded = true;
         raining = false;
+        clouds.emitParticles(cloudThickness);
         System.out.println("cloudy");
     }
 
@@ -119,6 +141,7 @@ public class WeatherControl extends AbstractControl {
         clouded = false;
         raining = false;
         System.out.println("sunny");
+        clouds.killAllParticles();
     }
 
     @Override

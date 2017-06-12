@@ -45,7 +45,7 @@ public class PlayerControl extends AbstractControl {
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     private boolean chaseEnabled = true;
-    private final float jump_Speed = 100;
+    private final float jump_Speed = 240;
     private final CameraNode camNode;
     private final float gravity = 120f;
     private final float playerMass = 25f;
@@ -73,7 +73,7 @@ public class PlayerControl extends AbstractControl {
     private final Node localRootNode;
     private final AnimControl aniCon;
     private final float scale = 0.45f;
-    private final int maxDistance = 35;
+    private final int maxDistance = 30;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
