@@ -224,7 +224,7 @@ public class GameRunningState extends AbstractAppState {
         String name = node.getName();
 
         if (n > 0) {
-            System.out.println("+ " + name + " " + n);
+            System.out.print("+ " + name + " " + n);
         } else {
             System.out.println(name);
         }
