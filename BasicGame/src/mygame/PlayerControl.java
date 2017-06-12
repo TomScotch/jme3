@@ -45,17 +45,17 @@ public class PlayerControl extends AbstractControl {
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     private boolean chaseEnabled = true;
-    private final float jump_Speed = 35f;
+    private final float jump_Speed = 100;
     private final CameraNode camNode;
     private final float gravity = 120f;
-    private final float playerMass = 4.2f;
+    private final float playerMass = 25f;
     private final float chaseCamRotationSpeed = 0.5f;
     private final SpotLight lamp;
     private final GhostControl ghostControl;
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     private final float move_speed = 0.1f;
-    private final float strafe_speed = 0.1f;
+    private final float strafe_speed = 0.005f;
     private final float rotationSpeed = 0.005f;
     private boolean attacking = false;
     private float attackTimer = 0f;
@@ -73,7 +73,7 @@ public class PlayerControl extends AbstractControl {
     private final Node localRootNode;
     private final AnimControl aniCon;
     private final float scale = 0.45f;
-    private final int maxDistance = 50;
+    private final int maxDistance = 35;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -133,12 +133,11 @@ public class PlayerControl extends AbstractControl {
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("anim");
         aniCon = n1.getControl(AnimControl.class);
-        physicsCharacter = new BetterCharacterControl(0.5f, 6, playerMass);
+        physicsCharacter = new BetterCharacterControl(1f, 6, playerMass);
         physicsCharacter.warp(new Vector3f(0, 2, 0));
         physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
         physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
         characterNode.addControl(physicsCharacter);
-        physicsCharacter.setSpatial(characterNode);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
 
         Node ghostNode = new Node("PlayerGhostNode");
@@ -164,7 +163,6 @@ public class PlayerControl extends AbstractControl {
                 case "flashlight":
                     if (value && isEnabled()) {
                         getLamp().setEnabled(!lamp.isEnabled());
-                        //spatial.getParent().getControl(GlobalLightingControl.class).switchFlashlight();
                     }
                     break;
                 case "rightRotate":
@@ -334,11 +332,11 @@ public class PlayerControl extends AbstractControl {
             walkDirection.set(0, 0, 0);
 
             if (leftStrafe) {
-                walkDirection.addLocal(camLeft);
+                walkDirection.addLocal(camLeft.mult(tpf));
             } else if (rightStrafe) {
-                walkDirection.addLocal(camLeft.negate());
+                walkDirection.addLocal(camLeft.negate().mult(tpf));
             }
-
+            physicsCharacter.setWalkDirection(walkDirection);
             if (forward) {
                 walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
             } else if (backward) {
@@ -348,7 +346,6 @@ public class PlayerControl extends AbstractControl {
             physicsCharacter.setViewDirection(viewDirection);
             physicsCharacter.setWalkDirection(walkDirection);
 
-            //lamp.setPosition(viewPort.getCamera().getLocation());
             lamp.setDirection(viewPort.getCamera().getDirection());
 
             if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
