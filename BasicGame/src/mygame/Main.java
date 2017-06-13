@@ -366,7 +366,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
             if (name.equals("rain_trigger") && !isPressed) {
                 if (!gameRunningState.getLocalRoot().getControl(WeatherControl.class).isRaining()) {
-                    gameRunningState.getLocalRoot().getControl(WeatherControl.class).makeRain();
+                    gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
                 }
             }
 
@@ -531,7 +531,7 @@ public class Main extends SimpleApplication implements ScreenController {
                                 });
 
                                 SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
-                                sliderBuilderA.max(modes.length-1);
+                                sliderBuilderA.max(modes.length - 1);
                                 sliderBuilderA.stepSize(1);
                                 sliderBuilderA.initial(getDisplayMode());
                                 sliderBuilderA.buttonStepSize(1);

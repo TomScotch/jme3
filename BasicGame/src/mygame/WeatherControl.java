@@ -101,31 +101,34 @@ public class WeatherControl extends AbstractControl {
 
     public final void startRandomWeather() {
 
-        switch (getRandomNumberInRange(1, 4)) {
-
+        switch (getRandomNumberInRange(1, 8)) {
             case 1:
-
-                makeSuny();
-                break;
-
-            case 2:
-
-                makeCloudy();
-                break;
-
-            case 3:
-
-                makeRain();
-                break;
-            case 4:
                 makeMisty();
                 break;
         }
 
+        switch (getRandomNumberInRange(1, 4)) {
+            case 1:
+                makeCloudy();
+                break;
+
+        }
+
+        switch (getRandomNumberInRange(1, 2)) {
+
+            case 1:
+                makeSuny();
+                break;
+
+            case 2:
+                makeRain();
+                break;
+        }
     }
 
     private void makeMisty() {
         misty = true;
+        suny = false;
         System.out.println("misty");
     }
 
@@ -140,7 +143,6 @@ public class WeatherControl extends AbstractControl {
     public void makeCloudy() {
         suny = false;
         clouded = true;
-        raining = false;
         clouds.emitParticles(cloudThickness);
         System.out.println("cloudy");
     }
@@ -166,6 +168,13 @@ public class WeatherControl extends AbstractControl {
                 flash.setParticlesPerSec(0);
             }
             if (misty) {
+
+                Node n = (Node) spatial;
+                if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+                    spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.DarkGray);
+                } else {
+                    spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.Gray);
+                }
 
                 if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance) {
                     spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf);
