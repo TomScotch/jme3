@@ -128,7 +128,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                     if (isSun == false) {
                         if (sl.isEnabled()) {
-                            slsr.setShadowIntensity(0.35f);
+                            slsr.setShadowIntensity(0.5f);
                         }
                         localRootNode.addLight(sun);
                         sun.setColor(ColorRGBA.Orange);
@@ -149,7 +149,7 @@ public class GlobalLightingControl extends AbstractControl {
                         localRootNode.removeLight(sun);
                         isSun = false;
                         if (sl.isEnabled()) {
-                            slsr.setShadowIntensity(0.5f);
+                            slsr.setShadowIntensity(0.35f);
                         }
                     }
                 }
