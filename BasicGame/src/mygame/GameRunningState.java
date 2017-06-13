@@ -154,6 +154,9 @@ public class GameRunningState extends AbstractAppState {
             localRootNode.addControl(new AnisotropyControl(assetManager, 2));
         }
 
+//      PosterizationFilter
+
+        
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));

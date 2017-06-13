@@ -9,7 +9,15 @@ import com.jme3.scene.control.AbstractControl;
 
 public class FogPostFilter extends AbstractControl {
 
-    private final FogFilter fog;
+    public FogFilter getFog() {
+        return fog;
+    }
+
+    public void setFog(FogFilter fog) {
+        this.fog = fog;
+    }
+
+    private FogFilter fog;
 
     public void setFogColor(ColorRGBA color) {
         fog.setFogColor(color);
