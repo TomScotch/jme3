@@ -92,6 +92,7 @@ public class WeatherControl extends AbstractControl {
     private boolean suny = false;
     private boolean clouded = false;
     private boolean raining = false;
+    private boolean misty = false;
 
     private float rainStrength = 3500;
     private float rainThickness = 80000;
@@ -100,7 +101,7 @@ public class WeatherControl extends AbstractControl {
 
     public final void startRandomWeather() {
 
-        switch (getRandomNumberInRange(1, 3)) {
+        switch (getRandomNumberInRange(1, 4)) {
 
             case 1:
 
@@ -116,8 +117,16 @@ public class WeatherControl extends AbstractControl {
 
                 makeRain();
                 break;
+            case 4:
+                makeMisty();
+                break;
         }
 
+    }
+
+    private void makeMisty() {
+        misty = true;
+        System.out.println("misty");
     }
 
     public void makeRain() {
@@ -140,6 +149,7 @@ public class WeatherControl extends AbstractControl {
         suny = true;
         clouded = false;
         raining = false;
+        misty = false;
         System.out.println("sunny");
         clouds.killAllParticles();
     }
@@ -155,8 +165,18 @@ public class WeatherControl extends AbstractControl {
                 rain.setParticlesPerSec(0);
                 flash.setParticlesPerSec(0);
             }
+            if (misty) {
+                spatial.getControl(FogPostFilter.class).setFogDistance(fogDistance);
+                spatial.getControl(FogPostFilter.class).setFogDensity(fogDensity);
+            } else {
+                spatial.getControl(FogPostFilter.class).setFogDensity(0);
+                spatial.getControl(FogPostFilter.class).setFogDistance(0);
+            }
+
         }
     }
+    private final float fogDensity = 1.3f;
+    private final int fogDistance = 50;
 
     private static int getRandomNumberInRange(int min, int max) {
         Random r = new Random();
@@ -223,4 +243,5 @@ public class WeatherControl extends AbstractControl {
     public void setRainColorEnd(ColorRGBA rainColorEnd) {
         this.rainColorEnd = rainColorEnd;
     }
+
 }

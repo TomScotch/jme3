@@ -28,9 +28,9 @@ public class FogPostFilter extends AbstractControl {
     public FogPostFilter(FilterPostProcessor fpp) {
 
         fog = new FogFilter();
-        fog.setFogColor(ColorRGBA.White);
-        fog.setFogDistance(999);
-        fog.setFogDensity(0.1f);
+        fog.setFogColor(ColorRGBA.Gray);
+        fog.setFogDistance(0);
+        fog.setFogDensity(0);
         fpp.addFilter(fog);
     }
 
