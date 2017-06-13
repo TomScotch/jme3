@@ -5,7 +5,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
@@ -51,7 +50,6 @@ public class GameRunningState extends AbstractAppState {
     private final PlayerControl playerControl;
     private boolean isRunning = false;
 
-    private final AudioNode bgm = new AudioNode();
     private boolean bgmOn = false;
     private int bgmVolume = 8;
     private int anisotrpy_samples = 4;
@@ -155,8 +153,8 @@ public class GameRunningState extends AbstractAppState {
         }
 
 //      PosterizationFilter
+        localRootNode.addControl(new PosterizationFilterControl(fpp));
 
-        
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
@@ -355,6 +353,8 @@ public class GameRunningState extends AbstractAppState {
         sc.setEnabled(true);
         glc.setEnabled(true);
         weatherControl.setEnabled(true);
+        
+        localRootNode.getControl(PosterizationFilterControl.class).setStrength(20);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
