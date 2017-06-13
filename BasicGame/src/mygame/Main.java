@@ -51,6 +51,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
     private static VideoRecorderAppState videoRecorderAppState;
     private static DisplayMode[] modes;
+
     private final Trigger rain_trigger = new KeyTrigger(KeyInput.KEY_R);
     private final Trigger pause_trigger = new KeyTrigger(KeyInput.KEY_BACK);
     private final Trigger record_trigger = new KeyTrigger(KeyInput.KEY_F6);
@@ -182,6 +183,23 @@ public class Main extends SimpleApplication implements ScreenController {
         return loadedNode;
     }
 
+    private static void sortModes(DisplayMode[] modes) {
+
+        for (int i = 0; i < modes.length; i++) {
+            for (int j = 0; j < modes.length; j++) {
+                if (modes[j].getWidth() < modes[i].getWidth()) {
+                    DisplayMode temp = modes[i];
+                    modes[i] = modes[j];
+                    modes[j] = temp;
+                }
+            }
+        }
+
+        for (DisplayMode dm : modes) {
+            System.out.println(dm.getWidth() + " : " + dm.getHeight());
+        }
+    }
+
     public static void main(String[] args) throws BackingStoreException {
 
         app = new Main();
@@ -191,6 +209,8 @@ public class Main extends SimpleApplication implements ScreenController {
 
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = device.getDisplayModes();
+
+        sortModes(modes);
 
         cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
@@ -511,14 +531,7 @@ public class Main extends SimpleApplication implements ScreenController {
                                 });
 
                                 SliderBuilder sliderBuilderA = new SliderBuilder("sliderA", false);
-
-                                if (modes.length < 6) {
-                                    sliderBuilderA.max(modes.length);
-
-                                } else {
-                                    sliderBuilderA.max(5);
-                                }
-
+                                sliderBuilderA.max(modes.length-1);
                                 sliderBuilderA.stepSize(1);
                                 sliderBuilderA.initial(getDisplayMode());
                                 sliderBuilderA.buttonStepSize(1);
