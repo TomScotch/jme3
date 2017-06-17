@@ -1,5 +1,6 @@
 package mygame;
 
+import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.VideoRecorderAppState;
 import com.jme3.export.binary.BinaryExporter;
@@ -226,6 +227,7 @@ public class Main extends SimpleApplication implements ScreenController {
         //
         cfg.load(cfg.getTitle());
         //
+        app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
         app.setSettings(cfg);
         //
@@ -722,6 +724,24 @@ public class Main extends SimpleApplication implements ScreenController {
                     System.out.println("switching to game...");
                 }
             }
+        }
+    }
+
+    @Override
+    public void loseFocus() {
+        super.loseFocus();
+        System.out.println("lostFocus");
+        if (gameRunningState != null) {
+            gameRunningState.setIsRunning(false);
+        }
+    }
+
+    @Override
+    public void gainFocus() {
+        super.gainFocus();
+        System.out.println("gainedFocus");
+        if (gameRunningState != null) {
+            gameRunningState.setIsRunning(true);
         }
     }
 

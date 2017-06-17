@@ -324,15 +324,9 @@ public class GameRunningState extends AbstractAppState {
 
         if (isRunning) {
             super.update(tpf);
-            playerControl.setEnabled(true);
-            sc.setEnabled(true);
-            glc.setEnabled(true);
-            weatherControl.setEnabled(true);
+            stateAttach();
         } else {
-            playerControl.setEnabled(false);
-            sc.setEnabled(false);
-            glc.setEnabled(false);
-            weatherControl.setEnabled(false);
+            stateDetach();
         }
     }
 
@@ -342,9 +336,21 @@ public class GameRunningState extends AbstractAppState {
         }
     }
 
+    public void dettachLocalRootNode() {
+        if (rootNode.hasChild(localRootNode)) {
+            localRootNode.removeFromParent();
+        }
+    }
+
     public void attachLocalGuiNode() {
         if (!guiNode.hasChild(localGuiNode)) {
             guiNode.attachChild(localGuiNode);
+        }
+    }
+
+    public void detachLocalGuiNode() {
+        if (guiNode.hasChild(localGuiNode)) {
+            guiNode.removeFromParent();
         }
     }
 
@@ -353,6 +359,13 @@ public class GameRunningState extends AbstractAppState {
 
         System.out.println("Game State is being attached");
 
+        stateAttach();
+
+        setIsRunning(true);
+
+    }
+
+    public void stateAttach() {
         playerControl.setEnabled(true);
         sc.setEnabled(true);
         glc.setEnabled(true);
@@ -377,14 +390,16 @@ public class GameRunningState extends AbstractAppState {
         }
         attachLocalGuiNode();
         attachLocalRootNode();
-
-        setIsRunning(true);
-
     }
 
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
+        stateDetach();
+        setIsRunning(false);
+    }
+
+    public void stateDetach() {
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
         playerControl.setEnabled(false);
         sc.setEnabled(false);
@@ -407,9 +422,8 @@ public class GameRunningState extends AbstractAppState {
             }
         }
 
-        rootNode.detachChild(localRootNode);
-        guiNode.detachChild(localGuiNode);
-        setIsRunning(false);
+        dettachLocalRootNode();
+        detachLocalGuiNode();
     }
 
     public boolean getIsRunning() {
