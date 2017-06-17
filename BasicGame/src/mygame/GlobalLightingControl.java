@@ -157,6 +157,8 @@ public class GlobalLightingControl extends AbstractControl {
                 sun.setDirection(new Vector3f(-5, -5, -5));
                 sun.setColor(ColorRGBA.White);
             }
+        }else{
+            System.out.println("glc stopped");
         }
     }
 

@@ -96,7 +96,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      CAMERA        
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
-        this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
+        //this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
 //      TERRAIN
         terrainControl = new Terrain(assetManager, bulletAppState, localRootNode, viewPort);
@@ -324,9 +324,6 @@ public class GameRunningState extends AbstractAppState {
 
         if (isRunning) {
             super.update(tpf);
-            stateAttach();
-        } else {
-            stateDetach();
         }
     }
 
@@ -371,7 +368,7 @@ public class GameRunningState extends AbstractAppState {
         glc.setEnabled(true);
         weatherControl.setEnabled(true);
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
-        localRootNode.getControl(PosterizationFilterControl.class).setStrength(2.75f);
+        localRootNode.getControl(PosterizationFilterControl.class).setStrength(1.75f);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
@@ -400,6 +397,7 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
+
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
         playerControl.setEnabled(false);
         sc.setEnabled(false);

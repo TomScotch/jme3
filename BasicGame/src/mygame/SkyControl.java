@@ -171,7 +171,9 @@ public class SkyControl extends AbstractControl {
 
                 //Night
                 if (z < -0.99f) {
-
+                    if (!localRootNode.hasChild(night)) {
+                        localRootNode.attachChild(night);
+                    }
                     if (localRootNode.hasChild(day)) {
                         day.removeFromParent();
                         if (localRootNode.getControl(WeatherControl.class) != null) {
@@ -193,6 +195,8 @@ public class SkyControl extends AbstractControl {
             day.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
             evening.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
             morning.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
+        }else{
+            System.out.println("glc stopped");
         }
     }
 

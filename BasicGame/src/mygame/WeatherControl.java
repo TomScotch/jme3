@@ -87,15 +87,15 @@ public class WeatherControl extends AbstractControl {
         localRoot.attachChild(clouds);
     }
     private final int cloudThickness = 400;
-    int lightningFrequency = 22;
-    int lightningVoloume = 80000;
+    int lightningFrequency = 27;
+    int lightningVoloume = 5850;
     private boolean suny = false;
     private boolean clouded = false;
     private boolean raining = false;
     private boolean misty = false;
 
-    private float rainStrength = 3500;
-    private float rainThickness = 80000;
+    private float rainStrength = 3000;
+    private float rainThickness = 6000;
     private ColorRGBA rainColorStart = new ColorRGBA(0.85f, 0.85f, 0.85f, 2f);
     private ColorRGBA rainColorEnd = new ColorRGBA(0f, 0f, 0, 1f);
 

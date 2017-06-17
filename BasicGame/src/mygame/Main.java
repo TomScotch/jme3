@@ -729,20 +729,11 @@ public class Main extends SimpleApplication implements ScreenController {
 
     @Override
     public void loseFocus() {
-        super.loseFocus();
         System.out.println("lostFocus");
         if (gameRunningState != null) {
-            gameRunningState.setIsRunning(false);
+            switchGameState();
         }
-    }
-
-    @Override
-    public void gainFocus() {
-        super.gainFocus();
-        System.out.println("gainedFocus");
-        if (gameRunningState != null) {
-            gameRunningState.setIsRunning(true);
-        }
+        super.loseFocus();
     }
 
     @Override
