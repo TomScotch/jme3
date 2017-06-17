@@ -17,6 +17,7 @@ public class CameraCollisionControl extends AbstractControl {
     private final PlayerControl pc;
 
     public CameraCollisionControl(BulletAppState bulletAppState, Camera cam, Node localRootNode, PlayerControl pc) {
+
         this.cam = cam;
         this.localRootNode = localRootNode;
         this.pc = pc;
@@ -26,17 +27,12 @@ public class CameraCollisionControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
 
         if (this.isEnabled()) {
-            Ray ray1 = new Ray(cam.getLocation().subtract(0, 0, 0), cam.getDirection().negate());
+            Ray ray1 = new Ray(cam.getLocation(), cam.getDirection());
             CollisionResults results1 = new CollisionResults();
             localRootNode.collideWith(ray1, results1);
             if (results1.size() > 0) {
-                if (!results1.getClosestCollision().getGeometry().getName().contains("player")) {
-                    if (pc.getChaseCam() != null) {
-                        float dist = cam.getLocation().distance(results1.getClosestCollision().getGeometry().getWorldTranslation());
-                        if (dist < 60f) {
-                            pc.getChaseCam().setMaxDistance(((pc.getChaseCam().getMaxDistance() - FastMath.PI) * tpf));
-                        }
-                    }
+                if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+                    pc.getChaseCam().setMaxDistance(((pc.getChaseCam().getMaxDistance() - FastMath.PI) * tpf));
                 } else {
                     pc.getChaseCam().setMaxDistance(30);
                 }

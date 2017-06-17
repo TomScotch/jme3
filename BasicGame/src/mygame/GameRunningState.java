@@ -28,6 +28,7 @@ public class GameRunningState extends AbstractAppState {
 
     private WeatherControl weatherControl;
     private final SkyControl sc;
+    private final Terrain terrainControl;
 
     public boolean isWeatherEnabled() {
         return weatherEnabled;
@@ -98,7 +99,10 @@ public class GameRunningState extends AbstractAppState {
         this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
 //      TERRAIN
-        localRootNode.addControl(new Terrain(assetManager, bulletAppState, localRootNode, viewPort));
+        terrainControl = new Terrain(assetManager, bulletAppState, localRootNode, viewPort);
+        Node terrainNode = new Node("terrainNode");
+        terrainNode.addControl(terrainControl);
+        localRootNode.attachChild(terrainNode);
 
 //      PLAYER
         playerControl = new PlayerControl(app, bulletAppState, localRootNode);
@@ -353,8 +357,8 @@ public class GameRunningState extends AbstractAppState {
         sc.setEnabled(true);
         glc.setEnabled(true);
         weatherControl.setEnabled(true);
-        
-        localRootNode.getControl(PosterizationFilterControl.class).setStrength(20);
+        localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
+        localRootNode.getControl(PosterizationFilterControl.class).setStrength(2.75f);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
@@ -381,6 +385,7 @@ public class GameRunningState extends AbstractAppState {
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
+        localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
         playerControl.setEnabled(false);
         sc.setEnabled(false);
         glc.setEnabled(false);

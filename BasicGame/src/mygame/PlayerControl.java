@@ -96,7 +96,7 @@ public class PlayerControl extends AbstractControl {
         chaseCam.setRotationSpeed(chaseCamRotationSpeed);
         chaseCam.setDownRotateOnCloseViewOnly(true);
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
-        chaseCam.setMinVerticalRotation(FastMath.QUARTER_PI / 6);
+        chaseCam.setMinVerticalRotation(FastMath.QUARTER_PI / 2);
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         chaseCam.setMaxDistance(maxDistance);
         chaseCam.setDefaultDistance(chaseCam.getMaxDistance());

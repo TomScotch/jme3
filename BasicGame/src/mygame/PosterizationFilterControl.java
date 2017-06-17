@@ -12,6 +12,8 @@ public class PosterizationFilterControl extends AbstractControl {
 
     public PosterizationFilterControl(FilterPostProcessor fpp) {
         pf = new PosterizationFilter();
+        pf.setNumColors(8);
+        pf.setGamma(0.225f);
         fpp.addFilter(pf);
     }
 
@@ -20,6 +22,9 @@ public class PosterizationFilterControl extends AbstractControl {
         if (this.isEnabled()) {
             if (pf.getStrength() > 0) {
                 pf.setStrength(pf.getStrength() - tpf);
+            }
+            if (pf.getStrength() < 0) {
+                pf.setStrength(0);
             }
         }
     }
