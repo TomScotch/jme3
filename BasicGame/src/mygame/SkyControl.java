@@ -114,7 +114,7 @@ public class SkyControl extends AbstractControl {
             Float z = glc.getTimingValue();
 
             if (glc.getIsSun()) {
-
+                
                 //Morning
                 if (z > 0) {
                     if (!localRootNode.hasChild(morning)) {

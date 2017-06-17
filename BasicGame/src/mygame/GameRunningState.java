@@ -12,7 +12,6 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.ViewPort;
@@ -46,7 +45,6 @@ public class GameRunningState extends AbstractAppState {
     private final Node localGuiNode = new Node("Game Screen GuiNode");
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
-    private final ColorRGBA backgroundColor = ColorRGBA.BlackNoAlpha;
 
     private final PlayerControl playerControl;
     private boolean isRunning = false;
@@ -188,7 +186,6 @@ public class GameRunningState extends AbstractAppState {
 
         System.out.println("Game State is being initialized");
 
-        viewPort.setBackgroundColor(backgroundColor);
         inputManager.setCursorVisible(false);
 
         //      WATER

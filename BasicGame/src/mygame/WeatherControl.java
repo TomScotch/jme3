@@ -127,12 +127,20 @@ public class WeatherControl extends AbstractControl {
     }
 
     private void makeMisty() {
+        Node n = (Node) spatial;
+        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().setColor(ColorRGBA.LightGray);
+        }
         misty = true;
         suny = false;
         System.out.println("misty");
     }
 
     public void makeRain() {
+        Node n = (Node) spatial;
+        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().setColor(ColorRGBA.Gray);
+        }
         suny = false;
         clouded = true;
         raining = true;
@@ -141,6 +149,10 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeCloudy() {
+        Node n = (Node) spatial;
+        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().setColor(ColorRGBA.DarkGray);
+        }
         suny = false;
         clouded = true;
         clouds.emitParticles(cloudThickness);
@@ -148,6 +160,10 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeSuny() {
+        Node n = (Node) spatial;
+        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().setColor(ColorRGBA.Orange);
+        }
         suny = true;
         clouded = false;
         raining = false;
@@ -158,7 +174,6 @@ public class WeatherControl extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-
         if (this.isEnabled()) {
             if (raining) {
                 rain.setParticlesPerSec(rainStrength);

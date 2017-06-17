@@ -24,6 +24,10 @@ import com.jme3.shadow.SpotLightShadowRenderer;
 
 public class GlobalLightingControl extends AbstractControl {
 
+    public DirectionalLight getSun() {
+        return sun;
+    }
+
     private final Node localRootNode;
     private final static Node pivot = new Node();
     private int timeDelay = 12;
@@ -157,7 +161,7 @@ public class GlobalLightingControl extends AbstractControl {
                 sun.setDirection(new Vector3f(-5, -5, -5));
                 sun.setColor(ColorRGBA.White);
             }
-        }else{
+        } else {
             System.out.println("glc stopped");
         }
     }
