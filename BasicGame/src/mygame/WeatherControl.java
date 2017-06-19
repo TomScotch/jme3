@@ -122,8 +122,8 @@ public class WeatherControl extends AbstractControl {
 
     public final void startRandomWeather() {
 
-        switch (getRandomNumberInRange(0, 2)) {
-            case 2:
+        switch (getRandomNumberInRange(0, 4)) {
+            case 4:
                 makeMisty();
                 break;
         }
