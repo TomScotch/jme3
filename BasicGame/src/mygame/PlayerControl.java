@@ -106,7 +106,7 @@ public class PlayerControl extends AbstractControl {
         camNode.setControlDir(CameraControl.ControlDirection.SpatialToCamera);
         characterNode.attachChild(camNode);
         camNode.setLocalTranslation(new Vector3f(0, 4.4f, -18f));
-        camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
+        //camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
         camNode.setEnabled(false);
 
         lamp = new SpotLight();
