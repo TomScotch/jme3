@@ -26,13 +26,14 @@ public class EntityControl extends AbstractControl {
     private Spatial targetSpatial;
     private final BetterCharacterControl bcc;
     private final AssetManager assetManager;
+    public int mass = 1000;
 
     public EntityControl(AssetManager assetManager, Spatial hostile, BulletAppState bulletState, String name, Vector3f pos) {
 
         this.spatial = hostile;
         this.assetManager = assetManager;
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
-        bcc = new BetterCharacterControl(3, 7, 100);
+        bcc = new BetterCharacterControl(3, 7, mass);
         bcc.setSpatial(hostile);
         hostile.addControl(bcc);
         bulletState.getPhysicsSpace().add(bcc);

@@ -45,11 +45,11 @@ public class PlayerControl extends AbstractControl {
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     private boolean chaseEnabled = true;
-    private final float jump_Speed = 240;
+    private final float jump_Speed = 750;
     private final CameraNode camNode;
-    private final float gravity = 120f;
-    private final float playerMass = 25f;
-    private final float chaseCamRotationSpeed = 0.5f;
+    private final float gravity = 200;
+    private final float playerMass = 75;
+    private final float chaseCamRotationSpeed = 0.375f;
     private final SpotLight lamp;
     private final GhostControl ghostControl;
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
@@ -96,17 +96,16 @@ public class PlayerControl extends AbstractControl {
         chaseCam.setRotationSpeed(chaseCamRotationSpeed);
         chaseCam.setDownRotateOnCloseViewOnly(true);
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
-        chaseCam.setMinVerticalRotation(FastMath.QUARTER_PI / 2);
+        //chaseCam.setMinVerticalRotation(FastMath.QUARTER_PI );
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         chaseCam.setMaxDistance(maxDistance);
-        chaseCam.setDefaultDistance(chaseCam.getMaxDistance());
+        chaseCam.setDefaultDistance(chaseCam.getMaxDistance() / 2);
         chaseCam.setDefaultVerticalRotation(FastMath.INV_PI - FastMath.ONE_THIRD);
 
         camNode = new CameraNode("Camera Node", app.getCamera());
         camNode.setControlDir(CameraControl.ControlDirection.SpatialToCamera);
         characterNode.attachChild(camNode);
         camNode.setLocalTranslation(new Vector3f(0, 4.4f, -18f));
-        //camNode.lookAt(characterNode.getLocalTranslation(), Vector3f.UNIT_Y);
         camNode.setEnabled(false);
 
         lamp = new SpotLight();
@@ -214,9 +213,9 @@ public class PlayerControl extends AbstractControl {
                     break;
                 case "Jump":
                     if (value) {
-                        if (physicsCharacter.isOnGround()) {
-                            physicsCharacter.jump();
-                        }
+                        //if (physicsCharacter.isOnGround()) {
+                        physicsCharacter.jump();
+                        //}
                     }
                     break;
                 default:
