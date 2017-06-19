@@ -18,23 +18,25 @@ public class WeatherControl extends AbstractControl {
     private final ParticleEmitter rain;
     private final ParticleEmitter flash;
     private final ParticleEmitter clouds;
-    private boolean suny = false;
 
+    private boolean suny = false;
+    private boolean misty = false;
     private boolean clouded = false;
+    private boolean raining = false;
+    private boolean lightnungStrikes = false;
+
     private boolean clouded_low = false;
     private boolean clouded_med = false;
     private boolean clouded_high = false;
 
-    private boolean raining = false;
     private boolean raining_low = false;
     private boolean raining_med = false;
     private boolean raining_high = false;
 
-    private boolean misty = false;
     private boolean misty_low = false;
     private boolean misty_med = false;
     private boolean misty_high = false;
-    private boolean lightnungStrikes = false;
+
     private boolean lightnungStrikes_low = false;
     private boolean lightnungStrikes_med = false;
     private boolean lightnungStrikes_high = false;
@@ -182,9 +184,9 @@ public class WeatherControl extends AbstractControl {
             n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().setColor(ColorRGBA.Gray);
         }
 
-        suny = false;
         makeCloudy();
         raining = true;
+        suny = false;
 
         switch (getRandomNumberInRange(0, 2)) {
             case 0:
@@ -284,28 +286,50 @@ public class WeatherControl extends AbstractControl {
         misty = false;
         lightnungStrikes = false;
 
-        misty_low = false;
-        misty_med = false;
-        misty_high = false;
-
-        clouded_high = false;
-        clouded_med = false;
-        clouded_low = false;
-
-        raining_high = false;
-        raining_med = false;
-        raining_low = false;
-
-        lightnungStrikes_high = false;
-        lightnungStrikes_med = false;
-        lightnungStrikes_low = false;
-
         System.out.println("sunny");
     }
 
     @Override
     protected void controlUpdate(float tpf) {
+
         if (this.isEnabled()) {
+
+            if (suny) {
+
+                clouded_low = false;
+                clouded_med = false;
+                clouded_high = false;
+
+                raining_low = false;
+                raining_med = false;
+                raining_high = false;
+
+                misty_low = false;
+                misty_med = false;
+                misty_high = false;
+
+                lightnungStrikes_low = false;
+                lightnungStrikes_med = false;
+                lightnungStrikes_high = false;
+
+                if (clouds.getNumVisibleParticles() > 0) {
+                    clouds.killParticle(0);
+                }
+                if (rain.getParticlesPerSec() > 0) {
+                    rain.setParticlesPerSec(0);
+                }
+                if (flash.getParticlesPerSec() > 0) {
+                    flash.setParticlesPerSec(0);
+                }
+                if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
+                    spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 10);
+                }
+
+                if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
+                    spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 10);
+                }
+            }
+
             if (clouded) {
                 if (clouded_high) {
                     if (clouds.getNumVisibleParticles() < cloudThickness * 2) {
@@ -325,6 +349,7 @@ public class WeatherControl extends AbstractControl {
                     clouds.killParticle(0);
                 }
             }
+
             if (raining) {
                 if (raining_high) {
                     rain.setParticlesPerSec(rainStrength * 2);
@@ -335,7 +360,7 @@ public class WeatherControl extends AbstractControl {
                 }
             } else {
                 if (rain.getParticlesPerSec() > 0) {
-                    rain.setParticlesPerSec(rain.getParticlesPerSec() - 100);
+                    rain.setParticlesPerSec(0);
                 }
             }
 
@@ -350,7 +375,7 @@ public class WeatherControl extends AbstractControl {
                 }
             } else {
                 if (flash.getParticlesPerSec() > 0) {
-                    flash.setParticlesPerSec(flash.getParticlesPerSec() - 100);
+                    flash.setParticlesPerSec(0);
                 }
             }
 
@@ -408,7 +433,7 @@ public class WeatherControl extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //rain.getWorldTranslation().set(vp.getCamera().getLocation()).addLocal(0, 45, 0);
+        //
     }
 
     public boolean isSuny() {
