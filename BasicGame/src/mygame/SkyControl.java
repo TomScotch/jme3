@@ -67,15 +67,6 @@ public class SkyControl extends AbstractControl {
         night.setLocalTranslation(0, -1000, 0);
         day.setLocalTranslation(0, -1000, 0);
 
-        localRootNode.attachChild(day);
-        localRootNode.attachChild(night);
-        localRootNode.attachChild(morning);
-        localRootNode.attachChild(evening);
-        localRootNode.detachChild(day);
-        localRootNode.detachChild(evening);
-        localRootNode.detachChild(morning);
-        localRootNode.detachChild(night);
-
         Geometry morningGeom = (Geometry) morning;
         matMorning = morningGeom.getMaterial();
 
@@ -100,8 +91,15 @@ public class SkyControl extends AbstractControl {
         nightGeom.setQueueBucket(Bucket.Sky);
         matNight.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
 
+        localRootNode.attachChild(day);
         localRootNode.attachChild(night);
         localRootNode.attachChild(morning);
+        localRootNode.attachChild(evening);
+
+        day.setCullHint(Spatial.CullHint.Always);
+        evening.setCullHint(Spatial.CullHint.Always);
+        morning.setCullHint(Spatial.CullHint.Never);
+        night.setCullHint(Spatial.CullHint.Never);
     }
 
     @Override
@@ -114,11 +112,11 @@ public class SkyControl extends AbstractControl {
             Float z = glc.getTimingValue();
 
             if (glc.getIsSun()) {
-                
+
                 //Morning
                 if (z > 0) {
-                    if (!localRootNode.hasChild(morning)) {
-                        localRootNode.attachChild(morning);
+                    if (morning.getCullHint() == Spatial.CullHint.Always) {
+                        morning.setCullHint(Spatial.CullHint.Never);
                         if (localRootNode.getControl(WeatherControl.class) != null) {
                             localRootNode.getControl(WeatherControl.class).makeSuny();
                         }
@@ -127,66 +125,49 @@ public class SkyControl extends AbstractControl {
 
                 //Day
                 if (z < -0.f && z > -0.38f) {
-
-                    if (!localRootNode.hasChild(day)) {
-                        localRootNode.attachChild(day);
+                    if (day.getCullHint() == Spatial.CullHint.Always) {
+                        day.setCullHint(Spatial.CullHint.Never);
+                        night.setCullHint(Spatial.CullHint.Always);
                         if (localRootNode.getControl(WeatherControl.class) != null) {
                             localRootNode.getControl(WeatherControl.class).startRandomWeather();
                         }
                     }
 
-                    if (localRootNode.hasChild(night)) {
-                        night.removeFromParent();
-                    }
-
                     if (z < -0.20f) {
-                        if (localRootNode.hasChild(morning)) {
-                            morning.removeFromParent();
-                        }
+                        morning.setCullHint(Spatial.CullHint.Always);
                     }
                 }
 
                 //Evening
                 if (z < -0.38f && z > -0.99f) {
-                    if (!localRootNode.hasChild(evening)) {
-                        localRootNode.attachChild(evening);
+                    if (evening.getCullHint() == Spatial.CullHint.Always) {
+                        evening.setCullHint(Spatial.CullHint.Never);
                         if (localRootNode.getControl(WeatherControl.class) != null) {
                             localRootNode.getControl(WeatherControl.class).startRandomWeather();
                         }
                     }
 
                     if (z < -0.70f) {
-                        if (localRootNode.hasChild(day)) {
-                            day.removeFromParent();
-                        }
+                        day.setCullHint(Spatial.CullHint.Always);
                     }
 
                     if (z < -0.86f) {
-                        if (!localRootNode.hasChild(night)) {
-                            localRootNode.attachChild(night);
-                        }
+                        night.setCullHint(Spatial.CullHint.Never);
                     }
                 }
             } else {
 
                 //Night
                 if (z < -0.99f) {
-                    if (!localRootNode.hasChild(night)) {
-                        localRootNode.attachChild(night);
-                    }
-                    if (localRootNode.hasChild(day)) {
-                        day.removeFromParent();
+
+                    day.setCullHint(Spatial.CullHint.Always);
+                    evening.setCullHint(Spatial.CullHint.Always);
+
+                    if (night.getCullHint() == Spatial.CullHint.Always) {
+                        night.setCullHint(Spatial.CullHint.Never);
                         if (localRootNode.getControl(WeatherControl.class) != null) {
                             localRootNode.getControl(WeatherControl.class).startRandomWeather();
                         }
-                    }
-
-                    if (localRootNode.hasChild(evening)) {
-                        evening.removeFromParent();
-                    }
-
-                    if (!localRootNode.hasChild(night)) {
-                        localRootNode.attachChild(night);
                     }
                 }
             }
@@ -195,7 +176,7 @@ public class SkyControl extends AbstractControl {
             day.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
             evening.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
             morning.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
-        }else{
+        } else {
             System.out.println("glc stopped");
         }
     }
