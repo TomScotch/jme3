@@ -55,7 +55,7 @@ public class PlayerControl extends AbstractControl {
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     private final float move_speed = 0.1f;
-    private final float strafe_speed = 0.005f;
+    private final float strafe_speed = 0.125f;
     private final float rotationSpeed = 0.005f;
     private boolean attacking = false;
     private float attackTimer = 0f;
@@ -304,7 +304,7 @@ public class PlayerControl extends AbstractControl {
             checkIdleforPlayer();
 
             if (attackTimer > 0) {
-                attackTimer -= 1 * tpf;
+                attackTimer -= tpf;
             }
 
             if (model.getWorldTranslation().y < -300f) {
@@ -331,9 +331,9 @@ public class PlayerControl extends AbstractControl {
             walkDirection.set(0, 0, 0);
 
             if (leftStrafe) {
-                walkDirection.addLocal(camLeft.mult(tpf));
+                walkDirection.addLocal(camLeft);
             } else if (rightStrafe) {
-                walkDirection.addLocal(camLeft.negate().mult(tpf));
+                walkDirection.addLocal(camLeft.negate());
             }
             physicsCharacter.setWalkDirection(walkDirection);
             if (forward) {

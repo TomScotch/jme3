@@ -20,7 +20,7 @@ public class PosterizationFilterControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
         if (this.isEnabled()) {
             if (pf.getStrength() > 0) {
-                pf.setStrength(pf.getStrength() - tpf * 1.25f);
+                pf.setStrength(pf.getStrength() - tpf);
             }
             if (pf.getStrength() < 0) {
                 pf.setStrength(0);

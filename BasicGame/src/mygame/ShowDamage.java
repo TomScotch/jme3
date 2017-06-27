@@ -32,12 +32,7 @@ public class ShowDamage extends AbstractControl {
     protected void controlUpdate(float tpf) {
         if (spatial.getParent() != null) {
             txt.getLocalTranslation().addLocal(0, tpf * 3.5f, 0);
-            //txt.setSize(txt.getSize() - tpf);
-            //txt.setAlpha(txt.getAlpha() - tpf);
-            if (txt.getAlpha() < -0) {
-                //txt.removeFromParent();
-                //this.spatial.removeControl(this);
-            }
+            txt.setAlpha(txt.getAlpha() - tpf);
             if (txt.getWorldTranslation().y > 15) {
                 txt.removeFromParent();
                 spatial.removeControl(this);

@@ -325,11 +325,11 @@ public class WeatherControl extends AbstractControl {
                     flash.setParticlesPerSec(0);
                 }
                 if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
-                    spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 10);
+                    spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 5);
                 }
 
                 if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
-                    spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 10);
+                    spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 5);
                 }
             }
 
@@ -418,11 +418,11 @@ public class WeatherControl extends AbstractControl {
                 }
             } else {
                 if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
-                    spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 10);
+                    spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 5);
                 }
 
                 if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
-                    spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 10);
+                    spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 5);
                 }
             }
 

@@ -31,7 +31,7 @@ public class CameraCollisionControl extends AbstractControl {
             localRootNode.collideWith(ray1, results1);
             if (results1.size() > 0) {
                 if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
-                    System.out.println(results1.getClosestCollision().getDistance());
+                    
                     if (results1.getClosestCollision().getDistance() < 16f) {
                         pc.getChaseCam().setMaxDistance((pc.getChaseCam().getMaxDistance() - (tpf * 115)));
                     }
