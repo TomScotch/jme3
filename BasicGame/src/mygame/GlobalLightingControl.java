@@ -128,7 +128,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (z > 0.99f) {
 
-                    sun.getColor().interpolateLocal(ColorRGBA.White, 0.02f / timeDelay);
+                    sun.getColor().interpolateLocal(ColorRGBA.White, tpf / timeDelay);
 
                     if (isSun == false) {
                         if (sl.isEnabled()) {
@@ -141,7 +141,7 @@ public class GlobalLightingControl extends AbstractControl {
                 }
 
                 if (z < -0.25f && z > -0.99f) {
-                    sun.getColor().interpolateLocal(ColorRGBA.Blue, 0.02f / timeDelay);
+                    sun.getColor().interpolateLocal(ColorRGBA.Blue, tpf / timeDelay);
                     if (sl.isEnabled()) {
                         slsr.setShadowIntensity(0.25f);
                     }
