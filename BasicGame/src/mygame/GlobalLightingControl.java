@@ -30,7 +30,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final static Node pivot = new Node();
-    private int timeDelay = 12;
+    private int timeDelay = 32;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;
@@ -96,6 +96,7 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setEdgesThickness(10);
         //vp.addProcessor(slsr);
     }
+    ColorRGBA tmpColor;
 
     @Override
     protected void controlUpdate(float tpf) {
@@ -128,11 +129,15 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (z > 0.99f) {
 
-                    sun.getColor().interpolateLocal(ColorRGBA.White, tpf * 0.25f / timeDelay);
+                    float val = getTimingValue();
+                    val = 0.9980841f - val;
+                    ColorRGBA col = ColorRGBA.Orange.interpolateLocal(ColorRGBA.White, val);
+                    sun.setColor(col);
+                    tmpColor = col;
 
                     if (isSun == false) {
                         if (sl.isEnabled()) {
-                            slsr.setShadowIntensity(0.5f);
+                            slsr.setShadowIntensity(0.33f);
                         }
                         localRootNode.addLight(sun);
                         sun.setColor(ColorRGBA.Orange);
@@ -140,10 +145,15 @@ public class GlobalLightingControl extends AbstractControl {
                     }
                 }
 
-                if (z < -0.25f && z > -0.99f) {
-                    sun.getColor().interpolateLocal(ColorRGBA.Blue, tpf * 0.25f / timeDelay);
+                if (z < -0.36f && z > -0.99f) {
+                    if (sun.getColor().getBlue() < 0.603f) {
+                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 2.25f));
+                    } else {
+                        sun.getColor().b = 0.603f;
+                    }
+
                     if (sl.isEnabled()) {
-                        slsr.setShadowIntensity(0.25f);
+                        slsr.setShadowIntensity(0.66f);
                     }
                 }
 
@@ -153,7 +163,7 @@ public class GlobalLightingControl extends AbstractControl {
                         localRootNode.removeLight(sun);
                         isSun = false;
                         if (sl.isEnabled()) {
-                            slsr.setShadowIntensity(0.35f);
+                            slsr.setShadowIntensity(0.99f);
                         }
                     }
                 }
