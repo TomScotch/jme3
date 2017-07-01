@@ -30,7 +30,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final static Node pivot = new Node();
-    private int timeDelay = 32;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
+    private int timeDelay = 12;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;
@@ -129,9 +129,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (z > 0.99f) {
 
-                    float val = getTimingValue();
-                    val = 0.9980841f - val;
-                    ColorRGBA col = ColorRGBA.Orange.interpolateLocal(ColorRGBA.White, val);
+                    ColorRGBA col = ColorRGBA.Orange.interpolateLocal(ColorRGBA.White, ((tpf / timeDelay) / 2));
                     sun.setColor(col);
                     tmpColor = col;
 
@@ -146,10 +144,10 @@ public class GlobalLightingControl extends AbstractControl {
                 }
 
                 if (z < -0.36f && z > -0.99f) {
-                    if (sun.getColor().getBlue() < 0.603f) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 2.25f));
+                    if (sun.getColor().getBlue() < 0.6f) {
+                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 2));
                     } else {
-                        sun.getColor().b = 0.603f;
+                        sun.getColor().b = 0.6f;
                     }
 
                     if (sl.isEnabled()) {
