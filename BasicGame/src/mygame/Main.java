@@ -339,14 +339,15 @@ public class Main extends SimpleApplication implements ScreenController {
 
         System.out.println("restart");
 
-        app.getContext().restart();
-        app.restart();
-
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
+            startScreenState = new StartScreenState(app);
             stateManager.attach(startScreenState);
             gameRunningState = null;
             switchGameState();
+        } else {
+            app.getContext().restart();
+            app.restart();
         }
     }
 

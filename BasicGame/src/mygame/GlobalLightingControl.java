@@ -30,7 +30,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final static Node pivot = new Node();
-    private int timeDelay = 6;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
+    private int timeDelay = 24;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;
