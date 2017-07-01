@@ -25,6 +25,10 @@ import java.io.IOException;
 
 public class GameRunningState extends AbstractAppState {
 
+    public BulletAppState getBulletAppState() {
+        return bulletAppState;
+    }
+
     private WeatherControl weatherControl;
     private final SkyControl sc;
     private final Terrain terrainControl;
@@ -62,7 +66,7 @@ public class GameRunningState extends AbstractAppState {
     private final boolean globalLightningEnabled;
     private final boolean shadows;
 
-    private static FilterPostProcessor fpp;
+    private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
@@ -290,7 +294,7 @@ public class GameRunningState extends AbstractAppState {
 
                 case "debug":
                     if (value && isRunning) {
-                        bulletAppState.setDebugEnabled(!bulletAppState.isDebugEnabled());
+                        getBulletAppState().setDebugEnabled(!bulletAppState.isDebugEnabled());
                     }
                     break;
             }

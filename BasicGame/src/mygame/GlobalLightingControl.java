@@ -29,7 +29,7 @@ public class GlobalLightingControl extends AbstractControl {
     }
 
     private final Node localRootNode;
-    private final static Node pivot = new Node();
+    private final Node pivot = new Node();
     private int timeDelay = 24;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
     private boolean isSun = true;
     private final SpotLight sl;
@@ -126,21 +126,24 @@ public class GlobalLightingControl extends AbstractControl {
 
                 float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
 
+                //morning
                 if (z > 0.99f) {
 
                     sun.getColor().interpolateLocal(ColorRGBA.White, ((tpf / timeDelay) / 1.25f));
 
                     if (isSun == false) {
-                        if (sl.isEnabled()) {
+                        if (sl != null) {
                             slsr.setShadowIntensity(0.33f);
                         }
                         localRootNode.addLight(sun);
                         sun.setColor(ColorRGBA.Orange);
-                        isSun = true;
+
                         System.out.println("Sun is Up");
                     }
+                    isSun = true;
                 }
 
+                //day
                 if (z < -0.36f && z > -0.99f) {
                     if (sun.getColor().getBlue() < 0.5275f) {
                         sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 1.25f));
@@ -148,21 +151,23 @@ public class GlobalLightingControl extends AbstractControl {
                         sun.getColor().b = 0.5275f;
                     }
 
-                    if (sl.isEnabled()) {
+                    if (sl != null) {
                         slsr.setShadowIntensity(0.66f);
                     }
+                    isSun = true;
                 }
 
+                //night
                 if (z < -0.999f) {
-
+                    
                     if (isSun == true) {
                         localRootNode.removeLight(sun);
-                        isSun = false;
                         System.out.println("Sun is Down");
-                        if (sl.isEnabled()) {
+                        if (sl != null) {
                             slsr.setShadowIntensity(0.99f);
                         }
                     }
+                    isSun = false;
                 }
             } else {
                 sun.setDirection(new Vector3f(-5, -5, -5));

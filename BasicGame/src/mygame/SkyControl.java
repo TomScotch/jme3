@@ -149,14 +149,8 @@ public class SkyControl extends AbstractControl {
                     }
 
                     evening.setCullHint(Spatial.CullHint.Never);
-
-                    if (z < -0.70f) {
-                        day.setCullHint(Spatial.CullHint.Always);
-                    }
-
-                    if (z < -0.86f) {
-                        night.setCullHint(Spatial.CullHint.Never);
-                    }
+                    night.setCullHint(Spatial.CullHint.Never);
+                    day.setCullHint(Spatial.CullHint.Always);
                 }
             } else {
 

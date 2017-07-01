@@ -66,7 +66,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private static SettingsScreenState settingsScreenState;
 
     private Future loadFuture = null;
-    private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(2);
+    private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
     private Nifty nifty;
     private NiftyJmeDisplay niftyDisplay;
 
@@ -345,14 +345,14 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
-
+                inputManager.clearMappings();
                 stateManager.attach(startScreenState);
+                //app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
                 gameRunningState = null;
                 viewPort.clearProcessors();
-                inputManager.clearMappings();
-                add_mapping();
                 switchGameState();
+                add_mapping();
             }
         } else {
             app.getContext().restart();
