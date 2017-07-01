@@ -292,6 +292,18 @@ public class Main extends SimpleApplication implements ScreenController {
 
         stateManager.attach(startScreenState);
 
+        add_mapping();
+
+        niftyDisplay = new NiftyJmeDisplay(
+                assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
+        nifty = niftyDisplay.getNifty();
+
+        app.getGuiViewPort().addProcessor(niftyDisplay);
+
+        initStartGui();
+    }
+
+    public void add_mapping() {
         inputManager.addMapping("rain_trigger", rain_trigger);
         inputManager.addListener(actionListener, new String[]{"rain_trigger"});
 
@@ -312,14 +324,6 @@ public class Main extends SimpleApplication implements ScreenController {
 
         inputManager.addMapping("exit", exit_trigger);
         inputManager.addListener(actionListener, new String[]{"exit"});
-
-        niftyDisplay = new NiftyJmeDisplay(
-                assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
-        nifty = niftyDisplay.getNifty();
-
-        app.getGuiViewPort().addProcessor(niftyDisplay);
-
-        initStartGui();
     }
 
     public int getDisplayMode() {
@@ -340,11 +344,16 @@ public class Main extends SimpleApplication implements ScreenController {
         System.out.println("restart");
 
         if (stateManager.hasState(gameRunningState)) {
-            stateManager.detach(gameRunningState);
-            startScreenState = new StartScreenState(app);
-            stateManager.attach(startScreenState);
-            gameRunningState = null;
-            switchGameState();
+            if (loadFuture == null) {
+
+                stateManager.attach(startScreenState);
+                stateManager.detach(gameRunningState);
+                gameRunningState = null;
+                viewPort.clearProcessors();
+                inputManager.clearMappings();
+                add_mapping();
+                switchGameState();
+            }
         } else {
             app.getContext().restart();
             app.restart();
