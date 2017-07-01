@@ -429,7 +429,7 @@ public class WeatherControl extends AbstractControl {
         }
     }
 
-    private static int getRandomNumberInRange(int min, int max) {
+    private int getRandomNumberInRange(int min, int max) {
         Random r = new Random();
         return r.ints(min, (max + 1)).findFirst().getAsInt();
     }

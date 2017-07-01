@@ -50,7 +50,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private static AppSettings cfg;
     private static Main app;
 
-    private static VideoRecorderAppState videoRecorderAppState;
+    private VideoRecorderAppState videoRecorderAppState;
     private static DisplayMode[] modes;
 
     private final Trigger rain_trigger = new KeyTrigger(KeyInput.KEY_R);
@@ -61,9 +61,9 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger superDebug_trigger = new KeyTrigger(KeyInput.KEY_F1);
     private final Trigger fpsSwitch_trigger = new KeyTrigger(KeyInput.KEY_F2);
 
-    private static GameRunningState gameRunningState;
-    private static StartScreenState startScreenState;
-    private static SettingsScreenState settingsScreenState;
+    private GameRunningState gameRunningState;
+    private StartScreenState startScreenState;
+    private SettingsScreenState settingsScreenState;
 
     private Future loadFuture = null;
     private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
