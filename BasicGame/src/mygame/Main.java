@@ -344,21 +344,10 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
+            stateManager.attach(startScreenState);
+            gameRunningState = null;
+            switchGameState();
         }
-        if (stateManager.hasState(startScreenState)) {
-            stateManager.detach(startScreenState);
-        }
-        if (stateManager.hasState(settingsScreenState)) {
-            stateManager.detach(settingsScreenState);
-        }
-
-        startScreenState = new StartScreenState(this);
-        settingsScreenState = new SettingsScreenState(this);
-
-        stateManager.attach(startScreenState);
-        nifty.gotoScreen("settings");
-        nifty.resolutionChanged();
-        nifty.update();
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -367,9 +356,9 @@ public class Main extends SimpleApplication implements ScreenController {
         public void onAction(String name, boolean isPressed, float tpf) {
 
             if (name.equals("rain_trigger") && !isPressed) {
-                if (!gameRunningState.getLocalRoot().getControl(WeatherControl.class).isRaining()) {
-                    gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
-                }
+                //if (!gameRunningState.getLocalRoot().getControl(WeatherControl.class).isRaining()) {
+                gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
+                // }
             }
 
             if (name.equals("fpsSwitch_trigger") && !isPressed) {
@@ -645,6 +634,9 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
         cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
 
+        nifty.resolutionChanged();
+        nifty.update();
+
         if (cfg.getSamples() != samples) {
             System.out.println("will Stop because samples");
             cfg.setSamples(samples);
@@ -688,7 +680,8 @@ public class Main extends SimpleApplication implements ScreenController {
                 cfg.setFullscreen(false);
             }
         }
-
+        nifty.resolutionChanged();
+        nifty.update();
         app.setSettings(cfg);
         doRestart();
     }

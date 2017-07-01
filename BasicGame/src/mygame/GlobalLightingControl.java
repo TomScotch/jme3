@@ -30,7 +30,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final static Node pivot = new Node();
-    private int timeDelay = 12;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
+    private int timeDelay = 6;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;
@@ -96,7 +96,6 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setEdgesThickness(10);
         //vp.addProcessor(slsr);
     }
-    ColorRGBA tmpColor;
 
     @Override
     protected void controlUpdate(float tpf) {
@@ -129,9 +128,8 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (z > 0.99f) {
 
-                    ColorRGBA col = ColorRGBA.Orange.interpolateLocal(ColorRGBA.White, ((tpf / timeDelay) / 2));
+                    ColorRGBA col = ColorRGBA.Orange.interpolateLocal(ColorRGBA.White, ((tpf / timeDelay) / 1.25f));
                     sun.setColor(col);
-                    tmpColor = col;
 
                     if (isSun == false) {
                         if (sl.isEnabled()) {
@@ -144,10 +142,10 @@ public class GlobalLightingControl extends AbstractControl {
                 }
 
                 if (z < -0.36f && z > -0.99f) {
-                    if (sun.getColor().getBlue() < 0.6f) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 2));
+                    if (sun.getColor().getBlue() < 0.5275f) {
+                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 1.75f));
                     } else {
-                        sun.getColor().b = 0.6f;
+                        sun.getColor().b = 0.5275f;
                     }
 
                     if (sl.isEnabled()) {
