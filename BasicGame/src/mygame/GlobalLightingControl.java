@@ -30,7 +30,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final static Node pivot = new Node();
-    private int timeDelay = 24;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
+    private int timeDelay = 6;// SUPERFAST=12 // FAST=24 // NORMAL= 48 // SLOW=96 //REALISTIC = 128
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;
@@ -128,8 +128,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (z > 0.99f) {
 
-                    ColorRGBA col = ColorRGBA.Orange.interpolateLocal(ColorRGBA.White, ((tpf / timeDelay) / 1.25f));
-                    sun.setColor(col);
+                    sun.getColor().interpolateLocal(ColorRGBA.White, ((tpf / timeDelay) / 1.25f));
 
                     if (isSun == false) {
                         if (sl.isEnabled()) {
@@ -138,12 +137,13 @@ public class GlobalLightingControl extends AbstractControl {
                         localRootNode.addLight(sun);
                         sun.setColor(ColorRGBA.Orange);
                         isSun = true;
+                        System.out.println("Sun is Up");
                     }
                 }
 
                 if (z < -0.36f && z > -0.99f) {
                     if (sun.getColor().getBlue() < 0.5275f) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 1.75f));
+                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 1.25f));
                     } else {
                         sun.getColor().b = 0.5275f;
                     }
@@ -158,6 +158,7 @@ public class GlobalLightingControl extends AbstractControl {
                     if (isSun == true) {
                         localRootNode.removeLight(sun);
                         isSun = false;
+                        System.out.println("Sun is Down");
                         if (sl.isEnabled()) {
                             slsr.setShadowIntensity(0.99f);
                         }
