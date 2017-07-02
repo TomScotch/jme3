@@ -75,7 +75,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private boolean lightScatterEnabled = false;
     private boolean anisotropyEnabled = false;
     private boolean waterPostProcessing = false;
-    private boolean globalLightningEnabled = true;
+    private boolean globalLightningEnabled = false;
     private boolean isGl3 = false;
     private boolean shadows = false;
     private static boolean showFps = false;
@@ -706,7 +706,6 @@ public class Main extends SimpleApplication implements ScreenController {
             }
             System.out.println("switching to startscreen...");
         } else {
-
             if (gameRunningState == null) {
 
                 inputManager.setCursorVisible(false);
@@ -734,7 +733,14 @@ public class Main extends SimpleApplication implements ScreenController {
     public void loseFocus() {
         System.out.println("lostFocus");
         if (gameRunningState != null) {
-            switchGameState();
+            if (gameRunningState.getIsRunning()) {
+                stateManager.detach(gameRunningState);
+                stateManager.attach(startScreenState);
+                if (!guiViewPort.getProcessors().contains(niftyDisplay)) {
+                    guiViewPort.addProcessor(niftyDisplay);
+                }
+                //switchGameState();
+            }
         }
         super.loseFocus();
     }

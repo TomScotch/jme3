@@ -44,13 +44,13 @@ public class WeatherControl extends AbstractControl {
     private final float fogDensity = 0.65f; // 1.3f
     private final int fogDistance = 35; // 50
     private final int cloudThickness = 325; // 400
-    private final int lightningFrequency = 36; // 27
-    private final int lightningVoloume = 3000; // 5850
-    private float rainStrength = 1750; // 3000
-    private float rainThickness = 4500; // 6000
+    private final int lightningFrequency = 22; // 27
+    private final int lightningVoloume = 180; // 5850
+    private float rainStrength = 1200; // 3000
+    private float rainThickness = 2400; // 6000
 
-    private ColorRGBA rainColorStart = new ColorRGBA(0.85f, 0.85f, 0.85f, 2f);
-    private ColorRGBA rainColorEnd = new ColorRGBA(0f, 0f, 0, 1f);
+    private ColorRGBA rainColorStart = new ColorRGBA(ColorRGBA.Blue);
+    private ColorRGBA rainColorEnd = new ColorRGBA(ColorRGBA.LightGray);
 
     public WeatherControl(AssetManager am, Node localRoot) {
 
@@ -85,7 +85,7 @@ public class WeatherControl extends AbstractControl {
         rain.setMaterial(rainMat);
         rain.setEndColor(rainColorEnd);
         rain.setStartColor(rainColorStart);
-        rain.setStartSize(0.18f);
+        rain.setStartSize(0.28f);
         rain.setEndSize(0.075f);
         //rain.setImagesX(1);
         rain.setImagesY(3);
@@ -96,7 +96,7 @@ public class WeatherControl extends AbstractControl {
         rain.setShape(new EmitterBoxShape(new Vector3f(-128, -15f, -128), new Vector3f(128, 15f, 128)));
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(true);
-        rain.getParticleInfluencer().setVelocityVariation(3f);
+        //rain.getParticleInfluencer().setVelocityVariation(3f);
         rain.setLocalTranslation(0, 40, 0);
         rain.center();
         localRoot.attachChild(rain);
@@ -151,7 +151,7 @@ public class WeatherControl extends AbstractControl {
         Node n = (Node) spatial;
 
         if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(ColorRGBA.LightGray, 0.45f);
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().add(ColorRGBA.LightGray);
         }
 
         misty = true;
@@ -184,7 +184,7 @@ public class WeatherControl extends AbstractControl {
         Node n = (Node) spatial;
 
         if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(ColorRGBA.Gray, 0.45f);
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().add(ColorRGBA.Gray);
         }
 
         makeCloudy();
@@ -249,7 +249,7 @@ public class WeatherControl extends AbstractControl {
     public void makeCloudy() {
         Node n = (Node) spatial;
         if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(ColorRGBA.DarkGray, 0.45f);
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().add(ColorRGBA.DarkGray);
         }
         suny = false;
         clouded = true;
@@ -279,10 +279,6 @@ public class WeatherControl extends AbstractControl {
 
         Node n = (Node) spatial;
 
-        /* if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-        n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(ColorRGBA.White, 0.9f);
-        n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(ColorRGBA.Orange, 0.9f);
-        } */
         suny = true;
         clouded = false;
         raining = false;

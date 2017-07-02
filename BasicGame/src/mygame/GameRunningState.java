@@ -80,7 +80,7 @@ public class GameRunningState extends AbstractAppState {
         this.waterPostProcessing = waterPostProcessing;
         this.globalLightningEnabled = globalLightningEnabled;
         this.shadows = shadows;
-        weatherEnabled = true;
+        this.weatherEnabled = true;
 
 //      CONSTRUKTOR
         this.rootNode = app.getRootNode();

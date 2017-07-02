@@ -136,38 +136,39 @@ public class GlobalLightingControl extends AbstractControl {
                             slsr.setShadowIntensity(0.33f);
                         }
                         localRootNode.addLight(sun);
+                        isSun = true;
                         sun.setColor(ColorRGBA.Orange);
 
                         System.out.println("Sun is Up");
                     }
-                    isSun = true;
+
                 }
 
                 //day
                 if (z < -0.36f && z > -0.99f) {
-                    if (sun.getColor().getBlue() < 0.5275f) {
+                    if (sun.getColor().getBlue() < 0.5f) {
                         sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 1.25f));
                     } else {
-                        sun.getColor().b = 0.5275f;
+                        sun.getColor().b = 0.5f;
                     }
 
                     if (sl != null) {
                         slsr.setShadowIntensity(0.66f);
                     }
-                    isSun = true;
                 }
 
                 //night
                 if (z < -0.999f) {
-                    
+
                     if (isSun == true) {
                         localRootNode.removeLight(sun);
+                        isSun = false;
                         System.out.println("Sun is Down");
                         if (sl != null) {
                             slsr.setShadowIntensity(0.99f);
                         }
                     }
-                    isSun = false;
+
                 }
             } else {
                 sun.setDirection(new Vector3f(-5, -5, -5));
