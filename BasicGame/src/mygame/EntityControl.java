@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
+import com.jme3.animation.SkeletonControl;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.effect.ParticleEmitter;
@@ -39,6 +40,7 @@ public class EntityControl extends AbstractControl {
         bulletState.getPhysicsSpace().add(bcc);
         bcc.warp(new Vector3f(pos));
         setAnim("Idle", LoopMode.Loop);
+        getSkeletonControl().setHardwareSkinningPreferred(false);
     }
 
     @Override
@@ -92,21 +94,29 @@ public class EntityControl extends AbstractControl {
 
     }
 
-    private void setAnim(String name, LoopMode mode) {
-
+    private SkeletonControl getSkeletonControl() {
         Node n = (Node) this.spatial;
         Node e = (Node) n.getChild("anim");
-        AnimControl aniCon = e.getControl(AnimControl.class);
+        return e.getControl(SkeletonControl.class);
+    }
 
-        if (aniCon.getClass() != null) {
-            aniCon.clearChannels();
-            aniCon.createChannel();
-            aniCon.getChannel(0).setAnim(name);
-            aniCon.getChannel(0).setLoopMode(mode);
+    public AnimControl getAnimControl() {
+        Node n = (Node) this.spatial;
+        Node e = (Node) n.getChild("anim");
+        return e.getControl(AnimControl.class);
+    }
+
+    private void setAnim(String name, LoopMode mode) {
+
+        if (getAnimControl().getClass() != null) {
+            getAnimControl().clearChannels();
+            getAnimControl().createChannel();
+            getAnimControl().getChannel(0).setAnim(name);
+            getAnimControl().getChannel(0).setLoopMode(mode);
         } else {
-            aniCon.createChannel();
-            aniCon.getChannel(0).setAnim(name);
-            aniCon.getChannel(0).setLoopMode(mode);
+            getAnimControl().createChannel();
+            getAnimControl().getChannel(0).setAnim(name);
+            getAnimControl().getChannel(0).setLoopMode(mode);
         }
     }
 

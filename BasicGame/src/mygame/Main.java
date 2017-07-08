@@ -645,7 +645,7 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
 
         nifty.resolutionChanged();
-        nifty.update();
+        //nifty.update();
 
         if (cfg.getSamples() != samples) {
             System.out.println("will Stop because samples");
@@ -691,7 +691,7 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
         nifty.resolutionChanged();
-        nifty.update();
+        // nifty.update();
         app.setSettings(cfg);
         doRestart();
     }

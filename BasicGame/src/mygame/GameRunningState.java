@@ -12,8 +12,10 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -25,6 +27,8 @@ import java.io.IOException;
 
 public class GameRunningState extends AbstractAppState {
 
+    private final Camera cam2;
+
     public BulletAppState getBulletAppState() {
         return bulletAppState;
     }
@@ -32,6 +36,8 @@ public class GameRunningState extends AbstractAppState {
     private WeatherControl weatherControl;
     private final SkyControl sc;
     private final Terrain terrainControl;
+
+    private final ViewPort view2;
 
     public boolean isWeatherEnabled() {
         return weatherEnabled;
@@ -177,10 +183,29 @@ public class GameRunningState extends AbstractAppState {
         spider.addControl(ec3);
         localRootNode.attachChild(spider);
         setupKeys();
+
+        //Second Camera View
+        cam2 = app.getCamera().clone();
+        cam2.setViewPort(0f, 0.5f, 0f, 0.5f);
+        cam2.setLocation(new Vector3f(-0.10947256f, 25.5760219f, 4.81758f));
+        cam2.setRotation(new Quaternion(0.0010108891f, 0.99857414f, -0.04928594f, 0.020481428f));
+
+        view2 = app.getRenderManager().createMainView("Bottom Left", cam2);
+        view2.setClearFlags(true, true, true);
+        view2.attachScene(localRootNode);
+        view2.setEnabled(false);
+        
+        //Audio
+        
     }
 
     public Node getLocalRoot() {
         return localRootNode;
+    }
+
+    public void switchSecondView() {
+
+        view2.setEnabled(!view2.isEnabled());
     }
 
     @Override
@@ -221,6 +246,11 @@ public class GameRunningState extends AbstractAppState {
                 new KeyTrigger(KeyInput.KEY_Q));
 
         inputManager.addListener(actionListener, "debug");
+
+        inputManager.addMapping("switchCam",
+                new KeyTrigger(KeyInput.KEY_P));
+
+        inputManager.addListener(actionListener, "switchCam");
     }
 
     private void treeoutroot(Node node) {
@@ -286,6 +316,12 @@ public class GameRunningState extends AbstractAppState {
                     }
                     break;
 
+                case "switchCam":
+                    if (value && isRunning) {
+                        switchSecondView();
+                    }
+                    break;
+
                 case "treeoutroot":
                     if (value && isRunning) {
                         treeoutroot(localRootNode);
@@ -325,6 +361,15 @@ public class GameRunningState extends AbstractAppState {
 
         if (isRunning) {
             super.update(tpf);
+            if (globalLightningEnabled) {
+                if (view2.isEnabled()) {
+                    cam2.setLocation(glc.getSunPosition());
+                    cam2.setRotation(new Quaternion(0.0010108891f, 0.99857414f, -0.04928594f, 0.020481428f));
+                    cam2.lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
+                    cam2.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+                }
+            }
+
         }
     }
 
@@ -497,4 +542,4 @@ public class GameRunningState extends AbstractAppState {
         this.waterPostProcessing = waterPostProcessing;
     }
 
-}
+};

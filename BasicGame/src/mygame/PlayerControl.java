@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
+import com.jme3.animation.SkeletonControl;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
@@ -31,6 +32,8 @@ import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.control.LightControl;
 
 public class PlayerControl extends AbstractControl {
+
+    private final SkeletonControl skelCon;
 
     public boolean isChaseEnabled() {
         return chaseEnabled;
@@ -132,6 +135,8 @@ public class PlayerControl extends AbstractControl {
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("anim");
         aniCon = n1.getControl(AnimControl.class);
+        skelCon = n1.getControl(SkeletonControl.class);
+        skelCon.setHardwareSkinningPreferred(false);
         physicsCharacter = new BetterCharacterControl(1f, 6, playerMass);
         physicsCharacter.warp(new Vector3f(0, 2, 0));
         physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
