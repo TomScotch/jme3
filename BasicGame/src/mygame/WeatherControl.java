@@ -378,7 +378,7 @@ public class WeatherControl extends AbstractControl {
                 }
             }
 
-            if (misty) {
+            if (misty && spatial.getControl(FogPostFilter.class).getFog() != null) {
 
                 Node n = (Node) spatial;
                 if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {

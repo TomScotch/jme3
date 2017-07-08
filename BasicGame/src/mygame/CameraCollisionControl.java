@@ -3,6 +3,7 @@ package mygame;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.Ray;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -26,12 +27,45 @@ public class CameraCollisionControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
 
         if (this.isEnabled()) {
+
             Ray ray1 = new Ray(cam.getLocation(), cam.getDirection());
             CollisionResults results1 = new CollisionResults();
             localRootNode.collideWith(ray1, results1);
             if (results1.size() > 0) {
                 if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
-                    
+
+                    if (results1.getClosestCollision().getDistance() < 16f) {
+                        pc.getChaseCam().setMaxDistance((pc.getChaseCam().getMaxDistance() - (tpf * 115)));
+                    }
+                } else {
+                    pc.getChaseCam().setMaxDistance(30);
+                }
+            } else {
+                pc.getChaseCam().setMaxDistance(30);
+            }
+
+            ray1 = new Ray(cam.getLocation(), Vector3f.UNIT_X);
+            results1 = new CollisionResults();
+            localRootNode.collideWith(ray1, results1);
+            if (results1.size() > 0) {
+                if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+
+                    if (results1.getClosestCollision().getDistance() < 16f) {
+                        pc.getChaseCam().setMaxDistance((pc.getChaseCam().getMaxDistance() - (tpf * 115)));
+                    }
+                } else {
+                    pc.getChaseCam().setMaxDistance(30);
+                }
+            } else {
+                pc.getChaseCam().setMaxDistance(30);
+            }
+
+            ray1 = new Ray(cam.getLocation(), Vector3f.UNIT_X.negate());
+            results1 = new CollisionResults();
+            localRootNode.collideWith(ray1, results1);
+            if (results1.size() > 0) {
+                if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+
                     if (results1.getClosestCollision().getDistance() < 16f) {
                         pc.getChaseCam().setMaxDistance((pc.getChaseCam().getMaxDistance() - (tpf * 115)));
                     }
