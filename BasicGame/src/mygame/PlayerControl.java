@@ -50,8 +50,8 @@ public class PlayerControl extends AbstractControl {
     private boolean chaseEnabled = true;
     private final float jump_Speed = 750;
     private final CameraNode camNode;
-    private final float gravity = 200;
-    private final float playerMass = 75;
+    private final float gravity = 0;
+    private final float playerMass = 175;
     private final float chaseCamRotationSpeed = 0.375f;
     private final SpotLight lamp;
     private final GhostControl ghostControl;
@@ -70,8 +70,11 @@ public class PlayerControl extends AbstractControl {
     private final Node characterNode;
     boolean rotate = false;
     private final ChaseCamera chaseCam;
-    private final float flashLightStrength = 2.75f;
-    private final float flashLightSpotRange = 45f;
+    private final float flashLightStrength = 1.25f;
+    private final float flashLightSpotRange = 33;
+    private final int outerLamp = 44;
+    private final int innerLamp = 33;
+
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
     private final AnimControl aniCon;
@@ -113,9 +116,9 @@ public class PlayerControl extends AbstractControl {
 
         lamp = new SpotLight();
         lamp.setSpotRange(flashLightSpotRange);
-        lamp.setSpotInnerAngle(30f * FastMath.DEG_TO_RAD);
-        lamp.setSpotOuterAngle(50f * FastMath.DEG_TO_RAD);
-        lamp.setColor(ColorRGBA.White.mult(flashLightStrength));
+        lamp.setSpotInnerAngle(innerLamp * FastMath.DEG_TO_RAD);
+        lamp.setSpotOuterAngle(outerLamp * FastMath.DEG_TO_RAD);
+        lamp.setColor(ColorRGBA.Orange.mult(flashLightStrength));
         lamp.setFrustumCheckNeeded(true);
         lamp.setIntersectsFrustum(true);
         lamp.setEnabled(false);
@@ -138,6 +141,7 @@ public class PlayerControl extends AbstractControl {
         skelCon = n1.getControl(SkeletonControl.class);
         skelCon.setHardwareSkinningPreferred(false);
         physicsCharacter = new BetterCharacterControl(1f, 6, playerMass);
+        physicsCharacter.setEnabled(false);
         physicsCharacter.warp(new Vector3f(0, 2, 0));
         physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
         physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
@@ -218,9 +222,9 @@ public class PlayerControl extends AbstractControl {
                     break;
                 case "Jump":
                     if (value) {
-                        //if (physicsCharacter.isOnGround()) {
-                        physicsCharacter.jump();
-                        //}
+                        if (getPhysicsCharacter().isOnGround()) {
+                            getPhysicsCharacter().jump();
+                        }
                     }
                     break;
                 default:
@@ -313,7 +317,7 @@ public class PlayerControl extends AbstractControl {
             }
 
             if (model.getWorldTranslation().y < -300f) {
-                physicsCharacter.warp(new Vector3f(0, 2, 0));
+                getPhysicsCharacter().warp(new Vector3f(0, 2, 0));
             }
 
             Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
@@ -340,15 +344,15 @@ public class PlayerControl extends AbstractControl {
             } else if (rightStrafe) {
                 walkDirection.addLocal(camLeft.negate());
             }
-            physicsCharacter.setWalkDirection(walkDirection);
+            getPhysicsCharacter().setWalkDirection(walkDirection);
             if (forward) {
                 walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
             } else if (backward) {
                 walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
             }
 
-            physicsCharacter.setViewDirection(viewDirection);
-            physicsCharacter.setWalkDirection(walkDirection);
+            getPhysicsCharacter().setViewDirection(viewDirection);
+            getPhysicsCharacter().setWalkDirection(walkDirection);
 
             lamp.setDirection(viewPort.getCamera().getDirection());
 
@@ -433,5 +437,13 @@ public class PlayerControl extends AbstractControl {
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations
+    }
+
+    public BetterCharacterControl getPhysicsCharacter() {
+        return physicsCharacter;
+    }
+
+    public void setPhysicsCharacter(BetterCharacterControl physicsCharacter) {
+        this.physicsCharacter = physicsCharacter;
     }
 }

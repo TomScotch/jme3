@@ -279,6 +279,10 @@ public class WeatherControl extends AbstractControl {
 
         Node n = (Node) spatial;
 
+        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.White, 0.15f);
+        }
+        
         suny = true;
         clouded = false;
         raining = false;

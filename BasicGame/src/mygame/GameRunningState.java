@@ -100,6 +100,7 @@ public class GameRunningState extends AbstractAppState {
 //      PHYSICS STATE
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
+        bulletAppState.setEnabled(false);
         bulletAppState.setDebugEnabled(false);
 
 //      CAMERA        
@@ -114,9 +115,11 @@ public class GameRunningState extends AbstractAppState {
 
 //      PLAYER
         playerControl = new PlayerControl(app, bulletAppState, localRootNode);
+        playerControl.getPhysicsCharacter().setEnabled(false);
         Node player = new Node("playerNode");
         player.addControl(playerControl);
         localRootNode.attachChild(player);
+        localRootNode.getControl(CameraCollisionControl.class).setEnabled(false);
 
 //      SUN
         Node sunNode = new Node("sunNode");
@@ -155,6 +158,7 @@ public class GameRunningState extends AbstractAppState {
         if (weatherEnabled) {
             if (localRootNode.getControl(WeatherControl.class) == null) {
                 weatherControl = new WeatherControl(assetManager, localRootNode);
+                weatherControl.setEnabled(false);
                 localRootNode.addControl(weatherControl);
             }
         }
@@ -194,9 +198,8 @@ public class GameRunningState extends AbstractAppState {
         view2.setClearFlags(true, true, true);
         view2.attachScene(localRootNode);
         view2.setEnabled(false);
-        
+
         //Audio
-        
     }
 
     public Node getLocalRoot() {
@@ -217,6 +220,8 @@ public class GameRunningState extends AbstractAppState {
 
         inputManager.setCursorVisible(false);
 
+        bulletAppState.setEnabled(true);
+
         //      WATER
         if (waterPostProcessing) {
             if (localRootNode.getControl(WaterPostFilter.class) == null) {
@@ -228,6 +233,13 @@ public class GameRunningState extends AbstractAppState {
             }
         }
 
+        localRootNode.getControl(CameraCollisionControl.class).setEnabled(true);
+
+        if (weatherEnabled) {
+            weatherControl.setEnabled(true);
+        }
+
+        playerControl.getPhysicsCharacter().setEnabled(true);
     }
 
     private void setupKeys() {
@@ -443,7 +455,7 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
-
+        view2.setEnabled(false);
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
         playerControl.setEnabled(false);
         sc.setEnabled(false);
