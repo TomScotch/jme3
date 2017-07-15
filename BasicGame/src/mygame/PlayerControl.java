@@ -6,9 +6,8 @@ import com.jme3.animation.SkeletonControl;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.collision.shapes.BoxCollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
-import com.jme3.bullet.control.GhostControl;
+import com.jme3.collision.CollisionResults;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -19,6 +18,7 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -54,7 +54,7 @@ public class PlayerControl extends AbstractControl {
     private final float playerMass = 175;
     private final float chaseCamRotationSpeed = 0.375f;
     private final SpotLight lamp;
-    private final GhostControl ghostControl;
+    //private final GhostControl ghostControl;
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     private final float move_speed = 0.1f;
@@ -63,7 +63,7 @@ public class PlayerControl extends AbstractControl {
     private boolean attacking = false;
     private float attackTimer = 0f;
     private final float attackTime = 1.5f;
-    private String collisionTarget = "";
+    //private String collisionTarget = "";
     private final float playerDmg = 30f;
     private final Spatial model;
     private BetterCharacterControl physicsCharacter;
@@ -73,7 +73,7 @@ public class PlayerControl extends AbstractControl {
     private final float flashLightStrength = 1.25f;
     private final float flashLightSpotRange = 33;
     private final int outerLamp = 44;
-    private final int innerLamp = 33;
+    private final int innerLamp = 27;
 
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
@@ -148,13 +148,13 @@ public class PlayerControl extends AbstractControl {
         characterNode.addControl(physicsCharacter);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
 
-        Node ghostNode = new Node("PlayerGhostNode");
+        /*        Node ghostNode = new Node("PlayerGhostNode");
         ghostControl = new GhostControl(new BoxCollisionShape(new Vector3f(2f, 0.1f, 3f)));
         bulletAppState.getPhysicsSpace().add(ghostControl);
         ghostNode.addControl(ghostControl);
-
+        
         characterNode.attachChild(ghostNode);
-        ghostNode.setLocalTranslation(0, 3, 5);
+        ghostNode.setLocalTranslation(0, 3, 5);*/
         this.localRootNode.attachChild(characterNode);
 
         doAnim("player", "Idle", LoopMode.Loop);
@@ -295,22 +295,23 @@ public class PlayerControl extends AbstractControl {
 
         if (isEnabled()) {
 
-            if (ghostControl.getOverlappingObjects().size() > 1) {
-
-                Node overlap = (Node) ghostControl.getOverlapping(1).getUserObject();
-
-                if (!overlap.getName().equals("terrain")) {
-                    collisionTarget = overlap.getName();
-                }
+            /*           if (ghostControl.getOverlappingObjects().size() > 1) {
+            
+            Node overlap = (Node) ghostControl.getOverlapping(1).getUserObject();
+            
+            if (!overlap.getName().equals("terrain")) {
+            collisionTarget = overlap.getName();
+            }
             } else {
-                collisionTarget = "";
-            }
-
-            if (attacking) {
-                attack();
-            }
-
+            collisionTarget = "";
+            }*/
             checkIdleforPlayer();
+
+            if (attackTimer <= 0) {
+                if (attacking) {
+                    attack();
+                }
+            }
 
             if (attackTimer > 0) {
                 attackTimer -= tpf;
@@ -424,13 +425,23 @@ public class PlayerControl extends AbstractControl {
 
         if (attackTimer <= 0) {
 
-            if (!collisionTarget.equals("")) {
-                if (!collisionTarget.equals("player")) {
-                    hit(collisionTarget);
-                }
-            }
             doAnim("player", "Attack", LoopMode.DontLoop);
             attackTimer = attackTime;
+
+            Ray ray1 = new Ray(model.getWorldTranslation(), physicsCharacter.getViewDirection());
+            CollisionResults results1 = new CollisionResults();
+            localRootNode.collideWith(ray1, results1);
+
+            if (results1.size() > 1) {
+                String target = results1.getCollision(1).getGeometry().getParent().getParent().getParent().getName();
+                if (!target.equals("terrain")) {
+                    if (!target.equals("")) {
+                        if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 8.75f) {
+                            hit(target);
+                        }
+                    }
+                }
+            }
         }
     }
 
