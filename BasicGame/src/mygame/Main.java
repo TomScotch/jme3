@@ -757,7 +757,7 @@ public class Main extends SimpleApplication implements ScreenController {
                     @Override
                     public Object call() throws Exception {
 
-                        startScreenState.getBoxGeo().rotate(0, -tpf, 0);
+                        startScreenState.getBoxGeo().rotate(0, 0, tpf);
                         return null;
                     }
                 });
