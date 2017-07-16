@@ -5,6 +5,8 @@ import com.jme3.animation.LoopMode;
 import com.jme3.animation.SkeletonControl;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioData;
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.collision.CollisionResults;
@@ -34,14 +36,8 @@ import com.jme3.scene.control.LightControl;
 public class PlayerControl extends AbstractControl {
 
     private final SkeletonControl skelCon;
-
-    public boolean isChaseEnabled() {
-        return chaseEnabled;
-    }
-
-    public SpotLight getLamp() {
-        return lamp;
-    }
+    private final AudioNode footsteps;
+    // private final AudioNode hit;
 
     private final ViewPort viewPort;
     private final AssetManager assetManager;
@@ -54,7 +50,7 @@ public class PlayerControl extends AbstractControl {
     private final float playerMass = 175;
     private final float chaseCamRotationSpeed = 0.375f;
     private final SpotLight lamp;
-    //private final GhostControl ghostControl;
+
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     private final float move_speed = 0.1f;
@@ -63,7 +59,6 @@ public class PlayerControl extends AbstractControl {
     private boolean attacking = false;
     private float attackTimer = 0f;
     private final float attackTime = 1.5f;
-    //private String collisionTarget = "";
     private final float playerDmg = 30f;
     private final Spatial model;
     private BetterCharacterControl physicsCharacter;
@@ -90,7 +85,6 @@ public class PlayerControl extends AbstractControl {
         this.localRootNode = localRootNode;
 
         characterNode = new Node("player");
-
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
         chaseCam.setChasingSensitivity(1);
         chaseCam.setTrailingEnabled(false);
@@ -102,18 +96,15 @@ public class PlayerControl extends AbstractControl {
         chaseCam.setRotationSpeed(chaseCamRotationSpeed);
         chaseCam.setDownRotateOnCloseViewOnly(true);
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
-        //chaseCam.setMinVerticalRotation(FastMath.QUARTER_PI );
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         chaseCam.setMaxDistance(maxDistance);
         chaseCam.setDefaultDistance(chaseCam.getMaxDistance() / 2);
         chaseCam.setDefaultVerticalRotation(FastMath.INV_PI - FastMath.ONE_THIRD);
-
         camNode = new CameraNode("Camera Node", app.getCamera());
         camNode.setControlDir(CameraControl.ControlDirection.SpatialToCamera);
         characterNode.attachChild(camNode);
         camNode.setLocalTranslation(new Vector3f(0, 4.4f, -18f));
         camNode.setEnabled(false);
-
         lamp = new SpotLight();
         lamp.setSpotRange(flashLightSpotRange);
         lamp.setSpotInnerAngle(innerLamp * FastMath.DEG_TO_RAD);
@@ -123,13 +114,11 @@ public class PlayerControl extends AbstractControl {
         lamp.setIntersectsFrustum(true);
         lamp.setEnabled(false);
         this.localRootNode.addLight(lamp);
-
         LightControl lc = new LightControl(lamp, LightControl.ControlDirection.SpatialToLight);
         Node lightNode = new Node("");
         lightNode.addControl(lc);
         characterNode.attachChild(lightNode);
         lightNode.getLocalTranslation().addLocal(0, 2.79f, 1.87f);
-
         model = assetManager.loadModel("Models/npc/berzerker.j3o");
         model.scale(scale);
         characterNode.attachChild(model);
@@ -147,19 +136,23 @@ public class PlayerControl extends AbstractControl {
         physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
         characterNode.addControl(physicsCharacter);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
-
-        /*        Node ghostNode = new Node("PlayerGhostNode");
-        ghostControl = new GhostControl(new BoxCollisionShape(new Vector3f(2f, 0.1f, 3f)));
-        bulletAppState.getPhysicsSpace().add(ghostControl);
-        ghostNode.addControl(ghostControl);
-        
-        characterNode.attachChild(ghostNode);
-        ghostNode.setLocalTranslation(0, 3, 5);*/
         this.localRootNode.attachChild(characterNode);
-
         doAnim("player", "Idle", LoopMode.Loop);
+
         setupKeys();
+
         localRootNode.addControl(new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, this));
+        footsteps = new AudioNode(assetManager, "Sound/Effects/Foot steps.ogg", AudioData.DataType.Buffer);
+        footsteps.setLooping(false);
+        footsteps.setPositional(false);
+        footsteps.setVolume(2);
+        localRootNode.attachChild(footsteps);
+
+        /*        hit = new AudioNode(assetManager, "Sound/Effects/Bang.wav", AudioData.DataType.Buffer);
+        hit.setLooping(false);
+        hit.setPositional(false);
+        hit.setVolume(4);
+        localRootNode.attachChild(hit);*/
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -295,16 +288,6 @@ public class PlayerControl extends AbstractControl {
 
         if (isEnabled()) {
 
-            /*           if (ghostControl.getOverlappingObjects().size() > 1) {
-            
-            Node overlap = (Node) ghostControl.getOverlapping(1).getUserObject();
-            
-            if (!overlap.getName().equals("terrain")) {
-            collisionTarget = overlap.getName();
-            }
-            } else {
-            collisionTarget = "";
-            }*/
             checkIdleforPlayer();
 
             if (attackTimer <= 0) {
@@ -341,15 +324,25 @@ public class PlayerControl extends AbstractControl {
             walkDirection.set(0, 0, 0);
 
             if (leftStrafe) {
+                footsteps.play();
                 walkDirection.addLocal(camLeft);
             } else if (rightStrafe) {
+                footsteps.play();
                 walkDirection.addLocal(camLeft.negate());
             }
+
             getPhysicsCharacter().setWalkDirection(walkDirection);
+
             if (forward) {
+                footsteps.play();
                 walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
             } else if (backward) {
+                footsteps.play();
                 walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
+            }
+
+            if (!forward && !backward && !rightStrafe && !leftStrafe) {
+                footsteps.stop();
             }
 
             getPhysicsCharacter().setViewDirection(viewDirection);
@@ -424,6 +417,7 @@ public class PlayerControl extends AbstractControl {
     private void attack() {
 
         if (attackTimer <= 0) {
+            //hit.play();
 
             doAnim("player", "Attack", LoopMode.DontLoop);
             attackTimer = attackTime;
@@ -436,7 +430,7 @@ public class PlayerControl extends AbstractControl {
                 String target = results1.getCollision(1).getGeometry().getParent().getParent().getParent().getName();
                 if (!target.equals("terrain")) {
                     if (!target.equals("")) {
-                        if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 8.75f) {
+                        if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 10) {
                             hit(target);
                         }
                     }
@@ -456,5 +450,13 @@ public class PlayerControl extends AbstractControl {
 
     public void setPhysicsCharacter(BetterCharacterControl physicsCharacter) {
         this.physicsCharacter = physicsCharacter;
+    }
+
+    public boolean isChaseEnabled() {
+        return chaseEnabled;
+    }
+
+    public SpotLight getLamp() {
+        return lamp;
     }
 }

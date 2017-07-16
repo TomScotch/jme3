@@ -5,6 +5,8 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioData.DataType;
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
@@ -28,24 +30,16 @@ import java.io.IOException;
 public class GameRunningState extends AbstractAppState {
 
     private final Camera cam2;
-
-    public BulletAppState getBulletAppState() {
-        return bulletAppState;
-    }
+    private final AudioNode amb;
+    private final AudioNode amb1;
+    private final AudioNode amb2;
+    private final int ambienceVolume = 3;
 
     private WeatherControl weatherControl;
     private final SkyControl sc;
     private final Terrain terrainControl;
 
     private final ViewPort view2;
-
-    public boolean isWeatherEnabled() {
-        return weatherEnabled;
-    }
-
-    public void setWeatherEnabled(boolean weatherEnabled) {
-        this.weatherEnabled = weatherEnabled;
-    }
 
     private final ViewPort viewPort;
     private final Node rootNode;
@@ -200,6 +194,23 @@ public class GameRunningState extends AbstractAppState {
         view2.setEnabled(false);
 
         //Audio
+        amb = new AudioNode(assetManager, "audio/ambience-creepyatmosfear.wav", DataType.Stream);
+        amb.setLooping(true);
+        amb.setPositional(false);
+        amb.setVolume(ambienceVolume - 2.5f);
+        localRootNode.attachChild(amb);
+
+        amb1 = new AudioNode(assetManager, "audio/Ocean Waves.ogg", DataType.Stream);
+        amb1.setLooping(true);
+        amb1.setPositional(false);
+        amb1.setVolume(ambienceVolume - 1f);
+        localRootNode.attachChild(amb1);
+
+        amb2 = new AudioNode(assetManager, "audio/Nature.ogg", DataType.Stream);
+        amb2.setLooping(true);
+        amb2.setPositional(false);
+        amb2.setVolume(ambienceVolume + 1.5f);
+        localRootNode.attachChild(amb2);
     }
 
     public Node getLocalRoot() {
@@ -240,6 +251,9 @@ public class GameRunningState extends AbstractAppState {
         }
 
         playerControl.getPhysicsCharacter().setEnabled(true);
+        amb.play();
+        amb1.play();
+        amb2.play();
     }
 
     private void setupKeys() {
@@ -291,9 +305,7 @@ public class GameRunningState extends AbstractAppState {
                     }
                 }
             }
-
         }
-
     }
 
     public Node treeOutOuter(Spatial spat) {
@@ -311,7 +323,6 @@ public class GameRunningState extends AbstractAppState {
                 }
             }
         }
-
         return (Node) spat;
     }
 
@@ -415,7 +426,6 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being attached");
 
         stateAttach();
-
         setIsRunning(true);
 
     }
@@ -455,6 +465,11 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
+
+        amb.stop();
+        amb1.stop();
+        amb2.stop();
+
         view2.setEnabled(false);
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
         playerControl.setEnabled(false);
@@ -554,4 +569,15 @@ public class GameRunningState extends AbstractAppState {
         this.waterPostProcessing = waterPostProcessing;
     }
 
+    public boolean isWeatherEnabled() {
+        return weatherEnabled;
+    }
+
+    public BulletAppState getBulletAppState() {
+        return bulletAppState;
+    }
+
+    public void setWeatherEnabled(boolean weatherEnabled) {
+        this.weatherEnabled = weatherEnabled;
+    }
 };

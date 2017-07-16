@@ -4,6 +4,8 @@ import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
 import com.jme3.animation.SkeletonControl;
 import com.jme3.asset.AssetManager;
+//import com.jme3.audio.AudioData;
+//import com.jme3.audio.AudioNode;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.math.Vector3f;
@@ -28,6 +30,7 @@ public class EntityControl extends AbstractControl {
     private final BetterCharacterControl bcc;
     private final AssetManager assetManager;
     public int mass = 1000;
+    //private final AudioNode hit;
 
     public EntityControl(AssetManager assetManager, Spatial hostile, BulletAppState bulletState, String name, Vector3f pos) {
 
@@ -41,6 +44,13 @@ public class EntityControl extends AbstractControl {
         bcc.warp(new Vector3f(pos));
         setAnim("Idle", LoopMode.Loop);
         getSkeletonControl().setHardwareSkinningPreferred(false);
+
+        /*        hit = new AudioNode(assetManager, "audio/creature-growl01.wav", AudioData.DataType.Buffer);
+        hit.setLooping(false);
+        hit.setPositional(false);
+        hit.setVolume(2);
+        Node localRootNode = (Node) this.spatial.getParent();
+        localRootNode.attachChild(hit);*/
     }
 
     @Override
@@ -127,6 +137,7 @@ public class EntityControl extends AbstractControl {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1.5f;
                 setAnim("Hit", LoopMode.Loop);
+                // hit.play();
                 hitParticles();
                 this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
             }
