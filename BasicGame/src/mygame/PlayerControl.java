@@ -145,7 +145,7 @@ public class PlayerControl extends AbstractControl {
         footsteps = new AudioNode(assetManager, "Sound/Effects/Foot steps.ogg", AudioData.DataType.Buffer);
         footsteps.setLooping(false);
         footsteps.setPositional(false);
-        footsteps.setVolume(2);
+        footsteps.setVolume(2.75f);
         localRootNode.attachChild(footsteps);
 
         /*        hit = new AudioNode(assetManager, "Sound/Effects/Bang.wav", AudioData.DataType.Buffer);

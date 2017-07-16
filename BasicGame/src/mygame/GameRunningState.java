@@ -197,13 +197,13 @@ public class GameRunningState extends AbstractAppState {
         amb = new AudioNode(assetManager, "audio/ambience-creepyatmosfear.wav", DataType.Stream);
         amb.setLooping(true);
         amb.setPositional(false);
-        amb.setVolume(ambienceVolume - 2.5f);
+        amb.setVolume(ambienceVolume - 3f);
         localRootNode.attachChild(amb);
 
         amb1 = new AudioNode(assetManager, "audio/Ocean Waves.ogg", DataType.Stream);
         amb1.setLooping(true);
         amb1.setPositional(false);
-        amb1.setVolume(ambienceVolume - 1f);
+        amb1.setVolume(ambienceVolume - 1.5f);
         localRootNode.attachChild(amb1);
 
         amb2 = new AudioNode(assetManager, "audio/Nature.ogg", DataType.Stream);
