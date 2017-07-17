@@ -296,7 +296,7 @@ public class WeatherControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
 
         if (this.isEnabled()) {
-
+            
             if (suny) {
 
                 clouded_low = false;
