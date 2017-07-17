@@ -107,8 +107,6 @@ public class SkyControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
-            Node localRootNode = (Node) this.spatial;
-
             Float z = glc.getTimingValue();
 
             if (glc.getIsSun()) {
@@ -119,14 +117,7 @@ public class SkyControl extends AbstractControl {
                     day.setCullHint(Spatial.CullHint.Always);
                     night.setCullHint(Spatial.CullHint.Never);
                     evening.setCullHint(Spatial.CullHint.Always);
-
-                    if (morning.getCullHint() == Spatial.CullHint.Always) {
-                        morning.setCullHint(Spatial.CullHint.Never);
-
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).makeSuny();
-                        }
-                    }
+                    morning.setCullHint(Spatial.CullHint.Never);
 
                 }
 
@@ -136,14 +127,8 @@ public class SkyControl extends AbstractControl {
                     night.setCullHint(Spatial.CullHint.Always);
                     morning.setCullHint(Spatial.CullHint.Never);
                     evening.setCullHint(Spatial.CullHint.Always);
+                    day.setCullHint(Spatial.CullHint.Never);
 
-                    if (day.getCullHint() == Spatial.CullHint.Always) {
-                        day.setCullHint(Spatial.CullHint.Never);
-
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
-                        }
-                    }
                 }
 
                 //Evening
@@ -152,14 +137,8 @@ public class SkyControl extends AbstractControl {
                     morning.setCullHint(Spatial.CullHint.Always);
                     day.setCullHint(Spatial.CullHint.Always);
                     night.setCullHint(Spatial.CullHint.Never);
+                    evening.setCullHint(Spatial.CullHint.Never);
 
-                    if (evening.getCullHint() == Spatial.CullHint.Always) {
-                        evening.setCullHint(Spatial.CullHint.Never);
-
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
-                        }
-                    }
                 }
             } else {
 
@@ -169,12 +148,8 @@ public class SkyControl extends AbstractControl {
                     morning.setCullHint(Spatial.CullHint.Always);
                     day.setCullHint(Spatial.CullHint.Always);
                     evening.setCullHint(Spatial.CullHint.Always);
-                    if (night.getCullHint() == Spatial.CullHint.Always) {
-                        night.setCullHint(Spatial.CullHint.Never);
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
-                        }
-                    }
+                    night.setCullHint(Spatial.CullHint.Never);
+
                 }
             }
 

@@ -47,6 +47,11 @@ public class GlobalLightingControl extends AbstractControl {
     private final int shadowmapSize = 256;
     private boolean globalLightning = true;
 
+    private boolean morning = true;
+    private boolean day = false;
+    private boolean evening = false;
+    private boolean night = false;
+
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
         this.localRootNode = localRootNode;
@@ -142,6 +147,11 @@ public class GlobalLightingControl extends AbstractControl {
                 //morning
                 if (z > 0.99f) {
 
+                    morning = true;
+                    day = false;
+                    evening = false;
+                    night = false;
+
                     if (isSun == false) {
                         if (sl != null) {
                             slsr.setShadowIntensity(0.33f);
@@ -163,6 +173,11 @@ public class GlobalLightingControl extends AbstractControl {
                 //day
                 if (z < -0.36f && z > -0.99f) {
 
+                    morning = false;
+                    day = true;
+                    evening = false;
+                    night = false;
+
                     tmp.interpolateLocal(ColorRGBA.Red, tpf / timeDelay / 1.25f);
                     tmp.interpolateLocal(ColorRGBA.Orange, tpf / timeDelay / 1.25f);
                     sunMat.setColor("Color", tmp);
@@ -177,8 +192,22 @@ public class GlobalLightingControl extends AbstractControl {
                     }
                 }
 
+                if (z < -0.38f && z > -0.99f) {
+
+                    morning = false;
+                    day = false;
+                    evening = true;
+                    night = false;
+                }
+
                 //night
                 if (z < -0.999f) {
+
+                    morning = false;
+                    day = false;
+                    evening = false;
+                    night = true;
+
                     if (isSun == true) {
                         tmp = ColorRGBA.Orange;
                         localRootNode.removeLight(sun);
@@ -238,5 +267,21 @@ public class GlobalLightingControl extends AbstractControl {
 
     public SpotLightShadowRenderer getSlsr() {
         return slsr;
+    }
+
+    public boolean isMorning() {
+        return morning;
+    }
+
+    public boolean isDay() {
+        return day;
+    }
+
+    public boolean isEvening() {
+        return evening;
+    }
+
+    public boolean isNight() {
+        return night;
     }
 }
