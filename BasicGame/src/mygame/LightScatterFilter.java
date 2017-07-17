@@ -12,7 +12,7 @@ public class LightScatterFilter extends AbstractControl {
     private final LightScatteringFilter sunlight;
     private GlobalLightingControl glc;
     private boolean dynamicLightScatter;
-    private final float density = 0.6f;
+    private final float density = 1.2f;
     private final int samples = 12;
 
     public LightScatterFilter(FilterPostProcessor fpp) {
@@ -27,7 +27,6 @@ public class LightScatterFilter extends AbstractControl {
     public LightScatterFilter(FilterPostProcessor fpp, GlobalLightingControl glc) {
 
         this.glc = glc;
-
         sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
         sunlight.setLightDensity(density);
         sunlight.setNbSamples(samples);

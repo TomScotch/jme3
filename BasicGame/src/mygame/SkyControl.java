@@ -116,51 +116,52 @@ public class SkyControl extends AbstractControl {
                 //Morning
                 if (z > 0) {
 
-                    if (morning.getCullHint() == Spatial.CullHint.Always) {
-                        morning.setCullHint(Spatial.CullHint.Never);
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).makeSuny();
-                        }
+                    day.setCullHint(Spatial.CullHint.Always);
+                    night.setCullHint(Spatial.CullHint.Never);
+                    evening.setCullHint(Spatial.CullHint.Always);
+                    morning.setCullHint(Spatial.CullHint.Never);
+                    if (localRootNode.getControl(WeatherControl.class) != null) {
+                        localRootNode.getControl(WeatherControl.class).makeSuny();
                     }
 
                 }
 
                 //Day
                 if (z < -0.f && z > -0.38f) {
-                    if (day.getCullHint() == Spatial.CullHint.Always) {
-                        day.setCullHint(Spatial.CullHint.Never);
-                        night.setCullHint(Spatial.CullHint.Always);
-                        morning.setCullHint(Spatial.CullHint.Always);
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
-                        }
+
+                    night.setCullHint(Spatial.CullHint.Always);
+                    morning.setCullHint(Spatial.CullHint.Always);
+                    evening.setCullHint(Spatial.CullHint.Always);
+                    day.setCullHint(Spatial.CullHint.Never);
+
+                    if (localRootNode.getControl(WeatherControl.class) != null) {
+                        localRootNode.getControl(WeatherControl.class).startRandomWeather();
                     }
                 }
 
                 //Evening
                 if (z < -0.38f && z > -0.99f) {
 
-                    if (evening.getCullHint() == Spatial.CullHint.Always) {
-                        evening.setCullHint(Spatial.CullHint.Never);
-                        night.setCullHint(Spatial.CullHint.Never);
-                        day.setCullHint(Spatial.CullHint.Always);
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
-                        }
+                    morning.setCullHint(Spatial.CullHint.Always);
+                    day.setCullHint(Spatial.CullHint.Always);
+                    night.setCullHint(Spatial.CullHint.Never);
+                    evening.setCullHint(Spatial.CullHint.Never);
+
+                    if (localRootNode.getControl(WeatherControl.class) != null) {
+                        localRootNode.getControl(WeatherControl.class).startRandomWeather();
                     }
                 }
             } else {
 
                 //Night
                 if (z < -0.99f) {
-                    if (night.getCullHint() == Spatial.CullHint.Always) {
-                        day.setCullHint(Spatial.CullHint.Always);
-                        evening.setCullHint(Spatial.CullHint.Always);
-                        morning.setCullHint(Spatial.CullHint.Always);
-                        night.setCullHint(Spatial.CullHint.Never);
-                        if (localRootNode.getControl(WeatherControl.class) != null) {
-                            localRootNode.getControl(WeatherControl.class).startRandomWeather();
-                        }
+
+                    morning.setCullHint(Spatial.CullHint.Always);
+                    day.setCullHint(Spatial.CullHint.Always);
+                    evening.setCullHint(Spatial.CullHint.Always);
+                    night.setCullHint(Spatial.CullHint.Never);
+                    if (localRootNode.getControl(WeatherControl.class) != null) {
+                        localRootNode.getControl(WeatherControl.class).startRandomWeather();
                     }
                 }
             }
