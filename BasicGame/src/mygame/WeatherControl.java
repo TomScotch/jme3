@@ -282,7 +282,7 @@ public class WeatherControl extends AbstractControl {
         if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
             n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.White, 0.15f);
         }
-        
+
         suny = true;
         clouded = false;
         raining = false;
@@ -296,7 +296,7 @@ public class WeatherControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
 
         if (this.isEnabled()) {
-            
+
             if (suny) {
 
                 clouded_low = false;
@@ -324,12 +324,21 @@ public class WeatherControl extends AbstractControl {
                 if (flash.getParticlesPerSec() > 0) {
                     flash.setParticlesPerSec(0);
                 }
-                if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
-                    spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 2);
+
+                if (spatial.getControl(FogPostFilter.class) != null) {
+                    if (spatial.getControl(FogPostFilter.class).getFog() != null) {
+                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
+                            spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 2);
+                        }
+                    }
                 }
 
-                if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
-                    spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 2);
+                if (spatial.getControl(FogPostFilter.class) != null) {
+                    if (spatial.getControl(FogPostFilter.class).getFog() != null) {
+                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
+                            spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 2);
+                        }
+                    }
                 }
             }
 
