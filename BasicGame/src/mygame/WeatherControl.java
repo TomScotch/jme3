@@ -196,11 +196,11 @@ public class WeatherControl extends AbstractControl {
 
     public void makeRain() {
 
-        Node n = (Node) spatial;
-
+        /*        Node n = (Node) spatial;
+        
         if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.Gray, 0.25f);
-        }
+        n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.Gray, 0.25f);
+        }*/
 
         makeCloudy();
         raining = true;
@@ -262,10 +262,10 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeCloudy() {
-        Node n = (Node) spatial;
+        /*        Node n = (Node) spatial;
         if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.DarkGray, 0.25f);
-        }
+        n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.DarkGray, 0.25f);
+        }*/
         //suny = false;
         clouded = true;
         switch (getRandomNumberInRange(0, 1)) {
@@ -302,11 +302,11 @@ public class WeatherControl extends AbstractControl {
         if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).isEvening()) {
             if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).isNight()) {
 
-                if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-                    n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.White, 0.75f);
-                    n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.Orange, 0.75f);
-                    n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().clamp();
-                }
+                /*                if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+                n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.White, 0.75f);
+                n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.Orange, 0.75f);
+                n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().clamp();
+                }*/
 
                 //suny = true;
                 System.out.println("sunny");

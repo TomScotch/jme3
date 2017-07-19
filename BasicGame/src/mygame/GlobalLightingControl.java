@@ -80,6 +80,8 @@ public class GlobalLightingControl extends AbstractControl {
         sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));
         pivotSun.attachChild(sphereGeo);
         sphereGeo.setShadowMode(RenderQueue.ShadowMode.Off);
+        sphereGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
+        
 
         //Sun
         sun = new DirectionalLight();
