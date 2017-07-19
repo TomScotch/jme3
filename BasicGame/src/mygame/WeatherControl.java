@@ -4,11 +4,14 @@ import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.shapes.EmitterBoxShape;
+import com.jme3.effect.shapes.EmitterSphereShape;
+import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
 import java.util.Random;
@@ -87,6 +90,8 @@ public class WeatherControl extends AbstractControl {
         flash.setInWorldSpace(false);
         flash.setGravity(0, 0, 0);
 
+        flash.addLight(new PointLight(Vector3f.ZERO, ColorRGBA.White, 256));
+
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/raindrop-icon.png"));
@@ -101,12 +106,13 @@ public class WeatherControl extends AbstractControl {
         rain.setHighLife(2f);
         rain.setLowLife(1f);
         rain.setInWorldSpace(true);
-        rain.setShape(new EmitterBoxShape(new Vector3f(-128, -15f, -128), new Vector3f(128, 15f, 128)));
+        rain.setShape(new EmitterSphereShape(Vector3f.ZERO, 256));
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(true);
         //rain.getParticleInfluencer().setVelocityVariation(3f);
         rain.setLocalTranslation(0, 40, 0);
         rain.center();
+        rain.setQueueBucket(RenderQueue.Bucket.Transparent);
         localRoot.attachChild(rain);
 
         clouds = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, cloudThickness);
@@ -125,6 +131,7 @@ public class WeatherControl extends AbstractControl {
         clouds.getParticleInfluencer().setVelocityVariation(3f);
         clouds.setLocalTranslation(0, 150, 0);
         clouds.center();
+        clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
         localRoot.attachChild(clouds);
     }
 
