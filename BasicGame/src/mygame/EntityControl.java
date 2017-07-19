@@ -51,6 +51,8 @@ public class EntityControl extends AbstractControl {
         hit.setVolume(2);
         Node localRootNode = (Node) this.spatial.getParent();
         localRootNode.attachChild(hit);*/
+        this.spatial.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        
     }
 
     @Override

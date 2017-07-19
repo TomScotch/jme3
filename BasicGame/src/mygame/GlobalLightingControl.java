@@ -20,12 +20,12 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
-import com.jme3.shadow.EdgeFilteringMode;
 import com.jme3.shadow.SpotLightShadowRenderer;
 
 public class GlobalLightingControl extends AbstractControl {
 
     private final Material sunMat;
+    private final ViewPort vp;
 
     public DirectionalLight getSun() {
         return sun;
@@ -39,12 +39,12 @@ public class GlobalLightingControl extends AbstractControl {
     private final DirectionalLight sun;
     private final Node pivotSun;
     private final float sunHeight = 300f;
-    private final int sunSize = 64;
+    private final int sunSize = 82;
     private final Geometry sphereGeo;
     private final SpotLightShadowRenderer slsr;
     private final SpotLight dummySpotLight;
     private final DirectionalLightShadowRenderer dlsr;
-    private final int shadowmapSize = 256;
+    private final int shadowmapSize = 1024;
     private boolean globalLightning = true;
 
     private boolean morning = true;
@@ -57,7 +57,7 @@ public class GlobalLightingControl extends AbstractControl {
         this.localRootNode = localRootNode;
         //Player FlashLight
         this.sl = sl;
-
+        this.vp = vp;
         dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
 
         //PointLightSunPivotNode
@@ -80,8 +80,7 @@ public class GlobalLightingControl extends AbstractControl {
         sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));
         pivotSun.attachChild(sphereGeo);
         sphereGeo.setShadowMode(RenderQueue.ShadowMode.Off);
-        sphereGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
-        
+        //sphereGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
 
         //Sun
         sun = new DirectionalLight();
@@ -99,18 +98,22 @@ public class GlobalLightingControl extends AbstractControl {
         }
 
         //Directional Light Shadow Renderer
-        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
+        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 2);
         dlsr.setLight(sun);
+        dlsr.setShadowCompareMode(CompareMode.Hardware);
+        dlsr.setShadowIntensity(0.30f);
+        //dlsr.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
+        dlsr.setEdgesThickness(5);
         vp.addProcessor(dlsr);
 
         //Spot Light Shadow Renderer
         slsr = new SpotLightShadowRenderer(assetManager, shadowmapSize);
         slsr.setLight(dummySpotLight);
-        slsr.setShadowCompareMode(CompareMode.Software);
-        slsr.setShadowIntensity(0.45f);
-        slsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
-        slsr.setEdgesThickness(10);
-        //vp.addProcessor(slsr);
+        slsr.setShadowCompareMode(CompareMode.Hardware);
+        slsr.setShadowIntensity(0.30f);
+        //slsr.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
+        slsr.setEdgesThickness(5);
+
     }
 
     private ColorRGBA tmp = ColorRGBA.Orange;
@@ -149,6 +152,10 @@ public class GlobalLightingControl extends AbstractControl {
                 //morning
                 if (z > 0.99f) {
 
+                    if (!vp.getProcessors().contains(dlsr)) {
+                        vp.addProcessor(dlsr);
+                    }
+
                     morning = true;
                     day = false;
                     evening = false;
@@ -156,7 +163,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                     if (isSun == false) {
                         if (sl != null) {
-                            slsr.setShadowIntensity(0.33f);
+                            slsr.setShadowIntensity(0.25f);
                         }
                         localRootNode.addLight(sun);
                         isSun = true;
@@ -175,6 +182,10 @@ public class GlobalLightingControl extends AbstractControl {
                 //day
                 if (z < -0.36f && z > -0.99f) {
 
+                    if (!vp.getProcessors().contains(dlsr)) {
+                        vp.addProcessor(dlsr);
+                    }
+
                     morning = false;
                     day = true;
                     evening = false;
@@ -190,7 +201,7 @@ public class GlobalLightingControl extends AbstractControl {
                         sun.getColor().b = 0.5f;
                     }
                     if (sl != null) {
-                        slsr.setShadowIntensity(0.66f);
+                        slsr.setShadowIntensity(0.35f);
                     }
                 }
 
@@ -205,6 +216,9 @@ public class GlobalLightingControl extends AbstractControl {
                 //night
                 if (z < -0.999f) {
 
+                    if (vp.getProcessors().contains(dlsr)) {
+                        vp.removeProcessor(dlsr);
+                    }
                     morning = false;
                     day = false;
                     evening = false;
@@ -216,7 +230,7 @@ public class GlobalLightingControl extends AbstractControl {
                         isSun = false;
                         System.out.println("Sun is Down");
                         if (sl != null) {
-                            slsr.setShadowIntensity(0.99f);
+                            slsr.setShadowIntensity(0.45f);
                         }
                     }
                 }
