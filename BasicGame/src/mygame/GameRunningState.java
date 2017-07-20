@@ -171,7 +171,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      Transparency Post Processing
         tbf = new TranslucentBucketFilter(false);
-        fpp.addFilter(tbf);
+        // fpp.addFilter(tbf);
         int samples = app.getContext().getSettings().getSamples();
         if (samples > 0) {
             fpp.setNumSamples(samples);
@@ -217,7 +217,7 @@ public class GameRunningState extends AbstractAppState {
         amb = new AudioNode(assetManager, "audio/ambience-creepyatmosfear.wav", DataType.Stream);
         amb.setLooping(true);
         amb.setPositional(false);
-        amb.setVolume(ambienceVolume - 3f);
+        amb.setVolume(ambienceVolume - 1.5f);
         localRootNode.attachChild(amb);
 
         amb1 = new AudioNode(assetManager, "audio/Ocean Waves.ogg", DataType.Stream);

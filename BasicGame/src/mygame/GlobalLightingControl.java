@@ -20,7 +20,6 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
@@ -147,19 +146,16 @@ public class GlobalLightingControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
-            fire.setLocalTranslation(sphereGeo.getWorldTranslation());
-
-            fire.rotate(tpf, -tpf, tpf);
-
-            if (this.isEnabled()) {
-                if (sl.isEnabled()) {
-                    slsr.setLight(sl);
-                } else {
-                    slsr.setLight(dummySpotLight);
-                }
+            if (sl.isEnabled()) {
+                slsr.setLight(sl);
+            } else {
+                slsr.setLight(dummySpotLight);
             }
 
             if (globalLightning) {
+
+                fire.setLocalTranslation(sphereGeo.getWorldTranslation());
+                fire.rotate(0, tpf, 0);
 
                 pivot.rotate((FastMath.QUARTER_PI * tpf) / timeDelay, 0, 0);
 
@@ -263,6 +259,8 @@ public class GlobalLightingControl extends AbstractControl {
             } else {
                 sun.setDirection(new Vector3f(-5, -5, -5));
                 sun.setColor(ColorRGBA.White);
+                fire.removeFromParent();
+                sphereGeo.removeFromParent();
             }
         } else {
             System.out.println("glc stopped");
