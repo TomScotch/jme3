@@ -12,8 +12,8 @@ public class LightScatterFilter extends AbstractControl {
     private final LightScatteringFilter sunlight;
     private GlobalLightingControl glc;
     private boolean dynamicLightScatter;
-    private final float density = 1.2f;
-    private final int samples = 12;
+    private final float density = 1.4f;
+    private final int samples = 50;
 
     public LightScatterFilter(FilterPostProcessor fpp) {
 

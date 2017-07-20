@@ -1,6 +1,9 @@
 package mygame;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
+import com.jme3.effect.shapes.EmitterSphereShape;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
 import com.jme3.light.LightList;
@@ -17,6 +20,7 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
@@ -26,6 +30,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Material sunMat;
     private final ViewPort vp;
+    private final ParticleEmitter fire;
 
     public DirectionalLight getSun() {
         return sun;
@@ -71,16 +76,37 @@ public class GlobalLightingControl extends AbstractControl {
         Sphere sphereMesh = new Sphere(sunSize, sunSize, sunSize);
         sphereGeo = new Geometry("", sphereMesh);
 
+        Material material = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+        material.setTexture("Texture", assetManager.loadTexture("Effects/Explosion/flame.png"));
+        material.setFloat("Softness", 3f); // 
+
+        //Fire
+        fire = new ParticleEmitter("Fire", ParticleMesh.Type.Triangle, 30);
+        fire.setMaterial(material);
+        fire.setShape(new EmitterSphereShape(Vector3f.ZERO, 0.1f));
+        fire.setImagesX(2);
+        fire.setImagesY(2);
+        fire.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f));
+        fire.setStartColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
+        fire.setStartSize(sunSize * 2);
+        fire.setEndSize(0.01f);
+        fire.setGravity(0, -0.3f, 0);
+        fire.setInWorldSpace(false);
+        fire.setLowLife(0.4f);
+        fire.setHighLife(2f);
+        fire.setParticlesPerSec(25);
+        fire.setNumParticles(100);
+        fire.setShadowMode(RenderQueue.ShadowMode.Off);
+        //fire.setQueueBucket(RenderQueue.Bucket.Translucent);
+        localRootNode.attachChild(fire);
+
         sunMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         sunMat.setColor("Color", ColorRGBA.Orange);
-
-        //Texture sunTex = assetManager.loadTexture("Textures/ColorRamp/cloudy.png");
-        //sunMat.setTexture("ColorMap", sunTex);
         sphereGeo.setMaterial(sunMat);//assetManager.loadMaterial("Common/Materials/WhiteColor.j3m")
         sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));
         pivotSun.attachChild(sphereGeo);
         sphereGeo.setShadowMode(RenderQueue.ShadowMode.Off);
-        //sphereGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
+        //sphereGeo.setQueueBucket(RenderQueue.Bucket.Translucent);
 
         //Sun
         sun = new DirectionalLight();
@@ -102,7 +128,6 @@ public class GlobalLightingControl extends AbstractControl {
         dlsr.setLight(sun);
         dlsr.setShadowCompareMode(CompareMode.Hardware);
         dlsr.setShadowIntensity(0.30f);
-        //dlsr.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
         dlsr.setEdgesThickness(5);
         vp.addProcessor(dlsr);
 
@@ -111,7 +136,6 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setLight(dummySpotLight);
         slsr.setShadowCompareMode(CompareMode.Hardware);
         slsr.setShadowIntensity(0.30f);
-        //slsr.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
         slsr.setEdgesThickness(5);
 
     }
@@ -123,9 +147,9 @@ public class GlobalLightingControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
-            if (slsr.getShadowCompareMode() == CompareMode.Software) {
-                slsr.setShadowCompareMode(CompareMode.Hardware);
-            }
+            fire.setLocalTranslation(sphereGeo.getWorldTranslation());
+
+            fire.rotate(tpf, -tpf, tpf);
 
             if (this.isEnabled()) {
                 if (sl.isEnabled()) {
@@ -177,6 +201,8 @@ public class GlobalLightingControl extends AbstractControl {
                     tmp.interpolateLocal(ColorRGBA.Yellow, tpf / timeDelay / 1.25f);
                     tmp.interpolateLocal(ColorRGBA.Gray, tpf / timeDelay / 1.25f);
                     sunMat.setColor("Color", tmp);
+                    fire.setEndColor(tmp);
+                    fire.setStartColor(sun.getColor());
                 }
 
                 //day

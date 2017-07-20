@@ -17,6 +17,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.TranslucentBucketFilter;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
@@ -68,6 +69,7 @@ public class GameRunningState extends AbstractAppState {
 
     private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
+    private final TranslucentBucketFilter tbf;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -164,6 +166,14 @@ public class GameRunningState extends AbstractAppState {
 
 //      PosterizationFilter
         localRootNode.addControl(new PosterizationFilterControl(fpp));
+
+//      Transparency Post Processing
+        tbf = new TranslucentBucketFilter(false);
+        fpp.addFilter(tbf);
+        int samples = app.getContext().getSettings().getSamples();
+        if (samples > 0) {
+            fpp.setNumSamples(samples);
+        }
 
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
