@@ -1,5 +1,6 @@
 package mygame;
 
+import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -70,6 +71,7 @@ public class GameRunningState extends AbstractAppState {
     private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
     private final TranslucentBucketFilter tbf;
+    private final WildLifeControl wildlifeControl;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -202,6 +204,14 @@ public class GameRunningState extends AbstractAppState {
         view2.setClearFlags(true, true, true);
         view2.attachScene(localRootNode);
         view2.setEnabled(false);
+
+        //Wildlife
+        Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
+        bird.setLocalTranslation(256, 45, 0);
+        wildlifeControl = new WildLifeControl();
+        bird.addControl(wildlifeControl);
+        localRootNode.attachChild(bird);
+        wildlifeControl.setAnim("fly", LoopMode.Loop);
 
         //Audio
         amb = new AudioNode(assetManager, "audio/ambience-creepyatmosfear.wav", DataType.Stream);
