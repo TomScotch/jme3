@@ -13,7 +13,7 @@ public class BloomPostFilter extends AbstractControl {
     public BloomPostFilter(FilterPostProcessor fpp) {
 
         bloom = new BloomFilter(BloomFilter.GlowMode.SceneAndObjects);
-        bloom.setBloomIntensity(0.3f);
+        bloom.setBloomIntensity(1.3f);
         bloom.setDownSamplingFactor(6);
         fpp.addFilter(bloom);
     }
