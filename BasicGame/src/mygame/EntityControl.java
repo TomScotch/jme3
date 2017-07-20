@@ -44,6 +44,7 @@ public class EntityControl extends AbstractControl {
         bcc.warp(new Vector3f(pos));
         setAnim("Idle", LoopMode.Loop);
         getSkeletonControl().setHardwareSkinningPreferred(false);
+        this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
 
         /*        hit = new AudioNode(assetManager, "audio/creature-growl01.wav", AudioData.DataType.Buffer);
         hit.setLooping(false);
@@ -52,7 +53,7 @@ public class EntityControl extends AbstractControl {
         Node localRootNode = (Node) this.spatial.getParent();
         localRootNode.attachChild(hit);*/
         this.spatial.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        
+
     }
 
     @Override

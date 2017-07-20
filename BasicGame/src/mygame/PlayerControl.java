@@ -138,7 +138,7 @@ public class PlayerControl extends AbstractControl {
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
         this.localRootNode.attachChild(characterNode);
         doAnim("player", "Idle", LoopMode.Loop);
-
+        characterNode.setQueueBucket( RenderQueue.Bucket.Opaque);
         setupKeys();
 
         localRootNode.addControl(new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, this));

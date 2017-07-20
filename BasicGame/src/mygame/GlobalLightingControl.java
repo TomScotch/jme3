@@ -172,9 +172,9 @@ public class GlobalLightingControl extends AbstractControl {
                 //morning
                 if (z > 0.99f) {
 
-                    if (!vp.getProcessors().contains(dlsr)) {
-                        vp.addProcessor(dlsr);
-                    }
+                    /*                    if (!vp.getProcessors().contains(dlsr)) {
+                    vp.addProcessor(dlsr);
+                    }*/
 
                     morning = true;
                     day = false;
@@ -204,9 +204,9 @@ public class GlobalLightingControl extends AbstractControl {
                 //day
                 if (z < -0.36f && z > -0.99f) {
 
-                    if (!vp.getProcessors().contains(dlsr)) {
-                        vp.addProcessor(dlsr);
-                    }
+                    /*                    if (!vp.getProcessors().contains(dlsr)) {
+                    vp.addProcessor(dlsr);
+                    }*/
 
                     morning = false;
                     day = true;
@@ -238,9 +238,9 @@ public class GlobalLightingControl extends AbstractControl {
                 //night
                 if (z < -0.999f) {
 
-                    if (vp.getProcessors().contains(dlsr)) {
-                        vp.removeProcessor(dlsr);
-                    }
+                    /*                    if (vp.getProcessors().contains(dlsr)) {
+                    vp.removeProcessor(dlsr);
+                    }*/
                     morning = false;
                     day = false;
                     evening = false;
