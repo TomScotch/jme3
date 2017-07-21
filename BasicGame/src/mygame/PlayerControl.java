@@ -67,8 +67,8 @@ public class PlayerControl extends AbstractControl {
     private final ChaseCamera chaseCam;
     private final float flashLightStrength = 1.25f;
     private final float flashLightSpotRange = 33;
-    private final int outerLamp = 44;
-    private final int innerLamp = 27;
+    private final int outerLamp = 30;
+    private final int innerLamp = 15;
 
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
