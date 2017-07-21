@@ -406,7 +406,8 @@ public class WeatherControl extends AbstractControl {
             }
 
             if (misty) {
-                if (spatial.getControl(FogPostFilter.class).getFog() != null) {
+                if (spatial != null) {
+                if (spatial.getControl(FogPostFilter.class) != null) {
                     Node n = (Node) spatial;
                     if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
                         spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.DarkGray);
@@ -438,7 +439,7 @@ public class WeatherControl extends AbstractControl {
                         if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5) {
                             spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 2);
                         }
-                    }
+                    }}
                 } else {
 
                     misty_low = false;
