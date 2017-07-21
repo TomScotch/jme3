@@ -96,7 +96,7 @@ public class GlobalLightingControl extends AbstractControl {
         fire.setParticlesPerSec(25);
         fire.setNumParticles(100);
         fire.setShadowMode(RenderQueue.ShadowMode.Off);
-        //fire.setQueueBucket(RenderQueue.Bucket.Translucent);
+        fire.setQueueBucket(RenderQueue.Bucket.Transparent);
         localRootNode.attachChild(fire);
 
         sunMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -175,7 +175,6 @@ public class GlobalLightingControl extends AbstractControl {
                     /*                    if (!vp.getProcessors().contains(dlsr)) {
                     vp.addProcessor(dlsr);
                     }*/
-
                     morning = true;
                     day = false;
                     evening = false;
@@ -197,8 +196,8 @@ public class GlobalLightingControl extends AbstractControl {
                     tmp.interpolateLocal(ColorRGBA.Yellow, tpf / timeDelay / 1.25f);
                     tmp.interpolateLocal(ColorRGBA.Gray, tpf / timeDelay / 1.25f);
                     sunMat.setColor("Color", tmp);
-                    fire.setEndColor(tmp);
-                    fire.setStartColor(sun.getColor());
+                    fire.setEndColor(sun.getColor());
+                    fire.setStartColor(tmp);
                 }
 
                 //day
@@ -207,7 +206,6 @@ public class GlobalLightingControl extends AbstractControl {
                     /*                    if (!vp.getProcessors().contains(dlsr)) {
                     vp.addProcessor(dlsr);
                     }*/
-
                     morning = false;
                     day = true;
                     evening = false;
