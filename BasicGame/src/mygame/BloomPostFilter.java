@@ -9,14 +9,16 @@ import com.jme3.scene.control.AbstractControl;
 public class BloomPostFilter extends AbstractControl {
 
     private final BloomFilter bloom;
-    private final float density = 0.5f;//2
-    private final float sampling = 4;//1
+    private final float density = 2;//2
+    private final float sampling = 1;//1
 
     public BloomPostFilter(FilterPostProcessor fpp) {
 
         bloom = new BloomFilter(BloomFilter.GlowMode.Objects);
         bloom.setBloomIntensity(density);
         bloom.setDownSamplingFactor(sampling);
+        bloom.setBlurScale(1f);//1.5f
+        bloom.setExposurePower(4.0f);//5.0f
         fpp.addFilter(bloom);
     }
 

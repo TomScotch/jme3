@@ -27,6 +27,7 @@ import com.jme3.terrain.geomipmap.TerrainPatch;
 import com.jme3.water.SimpleWaterProcessor;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
 
@@ -69,7 +70,9 @@ public class GameRunningState extends AbstractAppState {
 
     private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
-    private final WildLifeControl wildlifeControl;
+
+    private int counter = 0;
+    private int limit = 0;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -139,7 +142,7 @@ public class GameRunningState extends AbstractAppState {
         if (lightScatterEnabled) {
 
             if (localRootNode.getControl(LightScatterFilter.class) == null) {
-                localRootNode.addControl(new LightScatterFilter(fpp, glc));
+                localRootNode.addControl(new LightScatterFilter(fpp, glc, true));
             }
         }
 
@@ -195,14 +198,6 @@ public class GameRunningState extends AbstractAppState {
         view2.attachScene(localRootNode);
         view2.setEnabled(false);
 
-        //Wildlife
-        Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
-        bird.setLocalTranslation(256, 45, 0);
-        wildlifeControl = new WildLifeControl();
-        bird.addControl(wildlifeControl);
-        localRootNode.attachChild(bird);
-        wildlifeControl.setAnim("fly", LoopMode.Loop);
-
         //Audio
         amb = new AudioNode(assetManager, "audio/ambience-creepyatmosfear.wav", DataType.Stream);
         amb.setLooping(true);
@@ -223,6 +218,24 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(amb2);
     }
 
+    public final void attachBird() {
+
+        for (int i = 1; i < getRandomNumberInRange(6, 24); i++) {
+            Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
+
+            bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
+
+            bird.lookAt(new Vector3f(getRandomNumberInRange(-128, 128), 0, getRandomNumberInRange(-128, 128)), Vector3f.UNIT_Y);
+
+            WildLifeControl wildlifeControl = new WildLifeControl();
+
+            bird.addControl(wildlifeControl);
+            wildlifeControl.getSkeletonControl().setHardwareSkinningPreferred(false);
+            localRootNode.attachChild(bird);
+            wildlifeControl.setAnim("fly", LoopMode.Loop);
+        }
+    }
+
     public Node getLocalRoot() {
         return localRootNode;
     }
@@ -239,9 +252,14 @@ public class GameRunningState extends AbstractAppState {
 
         System.out.println("Game State is being initialized");
 
+        limit = getRandomNumberInRange(0, 90);
+
         inputManager.setCursorVisible(false);
 
         bulletAppState.setEnabled(true);
+
+        //Wildlife
+        attachBird();
 
         //      WATER
         if (waterPostProcessing) {
@@ -394,6 +412,7 @@ public class GameRunningState extends AbstractAppState {
 
         if (isRunning) {
             super.update(tpf);
+
             if (globalLightningEnabled) {
                 if (view2.isEnabled()) {
                     cam2.setLocation(glc.getSunPosition());
@@ -403,6 +422,11 @@ public class GameRunningState extends AbstractAppState {
                 }
             }
 
+            if (counter >= limit) {
+                counter = 0;
+                attachBird();
+                limit = getRandomNumberInRange(0, 90);
+            }
         }
     }
 
@@ -589,5 +613,10 @@ public class GameRunningState extends AbstractAppState {
 
     public void setWeatherEnabled(boolean weatherEnabled) {
         this.weatherEnabled = weatherEnabled;
+    }
+
+    private int getRandomNumberInRange(int min, int max) {
+        Random r = new Random();
+        return r.ints(min, (max + 1)).findFirst().getAsInt();
     }
 };
