@@ -71,8 +71,8 @@ public class GameRunningState extends AbstractAppState {
     private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
 
-    private int counter = 0;
-    private int limit = 0;
+    private float counter = 0;
+    private float limit = 0;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -104,7 +104,6 @@ public class GameRunningState extends AbstractAppState {
 
 //      CAMERA        
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
-        //this.viewPort.getCamera().lookAtDirection(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
 //      TERRAIN
         terrainControl = new Terrain(assetManager, bulletAppState, localRootNode, viewPort);
@@ -216,16 +215,20 @@ public class GameRunningState extends AbstractAppState {
         amb2.setPositional(false);
         amb2.setVolume(ambienceVolume + 1.5f);
         localRootNode.attachChild(amb2);
+
+        limit = getRandomNumberInRange(15, 45);
     }
 
     public final void attachBird() {
 
-        for (int i = 1; i < getRandomNumberInRange(6, 24); i++) {
+        int cl = getRandomNumberInRange(6, 24);
+
+        for (int i = 1; i < cl; i++) {
             Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
 
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
-            bird.lookAt(new Vector3f(getRandomNumberInRange(-128, 128), 0, getRandomNumberInRange(-128, 128)), Vector3f.UNIT_Y);
+            //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
 
             WildLifeControl wildlifeControl = new WildLifeControl();
 
@@ -252,14 +255,15 @@ public class GameRunningState extends AbstractAppState {
 
         System.out.println("Game State is being initialized");
 
-        limit = getRandomNumberInRange(0, 90);
+        int nl = getRandomNumberInRange(15, 45);
+
+        if (limit == 0) {
+            limit = nl;
+        }
 
         inputManager.setCursorVisible(false);
 
         bulletAppState.setEnabled(true);
-
-        //Wildlife
-        attachBird();
 
         //      WATER
         if (waterPostProcessing) {
@@ -411,6 +415,7 @@ public class GameRunningState extends AbstractAppState {
     public void update(float tpf) {
 
         if (isRunning) {
+
             super.update(tpf);
 
             if (globalLightningEnabled) {
@@ -422,10 +427,13 @@ public class GameRunningState extends AbstractAppState {
                 }
             }
 
+            counter += tpf;
+
             if (counter >= limit) {
                 counter = 0;
+                int nl = getRandomNumberInRange(15, 45);
+                limit = nl;
                 attachBird();
-                limit = getRandomNumberInRange(0, 90);
             }
         }
     }

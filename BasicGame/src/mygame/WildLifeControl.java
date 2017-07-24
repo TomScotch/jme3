@@ -33,12 +33,28 @@ public class WildLifeControl extends AbstractControl {
                 spatial.getWorldTranslation().addLocal(0, 2.5f * tpf, 0);
             }
         }
-
-        if (x >= 1024 | z >= 1024) {
-            this.spatial.removeFromParent();
-            this.spatial.removeControl(this);
+        if (x > 2048) {
+            killBird();
         }
 
+        if (x < -2048) {
+            killBird();
+        }
+
+        if (z > 2048) {
+            killBird();
+        }
+
+        if (z < -2048) {
+            killBird();
+        }
+
+    }
+
+    public void killBird() {
+        this.spatial.removeFromParent();
+        this.spatial.removeControl(this);
+        this.spatial = null;
     }
 
     @Override
