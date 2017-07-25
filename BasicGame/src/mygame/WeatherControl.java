@@ -150,7 +150,7 @@ public class WeatherControl extends AbstractControl {
         debrisEffect.setStartSize(1);
         debrisEffect.setEndSize(0.1f);
         debrisEffect.setHighLife(1f);
-        debrisEffect.setLowLife(0.5f);
+        debrisEffect.setLowLife(1f);
         debrisEffect.setInWorldSpace(true);
         debrisEffect.setFacingVelocity(false);
         // debrisEffect.setParticlesPerSec(0);
