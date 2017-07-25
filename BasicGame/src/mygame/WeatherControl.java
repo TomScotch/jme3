@@ -148,7 +148,7 @@ public class WeatherControl extends AbstractControl {
         debrisMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/splash.png"));
         debrisEffect.setMaterial(debrisMat);
         debrisEffect.setStartSize(1);
-        debrisEffect.setEndSize(0.1f);
+        debrisEffect.setEndSize(0.8f);
         debrisEffect.setHighLife(1f);
         debrisEffect.setLowLife(1f);
         debrisEffect.setInWorldSpace(true);
