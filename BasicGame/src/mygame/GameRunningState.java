@@ -73,6 +73,7 @@ public class GameRunningState extends AbstractAppState {
 
     private float counter = 0;
     private float limit = 0;
+    private final DepthOfField dof;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -169,6 +170,10 @@ public class GameRunningState extends AbstractAppState {
 //      PosterizationFilter
         localRootNode.addControl(new PosterizationFilterControl(fpp));
 
+        //DOF
+        dof = new DepthOfField(fpp, app.getContext(), viewPort, terrainControl.getTerrain(), assetManager);
+        localRootNode.addControl(dof);
+
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
@@ -229,7 +234,6 @@ public class GameRunningState extends AbstractAppState {
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
             //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
-
             WildLifeControl wildlifeControl = new WildLifeControl();
 
             bird.addControl(wildlifeControl);

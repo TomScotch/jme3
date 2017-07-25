@@ -45,6 +45,8 @@ public class EntityControl extends AbstractControl {
         setAnim("Idle", LoopMode.Loop);
         getSkeletonControl().setHardwareSkinningPreferred(false);
         this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
+        
+       // TangentBinormalGenerator.generate(this.spatial);
 
         /*        hit = new AudioNode(assetManager, "audio/creature-growl01.wav", AudioData.DataType.Buffer);
         hit.setLooping(false);

@@ -17,14 +17,18 @@ import com.jme3.texture.Texture;
 
 public class Terrain extends AbstractControl {
 
+    public TerrainQuad getTerrain() {
+        return terrain;
+    }
+
     private final boolean shadowsEnabled;
+    private final TerrainQuad terrain;
 
     public Terrain(AssetManager assetManager, BulletAppState bulletAppState, Node localRootNode, ViewPort vp) {
 
         shadowsEnabled = true;
 
         Texture heightMapImage = assetManager.loadTexture("Textures/Terrain/splat/mountains512.png");
-        TerrainQuad terrain;
         AbstractHeightMap heightmap;
         heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 0.275f);
         heightmap.load();
@@ -48,6 +52,9 @@ public class Terrain extends AbstractControl {
         if (shadowsEnabled) {
             terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
         }
+
+       // TangentBinormalGenerator.generate(terrain);
+
         terrain.addControl(new RigidBodyControl(0));
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);

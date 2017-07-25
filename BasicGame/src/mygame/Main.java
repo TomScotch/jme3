@@ -14,7 +14,6 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
-import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.Nifty;
@@ -43,6 +42,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
+import com.jme3.opencl.*;
+import com.jme3.system.AppSettings;
+import java.util.Collections;
+import java.util.List;
 
 @SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
@@ -81,8 +84,12 @@ public class Main extends SimpleApplication implements ScreenController {
     private static boolean showFps = false;
 
     private boolean wireframe = false;
-
+    private static Platform selectedPlatform;
     private Node settingsNode;
+
+    private static final Object sync = new Object();
+    private static List<? extends Device> availableDevices;
+    private static int currentDeviceIndex;
 
     public void switchShadows() {
         shadows = !shadows;
@@ -186,7 +193,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
     private static void sortModes(DisplayMode[] modes) {
 
-        for (int i = 0; i < modes.length; i++) {
+        for (int i = 1; i < modes.length; i++) {
             for (int j = 0; j < modes.length; j++) {
                 if (modes[j].getWidth() < modes[i].getWidth()) {
                     DisplayMode temp = modes[i];
@@ -196,8 +203,33 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
 
+        int dupes = 0;
+        for (int i = 0; i < modes.length; i++) {
+            int j = i + 1;
+            if (j < modes.length) {
+                if (modes[i].equals(modes[j])) {
+                    dupes += 1;
+                    System.out.println(dupes);
+                }
+            }
+        }
+
+        if (dupes > 0) {
+            int l = modes.length - dupes;
+            DisplayMode[] modes2 = new DisplayMode[l];
+            for (int i = 0; i < modes2.length; i++) {
+                int j = i + 1;
+                if (j < modes2.length) {
+                    if (!modes[i].equals(modes[j])) {
+                        modes2[i] = modes[i];
+                    }
+                }
+            }
+            modes = modes2;
+        }
+
         for (DisplayMode dm : modes) {
-            System.out.println(dm.getWidth() + " : " + dm.getHeight());
+            System.out.println(dm.getWidth() + " - " + dm.getHeight());
         }
     }
 
@@ -224,11 +256,14 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setDepthBits(24);
         cfg.setGammaCorrection(false);
 
+        //cfg.setOpenCLSupport(true);
+        //cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
         //
         cfg.load(cfg.getTitle());
         //
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
+
         app.setSettings(cfg);
         //
         app.start();
@@ -802,5 +837,33 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public static void setShowFps(boolean aShowFps) {
         showFps = aShowFps;
+    }
+
+    public static class CustomPlatformChooser implements PlatformChooser {
+
+        public CustomPlatformChooser() {
+        }
+
+        @Override
+        public List<? extends Device> chooseDevices(List<? extends Platform> platforms) {
+            synchronized (sync) {
+                if (currentDeviceIndex == -1) {
+                    return Collections.emptyList();
+                }
+
+                Platform platform = platforms.get(0);
+                availableDevices = platform.getDevices();
+                selectedPlatform = platform;
+
+                Device device = platform.getDevices().get(currentDeviceIndex);
+                currentDeviceIndex++;
+                if (currentDeviceIndex >= availableDevices.size()) {
+                    currentDeviceIndex = -1;
+                }
+
+                return Collections.singletonList(device);
+            }
+        }
+
     }
 }

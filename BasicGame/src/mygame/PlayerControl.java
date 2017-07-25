@@ -153,6 +153,9 @@ public class PlayerControl extends AbstractControl {
         hit.setPositional(false);
         hit.setVolume(4);
         localRootNode.attachChild(hit);*/
+        
+       // TangentBinormalGenerator.generate(this.model);
+        
     }
 
     private final ActionListener actionListener = new ActionListener() {

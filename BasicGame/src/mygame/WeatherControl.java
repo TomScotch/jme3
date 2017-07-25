@@ -49,14 +49,15 @@ public class WeatherControl extends AbstractControl {
     private final int cloudThickness = 325; // 400
     private final int lightningFrequency = 220; // 360
     private final int lightningVoloume = 12; // 180
-    private float rainStrength = 1700; // 3000
-    private float rainThickness = 2700; // 6000
+
+    private float rainStrength = 3000; // 3000
+    private float rainThickness = 6000; // 6000
 
     private float counter = 0f;
     private float limit = 0f;
 
     private ColorRGBA rainColorStart = new ColorRGBA(ColorRGBA.Blue);
-    private ColorRGBA rainColorEnd = new ColorRGBA(ColorRGBA.LightGray);
+    private ColorRGBA rainColorEnd = new ColorRGBA(ColorRGBA.DarkGray);
 
     private final int maximumWeatherLength = 38;
     private final int minimumWeatherLength = 8;
@@ -81,9 +82,9 @@ public class WeatherControl extends AbstractControl {
         flash.setStartColor(ColorRGBA.White);
 
         flash.setStartSize(3);
-        flash.setEndSize(35);
+        flash.setEndSize(28);
 
-        flash.setHighLife(0.5f);
+        flash.setHighLife(0.35f);
         flash.setLowLife(0.1f);
 
         flash.setFacingVelocity(false);
@@ -94,23 +95,23 @@ public class WeatherControl extends AbstractControl {
 
         rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/raindrop.png"));
+        rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/rain.png"));
         rain.setMaterial(rainMat);
-        rain.setEndColor(rainColorEnd);
-        rain.setStartColor(rainColorStart);
-        rain.setStartSize(0.28f);
-        rain.setEndSize(0.075f);
-        rain.setGravity(0, 1000, 0);
-        rain.setHighLife(2f);
-        rain.setLowLife(1f);
+        rain.setEndColor(ColorRGBA.DarkGray);
+        rain.setStartColor(ColorRGBA.DarkGray);
+        rain.setStartSize(0.5f);
+        rain.setEndSize(0.25f);
+        rain.setGravity(0, 1750, 0);
+        rain.setHighLife(3f);
+        rain.setLowLife(1.5f);
         rain.setInWorldSpace(true);
         rain.setShape(new EmitterSphereShape(Vector3f.ZERO, 256));
         rain.setParticlesPerSec(0);
-        rain.setFacingVelocity(true);
+        rain.setFacingVelocity(false);
         //rain.getParticleInfluencer().setVelocityVariation(3f);
         rain.setLocalTranslation(0, 40, 0);
         rain.center();
-        rain.setQueueBucket(RenderQueue.Bucket.Transparent);
+        //rain.setQueueBucket(RenderQueue.Bucket.Opaque);
         localRoot.attachChild(rain);
 
         clouds = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, cloudThickness);
@@ -405,39 +406,40 @@ public class WeatherControl extends AbstractControl {
 
             if (misty) {
                 if (spatial != null) {
-                if (spatial.getControl(FogPostFilter.class) != null) {
-                    Node n = (Node) spatial;
-                    if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-                        spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.DarkGray);
-                    } else {
-                        spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.Gray);
+                    if (spatial.getControl(FogPostFilter.class) != null) {
+                        Node n = (Node) spatial;
+                        if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+                            spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.DarkGray);
+                        } else {
+                            spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.Gray);
+                        }
+
+                        if (misty_high) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance) {
+                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 4);
+                            }
+
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity) {
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 4);
+                            }
+                        } else if (misty_med) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance / 1.25f) {
+                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 2);
+                            }
+
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.25) {
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 2);
+                            }
+                        } else if (misty_low) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance / 1.5) {
+                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 2);
+                            }
+
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5) {
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 2);
+                            }
+                        }
                     }
-
-                    if (misty_high) {
-                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance) {
-                            spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 4);
-                        }
-
-                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity) {
-                            spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 4);
-                        }
-                    } else if (misty_med) {
-                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance / 1.25f) {
-                            spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 2);
-                        }
-
-                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.25) {
-                            spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 2);
-                        }
-                    } else if (misty_low) {
-                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance / 1.5) {
-                            spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 2);
-                        }
-
-                        if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5) {
-                            spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 2);
-                        }
-                    }}
                 } else {
 
                     misty_low = false;
