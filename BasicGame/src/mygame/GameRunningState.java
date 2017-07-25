@@ -74,6 +74,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
+    private final SSAO ssao;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -156,7 +157,7 @@ public class GameRunningState extends AbstractAppState {
         //      Weather
         if (weatherEnabled) {
             if (localRootNode.getControl(WeatherControl.class) == null) {
-                weatherControl = new WeatherControl(assetManager, localRootNode);
+                weatherControl = new WeatherControl(assetManager, localRootNode, viewPort.getCamera(),terrainControl.getHeightmap());
                 weatherControl.setEnabled(false);
                 localRootNode.addControl(weatherControl);
             }
@@ -171,8 +172,12 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.addControl(new PosterizationFilterControl(fpp));
 
         //DOF
-        dof = new DepthOfField(fpp, app.getContext(), viewPort, terrainControl.getTerrain(), assetManager);
+        dof = new DepthOfField(fpp, app.getContext(), viewPort, assetManager);
         localRootNode.addControl(dof);
+
+        //SSAO
+        ssao = new SSAO(assetManager);
+        localRootNode.addControl(ssao);
 
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");

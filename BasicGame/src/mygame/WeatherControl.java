@@ -1,6 +1,7 @@
 package mygame;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.effect.Particle;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.shapes.EmitterBoxShape;
@@ -9,11 +10,13 @@ import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
+import com.jme3.terrain.heightmap.AbstractHeightMap;
 import java.util.Random;
 
 public class WeatherControl extends AbstractControl {
@@ -61,8 +64,15 @@ public class WeatherControl extends AbstractControl {
 
     private final int maximumWeatherLength = 38;
     private final int minimumWeatherLength = 8;
+    private final Camera cam;
+    private final AbstractHeightMap hm;
+    private final AssetManager am;
+    private final ParticleEmitter debrisEffect;
 
-    public WeatherControl(AssetManager am, Node localRoot) {
+    public WeatherControl(AssetManager am, Node localRoot, Camera cam, AbstractHeightMap hm) {
+        this.cam = cam;
+        this.hm = hm;
+        this.am = am;
 
         limit = (float) getRandomNumberInRange(minimumWeatherLength, maximumWeatherLength);
 
@@ -132,6 +142,23 @@ public class WeatherControl extends AbstractControl {
         clouds.center();
         clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
         localRoot.attachChild(clouds);
+
+        debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 4);
+        Material debrisMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
+        debrisMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/splash.png"));
+        debrisEffect.setMaterial(debrisMat);
+        debrisEffect.setStartSize(1);
+        debrisEffect.setEndSize(0.1f);
+        debrisEffect.setHighLife(1f);
+        debrisEffect.setLowLife(0.5f);
+        debrisEffect.setInWorldSpace(true);
+        debrisEffect.setFacingVelocity(false);
+        // debrisEffect.setParticlesPerSec(0);
+        //debrisEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 4, 0));
+        debrisEffect.setStartColor(ColorRGBA.DarkGray);
+        //debrisEffect.setGravity(0f, 1f, 0f);
+        //debrisEffect.getParticleInfluencer().setVelocityVariation(.60f);
+        localRoot.attachChild(debrisEffect);
     }
 
     public final void startRandomWeather() {
@@ -366,6 +393,23 @@ public class WeatherControl extends AbstractControl {
             }
 
             if (raining) {
+
+                if (rain.getNumVisibleParticles() > 0) {
+                    for (Particle p : rain.getParticles()) {
+                        Vector3f position = p.position;
+                        if (hm != null) {
+                            try {
+                                float trueHeightAtPoint = hm.getInterpolatedHeight(position.getX(), position.getY());
+                                if (position.getY() <= trueHeightAtPoint) {
+                                    debrisEffect.getWorldTranslation().set(p.position.getX(), trueHeightAtPoint + 0.5f, p.position.getZ()); //
+                                    debrisEffect.emitParticles(1);
+                                }
+                            } catch (Exception e) {
+                            }
+                        }
+                    }
+                }
+
                 if (raining_high) {
                     rain.setParticlesPerSec(rainStrength * 2);
                 } else if (raining_med) {
@@ -374,6 +418,9 @@ public class WeatherControl extends AbstractControl {
                     rain.setParticlesPerSec(rainStrength / 2);
                 }
             } else {
+
+                debrisEffect.setParticlesPerSec(0);
+                debrisEffect.killAllParticles();
 
                 raining_low = false;
                 raining_med = false;
@@ -393,6 +440,15 @@ public class WeatherControl extends AbstractControl {
                 } else if (lightnungStrikes_low) {
                     flash.setParticlesPerSec(lightningFrequency / 1.6f);
                 }
+
+                for (Particle p : flash.getParticles()) {
+                    if (cam.getLocation().distance(p.position) < 15) {
+                        //p.life = 0;
+                        p.size = 0.1f;
+                        System.out.println("too close lightning");
+                    }
+                }
+
             } else {
 
                 lightnungStrikes_low = false;

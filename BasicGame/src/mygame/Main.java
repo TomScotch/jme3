@@ -3,6 +3,8 @@ package mygame;
 import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.VideoRecorderAppState;
+import com.jme3.asset.AssetInfo;
+import com.jme3.asset.AssetLoader;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.export.binary.BinaryImporter;
 import com.jme3.input.KeyInput;
@@ -46,6 +48,7 @@ import com.jme3.opencl.*;
 import com.jme3.system.AppSettings;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 @SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
@@ -837,6 +840,23 @@ public class Main extends SimpleApplication implements ScreenController {
 
     public static void setShowFps(boolean aShowFps) {
         showFps = aShowFps;
+    }
+
+    public class TextLoader implements AssetLoader {
+
+        @Override
+        public String load(AssetInfo assetInfo) throws IOException {
+            Scanner scan = new Scanner(assetInfo.openStream());
+            StringBuilder sb = new StringBuilder();
+            try {
+                while (scan.hasNextLine()) {
+                    sb.append(scan.nextLine()).append('\n');
+                }
+            } finally {
+                scan.close();
+            }
+            return sb.toString();
+        }
     }
 
     public static class CustomPlatformChooser implements PlatformChooser {
