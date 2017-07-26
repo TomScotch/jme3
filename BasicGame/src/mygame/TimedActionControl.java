@@ -26,6 +26,7 @@ public abstract class TimedActionControl extends AbstractControl {
             counter += tpf;
             if (counter >= countDown) {
                 action();
+                this.spatial.removeControl(this);
             }
         }
     }
