@@ -53,8 +53,8 @@ public class WeatherControl extends AbstractControl {
     private final int lightningFrequency = 220; // 360
     private final int lightningVoloume = 12; // 180
 
-    private float rainStrength = 3000; // 3000
-    private float rainThickness = 6000; // 6000
+    private float rainStrength = 800; // 3000
+    private float rainThickness = 4000; // 6000
 
     private float counter = 0f;
     private float limit = 0f;
@@ -133,29 +133,32 @@ public class WeatherControl extends AbstractControl {
         clouds.setGravity(0.015f, 0, 0.015f);
         clouds.setHighLife(200f);
         clouds.setLowLife(200f);
-        clouds.setInWorldSpace(true);
         clouds.setShape(new EmitterBoxShape(new Vector3f(-256, -10f, -256), new Vector3f(256, 10f, 256)));
         clouds.setParticlesPerSec(0);
         clouds.setFacingVelocity(false);
-        clouds.getParticleInfluencer().setVelocityVariation(3f);
+        clouds.setInWorldSpace(true);
+        clouds.setFaceNormal(new Vector3f(0, -1, 0));
+        //clouds.getParticleInfluencer().setVelocityVariation(3f);
         clouds.setLocalTranslation(0, 150, 0);
         clouds.center();
         clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
         localRoot.attachChild(clouds);
 
-        debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 4);
+        debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 128);
         Material debrisMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         debrisMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/splash.png"));
         debrisEffect.setMaterial(debrisMat);
-        debrisEffect.setStartSize(1);
-        debrisEffect.setEndSize(0.8f);
+        debrisEffect.setStartSize(0.25f);
+        debrisEffect.setEndSize(0.01f);
+        debrisEffect.setRotateSpeed(0.75f);
         debrisEffect.setHighLife(1f);
         debrisEffect.setLowLife(1f);
         debrisEffect.setInWorldSpace(true);
         debrisEffect.setFacingVelocity(false);
+        debrisEffect.setShape(new EmitterSphereShape(Vector3f.ZERO, 128));
         // debrisEffect.setParticlesPerSec(0);
         //debrisEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 4, 0));
-        debrisEffect.setStartColor(ColorRGBA.DarkGray);
+        debrisEffect.setStartColor(ColorRGBA.White);
         //debrisEffect.setGravity(0f, 1f, 0f);
         //debrisEffect.getParticleInfluencer().setVelocityVariation(.60f);
         localRoot.attachChild(debrisEffect);
@@ -394,22 +397,6 @@ public class WeatherControl extends AbstractControl {
 
             if (raining) {
 
-                if (rain.getNumVisibleParticles() > 0) {
-                    for (Particle p : rain.getParticles()) {
-                        Vector3f position = p.position;
-                        if (hm != null) {
-                            try {
-                                float trueHeightAtPoint = hm.getInterpolatedHeight(position.getX(), position.getY());
-                                if (position.getY() <= trueHeightAtPoint) {
-                                    debrisEffect.getWorldTranslation().set(p.position.getX(), trueHeightAtPoint + 0.5f, p.position.getZ()); //
-                                    debrisEffect.emitParticles(1);
-                                }
-                            } catch (Exception e) {
-                            }
-                        }
-                    }
-                }
-
                 if (raining_high) {
                     rain.setParticlesPerSec(rainStrength * 2);
                 } else if (raining_med) {
@@ -417,6 +404,31 @@ public class WeatherControl extends AbstractControl {
                 } else if (raining_low) {
                     rain.setParticlesPerSec(rainStrength / 2);
                 }
+
+                if (rain.getNumVisibleParticles() > 0) {
+
+                    debrisEffect.setNumParticles((int) rain.getParticlesPerSec());
+
+                    for (int c = rain.getParticles().length; c >= 0; c--) {
+
+                        try {
+                            Vector3f position = rain.getParticles()[c].position;
+                            float trueHeightAtPoint = hm.getTrueHeightAtPoint((int) position.getX(), (int) position.getZ());
+                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint + 0.0001f, position.getZ()); //
+                            float distance = cam.getLocation().distance(position);
+
+                            if (distance < 1000) {
+                                debrisEffect.setStartSize(0.25f);
+                                if (distance < 500) {
+                                    debrisEffect.setStartSize(0.5f);
+                                }
+                                debrisEffect.emitParticles(1);
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+
             } else {
 
                 debrisEffect.setParticlesPerSec(0);

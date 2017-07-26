@@ -22,15 +22,19 @@ public class DepthOfField extends AbstractControl {
     private final JmeContext context;
     private final Camera cam;
 
+    private final float distance = 0;
+    private final float range = 25;
+    private final float scale = 1;
+
     public DepthOfField(FilterPostProcessor fpp, JmeContext context, ViewPort vp, AssetManager assetManager) {
 
         this.context = context;
         this.cam = vp.getCamera();
 
         dofFilter = new DepthOfFieldFilter();
-        dofFilter.setFocusDistance(0);
-        dofFilter.setFocusRange(50);
-        dofFilter.setBlurScale(1);
+        dofFilter.setFocusDistance(distance);
+        dofFilter.setFocusRange(range);
+        dofFilter.setBlurScale(scale);
         fpp.addFilter(dofFilter);
     }
 
@@ -48,7 +52,7 @@ public class DepthOfField extends AbstractControl {
             int numCollisions = s.collideWith(ray, results);
             if (numCollisions > 0) {
                 CollisionResult hit = results.getClosestCollision();
-                dofFilter.setFocusDistance(hit.getDistance() / 10.0f);
+                dofFilter.setFocusDistance(hit.getDistance() / 5.0f);
             }
         }
     }
@@ -57,5 +61,17 @@ public class DepthOfField extends AbstractControl {
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations,
         //not called when spatial is culled.
+    }
+
+    public float getDistance() {
+        return distance;
+    }
+
+    public float getRange() {
+        return range;
+    }
+
+    public float getScale() {
+        return scale;
     }
 }

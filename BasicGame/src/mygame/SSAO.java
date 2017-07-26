@@ -9,7 +9,7 @@ import com.jme3.scene.control.AbstractControl;
 
 public class SSAO extends AbstractControl {
 
-    private float intensity = 1.2f;
+    private float intensity = 2f;//1.2f
 
     public float getIntensity() {
         return intensity;
@@ -21,7 +21,7 @@ public class SSAO extends AbstractControl {
 
     public SSAO(AssetManager assetManager) {
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        SSAOFilter ssaoFilter = new SSAOFilter(2.9299974f, 32.920483f, 5.8100376f, 0.091000035f);
+        SSAOFilter ssaoFilter = new SSAOFilter(5.1f, 1.2f, 0.2f, 0.1f);
         ssaoFilter.setApproximateNormals(true);
         ssaoFilter.setIntensity(intensity);
         fpp.addFilter(ssaoFilter);
