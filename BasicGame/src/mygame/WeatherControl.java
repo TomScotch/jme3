@@ -53,9 +53,8 @@ public class WeatherControl extends AbstractControl {
 
     private final int cloudThickness = 350; // 400
 
-    private final int lightningFrequency = 100; // 360
-    private final int lightningVoloume = 10; // 180
-
+    //private final int lightningFrequency = 100; // 360
+    //private final int lightningVoloume = 10; // 180
     private float rainStrength = 800; // 3000
     private float rainThickness = 4000; // 6000
 
@@ -78,6 +77,7 @@ public class WeatherControl extends AbstractControl {
     private final DirectionalLight sun;
 
     public WeatherControl(AssetManager am, Node localRoot, Camera cam, AbstractHeightMap hm) {
+
         this.cam = cam;
         this.hm = hm;
         this.am = am;
@@ -397,8 +397,7 @@ public class WeatherControl extends AbstractControl {
             }
             }
             
-            */
-            
+             */
             if (clouded) {
                 if (clouded_high) {
                     if (clouds.getNumVisibleParticles() < cloudThickness * 2) {
