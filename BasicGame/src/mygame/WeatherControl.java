@@ -84,15 +84,15 @@ public class WeatherControl extends AbstractControl {
 
         limit = (float) getRandomNumberInRange(minimumWeatherLength, maximumWeatherLength);
 
-        flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) lightningVoloume / 10);
+        flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 8);
         Material flash_mat = new Material(
                 am, "Common/MatDefs/Misc/Particle.j3md");
         flash_mat.setTexture("Texture",
                 am.loadTexture("Textures/weatherSprites/lightning/Xz2ctMGg_5c2UF-vqdqT3dMZLvs.png"));
         flash.setMaterial(flash_mat);
-        flash.setShape(new EmitterBoxShape(new Vector3f(-496, -1.5f, -496), new Vector3f(496, 1.5f, 496)));
+        flash.setShape(new EmitterBoxShape(new Vector3f(-256f, -1f, -256f), new Vector3f(256f, 1f, 256f)));
         flash.setParticlesPerSec(0);
-        flash.setLocalTranslation(0, 35, 0);
+        flash.setLocalTranslation(0, 75, 0);
         flash.center();
         this.localRoot.attachChild(flash);
 
@@ -122,11 +122,11 @@ public class WeatherControl extends AbstractControl {
         rain.setHighLife(3f);
         rain.setLowLife(1.5f);
         rain.setInWorldSpace(true);
-        rain.setShape(new EmitterSphereShape(Vector3f.ZERO, 256));
+        rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(false);
         //rain.getParticleInfluencer().setVelocityVariation(3f);
-        rain.setLocalTranslation(0, 40, 0);
+        rain.setLocalTranslation(0, 75, 0);
         rain.center();
         //rain.setQueueBucket(RenderQueue.Bucket.Opaque);
         this.localRoot.attachChild(rain);
@@ -140,15 +140,16 @@ public class WeatherControl extends AbstractControl {
         clouds.setGravity(0.015f, 0, 0.015f);
         clouds.setHighLife(200f);
         clouds.setLowLife(200f);
-        clouds.setShape(new EmitterBoxShape(new Vector3f(-256, -10f, -256), new Vector3f(256, 10f, 256)));
+        clouds.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
         clouds.setParticlesPerSec(0);
         clouds.setFacingVelocity(false);
         clouds.setInWorldSpace(true);
         clouds.setFaceNormal(new Vector3f(0, -1, 0));
-        //clouds.getParticleInfluencer().setVelocityVariation(3f);
-        clouds.setLocalTranslation(0, 150, 0);
+        clouds.getParticleInfluencer().setVelocityVariation(3f);
+        clouds.setLocalTranslation(0, 75, 0);
         clouds.center();
         clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
+        clouds.setQueueBucket(RenderQueue.Bucket.Transparent);
         this.localRoot.attachChild(clouds);
 
         debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 128);
@@ -465,48 +466,43 @@ public class WeatherControl extends AbstractControl {
 
                 flashCounter += tpf;
 
+                if (lightnungStrikes_high) {
+                    flashLimit = (float) getRandomNumberInRange(2, 4);
+                } else if (lightnungStrikes_med) {
+                    flashLimit = (float) getRandomNumberInRange(4, 6);
+                } else if (lightnungStrikes_low) {
+                    flashLimit = (float) getRandomNumberInRange(6, 8);
+                }
+
                 if (flashCounter >= flashLimit) {
+
                     flashCounter = 0;
-                    flash.emitParticles(1);
-                    System.out.println("LIGHTNING");
-                    sun.setDirection(flash.getParticles()[0].position.add(cam.getLocation()));
-                    if (localRoot.getChild("sunNode").getControl(GlobalLightingControl.class).isEvening()) {
-                        this.localRoot.addLight(sun);
-                    } else if (localRoot.getChild("sunNode").getControl(GlobalLightingControl.class).isNight()) {
-                        this.localRoot.addLight(sun);
-                    }
-                    flash.addControl(new TimedActionControl(0.456f) {
-                        @Override
-                        void action() {
-                            localRoot.removeLight(sun);
-                            System.out.println("DARKNESS");
-                        }
-                    });
 
                     if (lightnungStrikes_high) {
-                        flashLimit = (float) getRandomNumberInRange(4, 8);
+                        flash.emitParticles(getRandomNumberInRange(3, 4));
                     } else if (lightnungStrikes_med) {
-                        flashLimit = (float) getRandomNumberInRange(6, 12);
+                        flash.emitParticles(getRandomNumberInRange(2, 3));
                     } else if (lightnungStrikes_low) {
-                        flashLimit = (float) getRandomNumberInRange(8, 16);
+                        flash.emitParticles(getRandomNumberInRange(1, 2));
                     }
-                }
 
-                for (Particle p : flash.getParticles()) {
-                    if (cam.getLocation().distance(p.position) < 20) {
-                        //p.life = 0;
-                        p.size = 0.01f;
-                        System.out.println("too close lightning");
+                    for (Particle p : flash.getParticles()) {
+
+                        sun.setDirection(p.position.add(cam.getLocation()));
+                        this.localRoot.addLight(sun);
+
+                        flash.addControl(new TimedActionControl(getRandomNumberInRange(1, 2) - 0.75f) {
+
+                            @Override
+                            void action() {
+
+                                localRoot.removeLight(sun);
+                            }
+                        });
                     }
+
                 }
 
-                if (flash.getNumVisibleParticles() == 0) {
-                    this.localRoot.removeLight(sun);
-                }
-
-                if (flash.getNumVisibleParticles() > 1) {
-                    this.localRoot.removeLight(sun);
-                }
             } else {
 
                 lightnungStrikes_low = false;
