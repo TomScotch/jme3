@@ -15,6 +15,7 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import java.util.Random;
@@ -149,7 +150,7 @@ public class WeatherControl extends AbstractControl {
         clouds.setLocalTranslation(0, 75, 0);
         clouds.center();
         clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
-        clouds.setQueueBucket(RenderQueue.Bucket.Transparent);
+        //clouds.setQueueBucket(RenderQueue.Bucket.Opaque);
         this.localRoot.attachChild(clouds);
 
         debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 128);
@@ -190,6 +191,14 @@ public class WeatherControl extends AbstractControl {
                 makeCloudy();
                 break;
         }
+
+        switch (getRandomNumberInRange(0, 2)) {
+
+            case 1:
+                makeLightning();
+                break;
+        }
+
         switch (getRandomNumberInRange(0, 1)) {
 
             case 0:
@@ -269,42 +278,39 @@ public class WeatherControl extends AbstractControl {
 
         switch (getRandomNumberInRange(0, 1)) {
             case 0:
-                lightnungStrikes = true;
-                switch (getRandomNumberInRange(0, 2)) {
-                    case 0:
-                        lightnungStrikes_high = true;
-                        lightnungStrikes_med = false;
-                        lightnungStrikes_low = false;
-                        System.out.println("lightnungStrikes_high");
-                        break;
-                    case 1:
-                        lightnungStrikes_high = false;
-                        lightnungStrikes_med = true;
-                        lightnungStrikes_low = false;
-                        System.out.println("lightnungStrikes_med");
-                        break;
-                    case 2:
-                        lightnungStrikes_high = false;
-                        lightnungStrikes_med = false;
-                        lightnungStrikes_low = true;
-                        System.out.println("lightnungStrikes_low");
-                        break;
-                }
+                makeLightning();
                 break;
-            case 1:
-                lightnungStrikes = false;
-                lightnungStrikes_high = false;
+        }
+    }
+
+    public void makeLightning() {
+        lightnungStrikes = true;
+        switch (getRandomNumberInRange(0, 2)) {
+            case 0:
+                lightnungStrikes_high = true;
                 lightnungStrikes_med = false;
                 lightnungStrikes_low = false;
-                System.out.println("noLightning");
+                System.out.println("lightnungStrikes_high");
+                break;
+            case 1:
+                lightnungStrikes_high = false;
+                lightnungStrikes_med = true;
+                lightnungStrikes_low = false;
+                System.out.println("lightnungStrikes_med");
+                break;
+            case 2:
+                lightnungStrikes_high = false;
+                lightnungStrikes_med = false;
+                lightnungStrikes_low = true;
+                System.out.println("lightnungStrikes_low");
                 break;
         }
         if (lightnungStrikes_high) {
-            flashLimit = (float) getRandomNumberInRange(4, 8);
+            flashLimit = (float) getRandomNumberInRange(2, 4);
         } else if (lightnungStrikes_med) {
-            flashLimit = (float) getRandomNumberInRange(6, 12);
+            flashLimit = (float) getRandomNumberInRange(4, 6);
         } else if (lightnungStrikes_low) {
-            flashLimit = (float) getRandomNumberInRange(8, 16);
+            flashLimit = (float) getRandomNumberInRange(6, 8);
         }
     }
 
@@ -377,8 +383,9 @@ public class WeatherControl extends AbstractControl {
                 limit = (float) getRandomNumberInRange(minimumWeatherLength, maximumWeatherLength);
             }
 
-            /*            if (suny) {
+            /*
             
+            if (suny) {
             if (clouds.getNumVisibleParticles() > 0) {
             clouds.killParticle(0);
             }
@@ -388,7 +395,10 @@ public class WeatherControl extends AbstractControl {
             if (flash.getParticlesPerSec() > 0) {
             flash.setParticlesPerSec(0);
             }
-            }*/
+            }
+            
+            */
+            
             if (clouded) {
                 if (clouded_high) {
                     if (clouds.getNumVisibleParticles() < cloudThickness * 2) {
@@ -486,9 +496,15 @@ public class WeatherControl extends AbstractControl {
                         flash.emitParticles(getRandomNumberInRange(1, 2));
                     }
 
+                    Node n = new Node();
+                    Spatial spat = (Spatial) n;
+
                     for (Particle p : flash.getParticles()) {
 
-                        sun.setDirection(p.position.add(cam.getLocation()));
+                        spat.setLocalTranslation((p.position));
+                        spat.lookAt(Vector3f.ZERO, Vector3f.UNIT_XYZ);
+
+                        sun.setDirection(spat.getLocalRotation().getRotationColumn(2));
                         this.localRoot.addLight(sun);
 
                         flash.addControl(new TimedActionControl(getRandomNumberInRange(1, 2) - 0.75f) {
