@@ -264,11 +264,11 @@ public class PlayerControl extends AbstractControl {
 
         chaseEnabled = !chaseEnabled;
 
-        if (!chaseEnabled) {
-            chaseCam.setDragToRotate(true);
+        /*        if (!chaseEnabled) {
+        chaseCam.setDragToRotate(true);
         } else {
-            chaseCam.setDragToRotate(false);
-        }
+        chaseCam.setDragToRotate(false);
+        }*/
     }
 
     public ChaseCamera getChaseCam() {

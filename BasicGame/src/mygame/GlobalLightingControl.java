@@ -37,7 +37,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final Node pivot = new Node();
-    private int timeDelay = 640;// INSTANE=128 // SUPERFAST=256 // FAST=512 // NORMAL= 1024 // SLOW=2048 //REALISTIC = 4096
+    private int timeDelay = 24;// INSTANE=24  to REALISTIC = 8192  
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;
@@ -157,7 +157,7 @@ public class GlobalLightingControl extends AbstractControl {
                 fire.setLocalTranslation(sphereGeo.getWorldTranslation());
                 fire.rotate(0, tpf, 0);
 
-                final float rotation = (1 - tpf) / timeDelay;//(FastMath.QUARTER_PI * tpf) / timeDelay
+                final float rotation = tpf / timeDelay ;//(FastMath.QUARTER_PI * tpf) / timeDelay
 
                 pivot.rotate(rotation, 0, 0);
 
