@@ -75,6 +75,8 @@ public class PlayerControl extends AbstractControl {
     private final AnimControl aniCon;
     private final float scale = 0.45f;
     private final int maxDistance = 30;
+    private boolean rotateAround = false;
+    private float idleCounter = 0;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -139,7 +141,14 @@ public class PlayerControl extends AbstractControl {
         this.localRootNode.attachChild(characterNode);
         doAnim("player", "Idle", LoopMode.Loop);
         characterNode.setQueueBucket(RenderQueue.Bucket.Opaque);
+
         setupKeys();
+
+        if (aniCon.getClass() == null) {
+            aniCon.createChannel();
+            aniCon.getChannel(0).setAnim("idle");
+            aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
+        }
 
         localRootNode.addControl(new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, this));
         footsteps = new AudioNode(assetManager, "Sound/Effects/Foot steps.ogg", AudioData.DataType.Buffer);
@@ -160,21 +169,25 @@ public class PlayerControl extends AbstractControl {
 
         @Override
         public void onAction(String binding, boolean value, float tpf) {
-
+            idleCounter = 0;
             switch (binding) {
                 case "flashlight":
                     if (value && isEnabled()) {
                         getLamp().setEnabled(!lamp.isEnabled());
                     }
+
                     break;
                 case "rightRotate":
                     rightRotate = value;
+
                     break;
                 case "leftRotate":
                     leftRotate = value;
+
                     break;
                 case "Shoot":
                     attacking = value;
+
                     break;
                 case "Strafe Left":
                     leftStrafe = value;
@@ -183,6 +196,7 @@ public class PlayerControl extends AbstractControl {
                     } else {
                         doAnim("player", "Idle", LoopMode.Loop);
                     }
+
                     break;
                 case "Strafe Right":
                     rightStrafe = value;
@@ -191,13 +205,19 @@ public class PlayerControl extends AbstractControl {
                     } else {
                         doAnim("player", "Idle", LoopMode.Loop);
                     }
+
                     break;
                 case "chase":
                     if (value && isEnabled()) {
                         makeChase();
                     }
-                    break;
 
+                    break;
+                /*                case "rotateAround":
+                    if (value && isEnabled()) {
+                    makeRotateAround();
+                    }
+                    break;*/
                 case "Walk Forward":
                     if (value && isEnabled()) {
                         doAnim("player", "Walk", LoopMode.Loop);
@@ -205,6 +225,7 @@ public class PlayerControl extends AbstractControl {
                         doAnim("player", "Idle", LoopMode.Loop);
                     }
                     forward = value;
+
                     break;
                 case "Walk Backward":
                     if (value && isEnabled()) {
@@ -213,6 +234,7 @@ public class PlayerControl extends AbstractControl {
                         doAnim("player", "Idle", LoopMode.Loop);
                     }
                     backward = value;
+
                     break;
                 case "Jump":
                     if (value) {
@@ -220,8 +242,10 @@ public class PlayerControl extends AbstractControl {
                             getPhysicsCharacter().jump();
                         }
                     }
+
                     break;
                 default:
+
                     break;
             }
 
@@ -230,16 +254,13 @@ public class PlayerControl extends AbstractControl {
 
     public void makeChase() {
 
-        // camNode.setEnabled(!camNode.isEnabled());
-        // chaseCam.setEnabled(!chaseCam.isEnabled());
-        //  chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
         chaseEnabled = !chaseEnabled;
 
-        /*        if (chaseEnabled) {
-        getChaseCam().setMaxDistance(30);
+        if (!chaseEnabled) {
+            chaseCam.setDragToRotate(true);
         } else {
-        getChaseCam().setMaxDistance(0);
-        }*/
+            chaseCam.setDragToRotate(false);
+        }
     }
 
     public ChaseCamera getChaseCam() {
@@ -276,18 +297,29 @@ public class PlayerControl extends AbstractControl {
                 new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("Shoot",
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        /*        inputManager.addMapping("rotateAround",
+        new KeyTrigger(KeyInput.KEY_T));*/
 
         inputManager.addListener(actionListener, "leftRotate", "rightRotate");
         inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
         inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
         inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
         inputManager.addListener(actionListener, "chase");
+        // inputManager.addListener(actionListener, "rotateAround");
         inputManager.addListener(actionListener, "Jump", "Shoot", "flashlight");
 
-        if (aniCon.getClass() == null) {
-            aniCon.createChannel();
-            aniCon.getChannel(0).setAnim("idle");
-            aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
+    }
+
+    public void makeRotateAround(Boolean bol) {
+
+        rotateAround = bol;
+
+        if (rotateAround == false) {
+            model.setCullHint(Spatial.CullHint.Dynamic);
+            camNode.setEnabled(false);
+        } else {
+            model.setCullHint(Spatial.CullHint.Always);
+            camNode.setEnabled(true);
         }
     }
 
@@ -318,15 +350,28 @@ public class PlayerControl extends AbstractControl {
             camDir.y = 0;
             camLeft.y = 0;
 
-            if (!chaseEnabled) {
-                if (rightRotate) {
-                    viewDirection.addLocal(camLeft.mult(rotationSpeed).negate());
+            if (idleCounter > 30f) {
+                if (!rotateAround) {
+                    System.out.println("start idleing");
+                    makeRotateAround(true);
                 }
-                if (leftRotate) {
-                    viewDirection.addLocal(camLeft.mult(rotationSpeed));
+            }
+
+            if (idleCounter == 0) {
+                if (rotateAround) {
+                    System.out.println("stop idleing");
+                    makeRotateAround(false);
                 }
-            } else {
+            }
+
+            idleCounter += tpf;
+
+            if (chaseEnabled) {
                 viewDirection.set(camDir);
+            }
+
+            if (rotateAround) {
+                viewDirection.addLocal(camLeft.mult((rotationSpeed * 1.5f) * tpf));
             }
 
             walkDirection.set(0, 0, 0);
@@ -360,7 +405,9 @@ public class PlayerControl extends AbstractControl {
                 model.setCullHint(Spatial.CullHint.Always);
                 lamp.setDirection(viewPort.getCamera().getDirection());
             } else {
-                model.setCullHint(Spatial.CullHint.Dynamic);
+                if (!rotateAround) {
+                    model.setCullHint(Spatial.CullHint.Dynamic);
+                }
                 lamp.setDirection(model.getWorldRotation().getRotationColumn(2));
             }
         }
