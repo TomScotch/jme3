@@ -15,6 +15,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.light.PointLight;
+import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.queue.RenderQueue;
 
 public class EntityControl extends AbstractControl {
@@ -45,8 +47,8 @@ public class EntityControl extends AbstractControl {
         setAnim("Idle", LoopMode.Loop);
         getSkeletonControl().setHardwareSkinningPreferred(false);
         this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
-        
-       // TangentBinormalGenerator.generate(this.spatial);
+
+        // TangentBinormalGenerator.generate(this.spatial);
 
         /*        hit = new AudioNode(assetManager, "audio/creature-growl01.wav", AudioData.DataType.Buffer);
         hit.setLooping(false);
@@ -142,6 +144,19 @@ public class EntityControl extends AbstractControl {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1.5f;
                 setAnim("Hit", LoopMode.Loop);
+
+                PointLight lamp = new PointLight();
+                lamp.setPosition(Vector3f.ZERO);
+                lamp.setColor(ColorRGBA.Red);
+                this.spatial.addLight(lamp);
+                lamp.setRadius(42);
+                this.spatial.addControl(new TimedActionControl(0.30f) {
+                    @Override
+                    void action() {
+                        this.spatial.removeLight(lamp);
+                    }
+                });
+
                 // hit.play();
                 hitParticles();
                 this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
