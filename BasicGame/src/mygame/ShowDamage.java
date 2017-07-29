@@ -3,7 +3,6 @@ package mygame;
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.font.Rectangle;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -15,17 +14,18 @@ public class ShowDamage extends AbstractControl {
 
     private final BitmapText txt;
 
-    public ShowDamage(AssetManager assetManager, String val, Node n) {
+    public ShowDamage(AssetManager assetManager, String val) {
         BitmapFont fnt = assetManager.loadFont("Interface/Fonts/Default.fnt");
         txt = new BitmapText(fnt, false);
-        txt.setBox(new Rectangle(0, 0, 1f, 1f));
+        //txt.setBox(new Rectangle(0, 0, 1f, 1f));
         txt.setQueueBucket(RenderQueue.Bucket.Transparent);
         txt.setSize(1f);
         txt.center();
         txt.setText(val);
         txt.setColor(ColorRGBA.Red);
+        Node n = (Node) this.spatial;
         n.attachChild(txt);
-        txt.getLocalTranslation().addLocal(0, n.getWorldTransform().getScale().getY() * 10f, 0);
+        txt.getLocalTranslation().addLocal(0, n.getWorldTransform().getScale().getY() * 7.5f, 0);
     }
 
     @Override

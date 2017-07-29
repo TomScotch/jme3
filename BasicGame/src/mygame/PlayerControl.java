@@ -138,7 +138,7 @@ public class PlayerControl extends AbstractControl {
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
         this.localRootNode.attachChild(characterNode);
         doAnim("player", "Idle", LoopMode.Loop);
-        characterNode.setQueueBucket( RenderQueue.Bucket.Opaque);
+        characterNode.setQueueBucket(RenderQueue.Bucket.Opaque);
         setupKeys();
 
         localRootNode.addControl(new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, this));
@@ -153,9 +153,7 @@ public class PlayerControl extends AbstractControl {
         hit.setPositional(false);
         hit.setVolume(4);
         localRootNode.attachChild(hit);*/
-        
-       // TangentBinormalGenerator.generate(this.model);
-        
+        // TangentBinormalGenerator.generate(this.model);
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -231,10 +229,17 @@ public class PlayerControl extends AbstractControl {
     };
 
     public void makeChase() {
-        camNode.setEnabled(!camNode.isEnabled());
-        chaseCam.setEnabled(!chaseCam.isEnabled());
+
+        // camNode.setEnabled(!camNode.isEnabled());
+        // chaseCam.setEnabled(!chaseCam.isEnabled());
+        //  chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
         chaseEnabled = !chaseEnabled;
-        chaseCam.setDragToRotate(!chaseCam.isDragToRotate());
+
+        /*        if (chaseEnabled) {
+        getChaseCam().setMaxDistance(30);
+        } else {
+        getChaseCam().setMaxDistance(0);
+        }*/
     }
 
     public ChaseCamera getChaseCam() {
