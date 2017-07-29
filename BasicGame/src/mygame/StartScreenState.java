@@ -5,6 +5,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.ViewPort;
@@ -14,6 +15,8 @@ import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 
 public class StartScreenState extends AbstractAppState {
+
+    private final Geometry geo;
 
     public Geometry getBoxGeo() {
         return boxGeo;
@@ -38,10 +41,21 @@ public class StartScreenState extends AbstractAppState {
         boxMat.setTexture("ColorMap", monkeyTex);
         boxMat.setColor("Color", ColorRGBA.White);
         boxGeo.setMaterial(boxMat);
+
+        Box box = new Box(1, 1, 1);
+        geo = new Geometry("Box", box);
+        Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        Texture tex = app.getAssetManager().loadTexture("Textures/dragon_logo.png");
+        mat.setTexture("ColorMap", tex);
+        mat.setColor("Color", ColorRGBA.White);
+        mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        geo.setMaterial(mat);
+        localRootNode.attachChild(geo);
     }
 
     public void attachBox() {
         if (!localRootNode.hasChild(boxGeo)) {
+            localRootNode.detachChild(geo);
             localRootNode.attachChild(boxGeo);
         }
     }
@@ -49,6 +63,7 @@ public class StartScreenState extends AbstractAppState {
     public void detachBox() {
         if (localRootNode.hasChild(boxGeo)) {
             boxGeo.removeFromParent();
+            localRootNode.attachChild(geo);
         }
     }
 
@@ -61,8 +76,14 @@ public class StartScreenState extends AbstractAppState {
 
     @Override
     public void update(float tpf) {
-        viewPort.getCamera().setLocation(new Vector3f(0, 0, -5.5f));
-        viewPort.getCamera().lookAt(boxGeo.getLocalTranslation(), Vector3f.UNIT_Y);
+        if (localRootNode.hasChild(boxGeo)) {
+            viewPort.getCamera().setLocation(new Vector3f(0, 0, -5.5f));
+            viewPort.getCamera().lookAt(boxGeo.getLocalTranslation(), Vector3f.UNIT_Y);
+        }
+        if (localRootNode.hasChild(geo)) {
+            viewPort.getCamera().setLocation(new Vector3f(0, 0, -5.5f));
+            viewPort.getCamera().lookAt(geo.getLocalTranslation(), Vector3f.UNIT_Y);
+        }
     }
 
     @Override

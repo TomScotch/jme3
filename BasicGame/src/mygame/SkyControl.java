@@ -60,7 +60,8 @@ public class SkyControl extends AbstractControl {
         Texture south3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetFront2048.png");
         Texture up3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetUp2048.png");
         Texture down3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetDown2048.png");
-        day = SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
+        day = SkyFactory.createSky(assetManager, west1, east1, north1, south1, up1, down1);
+        //day = SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
 
         morning.setLocalTranslation(0, -1000, 0);
         evening.setLocalTranslation(0, -1000, 0);
