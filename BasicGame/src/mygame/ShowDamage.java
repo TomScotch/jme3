@@ -14,7 +14,7 @@ public class ShowDamage extends AbstractControl {
 
     private final BitmapText txt;
 
-    public ShowDamage(AssetManager assetManager, String val) {
+    public ShowDamage(AssetManager assetManager, String val, Node n) {
         BitmapFont fnt = assetManager.loadFont("Interface/Fonts/Default.fnt");
         txt = new BitmapText(fnt, false);
         //txt.setBox(new Rectangle(0, 0, 1f, 1f));
@@ -23,7 +23,6 @@ public class ShowDamage extends AbstractControl {
         txt.center();
         txt.setText(val);
         txt.setColor(ColorRGBA.Red);
-        Node n = (Node) this.spatial;
         n.attachChild(txt);
         txt.getLocalTranslation().addLocal(0, n.getWorldTransform().getScale().getY() * 7.5f, 0);
     }

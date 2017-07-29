@@ -159,7 +159,7 @@ public class EntityControl extends AbstractControl {
 
                 // hit.play();
                 hitParticles();
-                this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg)));
+                this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
             }
         }
     }

@@ -356,12 +356,12 @@ public class PlayerControl extends AbstractControl {
             getPhysicsCharacter().setViewDirection(viewDirection);
             getPhysicsCharacter().setWalkDirection(walkDirection);
 
-            lamp.setDirection(viewPort.getCamera().getDirection());
-
             if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
                 model.setCullHint(Spatial.CullHint.Always);
+                lamp.setDirection(viewPort.getCamera().getDirection());
             } else {
                 model.setCullHint(Spatial.CullHint.Dynamic);
+                lamp.setDirection(model.getWorldRotation().getRotationColumn(2));
             }
         }
     }
