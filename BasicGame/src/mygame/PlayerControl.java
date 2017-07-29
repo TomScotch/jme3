@@ -32,6 +32,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.control.LightControl;
+import com.jme3.system.JmeContext;
 
 public class PlayerControl extends AbstractControl {
 
@@ -77,9 +78,11 @@ public class PlayerControl extends AbstractControl {
     private final int maxDistance = 30;
     private boolean rotateAround = false;
     private float idleCounter = 0;
+    private final JmeContext context;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
+        this.context = app.getContext();
         this.viewPort = app.getViewPort();
         this.assetManager = app.getAssetManager();
         this.inputManager = app.getInputManager();
@@ -213,11 +216,16 @@ public class PlayerControl extends AbstractControl {
                     }
 
                     break;
-                /*                case "rotateAround":
+                case "changeFPS":
                     if (value && isEnabled()) {
-                    makeRotateAround();
+                        if (context.getSettings().getFrameRate() == 30) {
+                            context.getSettings().setFrameRate(60);
+                        } else {
+                            context.getSettings().setFrameRate(30);
+                        }
+                        context.restart();
                     }
-                    break;*/
+                    break;
                 case "Walk Forward":
                     if (value && isEnabled()) {
                         doAnim("player", "Walk", LoopMode.Loop);
@@ -297,15 +305,15 @@ public class PlayerControl extends AbstractControl {
                 new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("Shoot",
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        /*        inputManager.addMapping("rotateAround",
-        new KeyTrigger(KeyInput.KEY_T));*/
+        inputManager.addMapping("changeFPS",
+                new KeyTrigger(KeyInput.KEY_T));
 
         inputManager.addListener(actionListener, "leftRotate", "rightRotate");
         inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
         inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
         inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
         inputManager.addListener(actionListener, "chase");
-        // inputManager.addListener(actionListener, "rotateAround");
+        inputManager.addListener(actionListener, "changeFPS");
         inputManager.addListener(actionListener, "Jump", "Shoot", "flashlight");
 
     }
