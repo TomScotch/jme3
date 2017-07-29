@@ -108,7 +108,7 @@ public class PlayerControl extends AbstractControl {
         camNode = new CameraNode("Camera Node", app.getCamera());
         camNode.setControlDir(CameraControl.ControlDirection.SpatialToCamera);
         characterNode.attachChild(camNode);
-        camNode.setLocalTranslation(new Vector3f(0, 4.4f, -18f));
+        camNode.setLocalTranslation(new Vector3f(0, 4.4f, 0)); //-18f
         camNode.setEnabled(false);
         lamp = new SpotLight();
         lamp.setSpotRange(flashLightSpotRange);
@@ -264,11 +264,11 @@ public class PlayerControl extends AbstractControl {
 
         chaseEnabled = !chaseEnabled;
 
-        /*        if (!chaseEnabled) {
-        chaseCam.setDragToRotate(true);
+        if (!chaseEnabled) {
+            chaseCam.setDragToRotate(true);
         } else {
-        chaseCam.setDragToRotate(false);
-        }*/
+            chaseCam.setDragToRotate(false);
+        }
     }
 
     public ChaseCamera getChaseCam() {
@@ -325,9 +325,15 @@ public class PlayerControl extends AbstractControl {
         if (rotateAround == false) {
             model.setCullHint(Spatial.CullHint.Dynamic);
             camNode.setEnabled(false);
+            if (!chaseEnabled) {
+                chaseCam.setDragToRotate(true);
+            } else {
+                chaseCam.setDragToRotate(false);
+            }
         } else {
             model.setCullHint(Spatial.CullHint.Always);
             camNode.setEnabled(true);
+            chaseCam.setDragToRotate(false);
         }
     }
 
@@ -521,5 +527,9 @@ public class PlayerControl extends AbstractControl {
 
     public SpotLight getLamp() {
         return lamp;
+    }
+    
+    public boolean isRotating(){
+        return rotateAround;
     }
 }
