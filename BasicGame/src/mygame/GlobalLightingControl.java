@@ -28,14 +28,14 @@ import com.jme3.shadow.SpotLightShadowRenderer;
 public class GlobalLightingControl extends AbstractControl {
 
     private final Material sunMat;
-    private final ViewPort vp;
     private final ParticleEmitter fire;
+    private float rotation;
+    private final SpotLight dummySpotLight;
 
     public DirectionalLight getSun() {
         return sun;
     }
 
-    private final Node localRootNode;
     private final Node pivot = new Node();
     private int timeDelay = 24;// INSTANE=24  to REALISTIC = 8192  
     private boolean isSun = true;
@@ -46,7 +46,6 @@ public class GlobalLightingControl extends AbstractControl {
     private final int sunSize = 82;
     private final Geometry sphereGeo;
     private final SpotLightShadowRenderer slsr;
-    private final SpotLight dummySpotLight;
     private final DirectionalLightShadowRenderer dlsr;
     private final int shadowmapSize = 1024;
     private boolean globalLightning = true;
@@ -55,13 +54,12 @@ public class GlobalLightingControl extends AbstractControl {
     private boolean day = false;
     private boolean evening = false;
     private boolean night = false;
+    private float clock = 0;
 
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
-        this.localRootNode = localRootNode;
-        //Player FlashLight
         this.sl = sl;
-        this.vp = vp;
+
         dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
 
         //PointLightSunPivotNode
@@ -137,6 +135,7 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setShadowIntensity(0.30f);
         slsr.setEdgesThickness(5);
 
+        sun.setColor(ColorRGBA.Orange);
     }
 
     private ColorRGBA tmp = ColorRGBA.Orange;
@@ -146,9 +145,17 @@ public class GlobalLightingControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
+            if (clock > 6.2f) {
+                clock = 0f;
+            }
+
+            clock += tpf / timeDelay;
+
             if (sl.isEnabled()) {
+
                 slsr.setLight(sl);
             } else {
+
                 slsr.setLight(dummySpotLight);
             }
 
@@ -157,26 +164,20 @@ public class GlobalLightingControl extends AbstractControl {
                 fire.setLocalTranslation(sphereGeo.getWorldTranslation());
                 fire.rotate(0, tpf, 0);
 
-                final float rotation = tpf / timeDelay ;//(FastMath.QUARTER_PI * tpf) / timeDelay
+                rotation = tpf / timeDelay;
 
                 pivot.rotate(rotation, 0, 0);
 
                 if (isSun) {
-                    sphereGeo.rotate(0, tpf, 0);
-                    sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
-
+                    sun.setEnabled(true);
                 } else {
-                    sun.setDirection(new Vector3f(0, 1, 0));
+                    sun.setEnabled(false);
                 }
 
-                float z = pivot.getLocalRotation().getRotationColumn(2).getZ();
+                sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-                //morning
-                if (z > 0.99f) {
-
-                    /*                    if (!vp.getProcessors().contains(dlsr)) {
-                    vp.addProcessor(dlsr);
-                    }*/
+                if (clock > 0 && clock < 1f) {
+                    //morning
                     morning = true;
                     day = false;
                     evening = false;
@@ -186,28 +187,22 @@ public class GlobalLightingControl extends AbstractControl {
                         if (sl != null) {
                             slsr.setShadowIntensity(0.25f);
                         }
-                        localRootNode.addLight(sun);
+
                         isSun = true;
                         sun.setColor(ColorRGBA.Orange);
                         tmp = ColorRGBA.Orange;
                         System.out.println("Sun is Up");
                     }
 
-                    sun.getColor().interpolateLocal(ColorRGBA.White, ((tpf / timeDelay) / 1.25f));
+                    sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay / 1.25f));
 
                     tmp.interpolateLocal(ColorRGBA.Yellow, tpf / timeDelay / 1.25f);
                     tmp.interpolateLocal(ColorRGBA.Gray, tpf / timeDelay / 1.25f);
                     sunMat.setColor("Color", tmp);
                     fire.setEndColor(sun.getColor());
                     fire.setStartColor(tmp);
-                }
-
-                //day
-                if (z < -0.36f && z > -0.99f) {
-
-                    /*                    if (!vp.getProcessors().contains(dlsr)) {
-                    vp.addProcessor(dlsr);
-                    }*/
+                } else if (clock > 1f && clock < 2) {
+                    //day
                     morning = false;
                     day = true;
                     evening = false;
@@ -225,22 +220,14 @@ public class GlobalLightingControl extends AbstractControl {
                     if (sl != null) {
                         slsr.setShadowIntensity(0.35f);
                     }
-                }
-
-                if (z < -0.38f && z > -0.99f) {
-
+                } else if (clock > 2f && clock < 3.2f) {
+                    //evening
                     morning = false;
                     day = false;
                     evening = true;
                     night = false;
-                }
-
-                //night
-                if (z < -0.999f) {
-
-                    /*                    if (vp.getProcessors().contains(dlsr)) {
-                    vp.removeProcessor(dlsr);
-                    }*/
+                } else if (clock > 3.2f && clock < 6.2f) {
+                    //night
                     morning = false;
                     day = false;
                     evening = false;
@@ -248,7 +235,6 @@ public class GlobalLightingControl extends AbstractControl {
 
                     if (isSun == true) {
                         tmp = ColorRGBA.Orange;
-                        localRootNode.removeLight(sun);
                         isSun = false;
                         System.out.println("Sun is Down");
                         if (sl != null) {
@@ -256,6 +242,7 @@ public class GlobalLightingControl extends AbstractControl {
                         }
                     }
                 }
+
             } else {
                 sun.setDirection(new Vector3f(-5, -5, -5));
                 sun.setColor(ColorRGBA.White);
@@ -323,5 +310,9 @@ public class GlobalLightingControl extends AbstractControl {
 
     public boolean isNight() {
         return night;
+    }
+
+    public float getRotation() {
+        return rotation;
     }
 }

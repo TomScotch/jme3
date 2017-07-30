@@ -25,6 +25,10 @@ public class SkyControl extends AbstractControl {
     private final Material matDay;
     private final Material matEvening;
     private final Material matNight;
+    private float morningAlpha;
+    private float nightAlpha;
+    private float eveningAlpha;
+    private float dayAlpha;
 
     public SkyControl(AssetManager assetManager, GlobalLightingControl glc, Node localRootNode) {
 
@@ -60,8 +64,7 @@ public class SkyControl extends AbstractControl {
         Texture south3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetFront2048.png");
         Texture up3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetUp2048.png");
         Texture down3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetDown2048.png");
-        day = SkyFactory.createSky(assetManager, west1, east1, north1, south1, up1, down1);
-        //day = SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
+        day = SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
 
         morning.setLocalTranslation(0, -1000, 0);
         evening.setLocalTranslation(0, -1000, 0);
@@ -70,27 +73,27 @@ public class SkyControl extends AbstractControl {
 
         Geometry morningGeom = (Geometry) morning;
         matMorning = morningGeom.getMaterial();
-
+        matMorning.setTransparent(true);
+        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Color);
         morningGeom.setQueueBucket(Bucket.Sky);
-        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
 
         Geometry dayGeom = (Geometry) day;
         matDay = dayGeom.getMaterial();
-
+        matDay.setTransparent(true);
+        matDay.getAdditionalRenderState().setBlendMode(BlendMode.Color);
         dayGeom.setQueueBucket(Bucket.Sky);
-        matDay.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
 
         Geometry eveningGeom = (Geometry) evening;
         matEvening = eveningGeom.getMaterial();
-
+        matEvening.setTransparent(true);
+        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Color);
         eveningGeom.setQueueBucket(Bucket.Sky);
-        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
 
         Geometry nightGeom = (Geometry) night;
         matNight = nightGeom.getMaterial();
-
+        matNight.setTransparent(true);
+        matNight.getAdditionalRenderState().setBlendMode(BlendMode.Color);
         nightGeom.setQueueBucket(Bucket.Sky);
-        matNight.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
 
         localRootNode.attachChild(day);
         localRootNode.attachChild(night);
@@ -108,58 +111,35 @@ public class SkyControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
-            Float z = glc.getTimingValue();
+            night.rotate(0, glc.getRotation() / 4, 0);
+            day.rotate(0, glc.getRotation() / 4, 0);
+            evening.rotate(0, glc.getRotation() / 4, 0);
+            morning.rotate(0, glc.getRotation() / 4, 0);
 
-            if (glc.getIsSun()) {
+            if (glc.isMorning()) {
+                day.setCullHint(Spatial.CullHint.Always);
+                night.setCullHint(Spatial.CullHint.Never);
+                evening.setCullHint(Spatial.CullHint.Always);
+                morning.setCullHint(Spatial.CullHint.Never);
 
-                //Morning
-                if (z > 0) {
+            } else if (glc.isDay()) {
+                night.setCullHint(Spatial.CullHint.Always);
+                morning.setCullHint(Spatial.CullHint.Never);
+                evening.setCullHint(Spatial.CullHint.Always);
+                day.setCullHint(Spatial.CullHint.Never);
 
-                    day.setCullHint(Spatial.CullHint.Always);
-                    night.setCullHint(Spatial.CullHint.Never);
-                    evening.setCullHint(Spatial.CullHint.Always);
-                    morning.setCullHint(Spatial.CullHint.Never);
+            } else if (glc.isEvening()) {
+                morning.setCullHint(Spatial.CullHint.Always);
+                day.setCullHint(Spatial.CullHint.Always);
+                night.setCullHint(Spatial.CullHint.Never);
+                evening.setCullHint(Spatial.CullHint.Never);
 
-                }
-
-                //Day
-                if (z < -0.f && z > -0.38f) {
-
-                    night.setCullHint(Spatial.CullHint.Always);
-                    morning.setCullHint(Spatial.CullHint.Never);
-                    evening.setCullHint(Spatial.CullHint.Always);
-                    day.setCullHint(Spatial.CullHint.Never);
-
-                }
-
-                //Evening
-                if (z < -0.38f && z > -0.99f) {
-
-                    morning.setCullHint(Spatial.CullHint.Always);
-                    day.setCullHint(Spatial.CullHint.Always);
-                    night.setCullHint(Spatial.CullHint.Never);
-                    evening.setCullHint(Spatial.CullHint.Never);
-
-                }
-            } else {
-
-                //Night
-                if (z < -0.99f) {
-
-                    morning.setCullHint(Spatial.CullHint.Always);
-                    day.setCullHint(Spatial.CullHint.Always);
-                    evening.setCullHint(Spatial.CullHint.Always);
-                    night.setCullHint(Spatial.CullHint.Never);
-
-                }
+            } else if (glc.isNight()) {
+                morning.setCullHint(Spatial.CullHint.Always);
+                day.setCullHint(Spatial.CullHint.Always);
+                evening.setCullHint(Spatial.CullHint.Always);
+                night.setCullHint(Spatial.CullHint.Never);
             }
-
-            night.rotate(0, -(tpf / (glc.getTimeDelay() * 5f)), 0);
-            day.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
-            evening.rotate(0, tpf / (glc.getTimeDelay() * 5f), 0);
-            morning.rotate(0, tpf / (glc.getTimeDelay() * 7.5f), 0);
-        } else {
-            System.out.println("glc stopped");
         }
     }
 

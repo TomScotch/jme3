@@ -66,6 +66,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger exit_trigger = new KeyTrigger(KeyInput.KEY_F12);
     private final Trigger superDebug_trigger = new KeyTrigger(KeyInput.KEY_F1);
     private final Trigger fpsSwitch_trigger = new KeyTrigger(KeyInput.KEY_F2);
+    private final Trigger statsViewTrigger = new KeyTrigger(KeyInput.KEY_F3);
 
     private GameRunningState gameRunningState;
     private StartScreenState startScreenState;
@@ -194,8 +195,8 @@ public class Main extends SimpleApplication implements ScreenController {
         return loadedNode;
     }
 
-    private static void sortModes(DisplayMode[] modes) {
-
+    private static DisplayMode[] sortModes(DisplayMode[] modes) {
+        DisplayMode[] modes2;
         for (int i = 1; i < modes.length; i++) {
             for (int j = 0; j < modes.length; j++) {
                 if (modes[j].getWidth() < modes[i].getWidth()) {
@@ -217,23 +218,17 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
 
-        if (dupes > 0) {
-            int l = modes.length - dupes;
-            DisplayMode[] modes2 = new DisplayMode[l];
-            for (int i = 0; i < modes2.length; i++) {
-                int j = i + 1;
-                if (j < modes2.length) {
-                    if (!modes[i].equals(modes[j])) {
-                        modes2[i] = modes[i];
-                    }
+        int l = modes.length - dupes;
+        modes2 = new DisplayMode[l];
+        for (int i = 0; i < modes2.length; i++) {
+            int j = i + 1;
+            if (j < modes2.length) {
+                if (!modes[i].equals(modes[j])) {
+                    modes2[i] = modes[i];
                 }
             }
-            modes = modes2;
         }
-
-        for (DisplayMode dm : modes) {
-            System.out.println(dm.getWidth() + " - " + dm.getHeight());
-        }
+        return modes2;
     }
 
     public static void main(String[] args) throws BackingStoreException {
@@ -244,9 +239,7 @@ public class Main extends SimpleApplication implements ScreenController {
         app.setShowSettings(false);
 
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        modes = device.getDisplayModes();
-
-        sortModes(modes);
+        modes = sortModes(device.getDisplayModes());
 
         cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
@@ -256,14 +249,16 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setSamples(0);
         app.setDisplayFps(showFps);
         app.setDisplayStatView(false);
-        cfg.setDepthBits(24);
-        cfg.setGammaCorrection(false);
 
         //cfg.setOpenCLSupport(true);
         //cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
         //
         cfg.load(cfg.getTitle());
         //
+
+        cfg.setDepthBits(modes[0].getBitDepth());
+        cfg.setGammaCorrection(true);
+
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
 
@@ -362,6 +357,9 @@ public class Main extends SimpleApplication implements ScreenController {
 
         inputManager.addMapping("exit", exit_trigger);
         inputManager.addListener(actionListener, new String[]{"exit"});
+
+        inputManager.addMapping("switchStats", statsViewTrigger);
+        inputManager.addListener(actionListener, new String[]{"switchStats"});
     }
 
     public int getDisplayMode() {
@@ -398,6 +396,8 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     }
 
+    private boolean displayStatView = false;
+
     private final ActionListener actionListener = new ActionListener() {
         @Override
         @SuppressWarnings("Convert2Lambda")
@@ -407,6 +407,11 @@ public class Main extends SimpleApplication implements ScreenController {
                 //if (!gameRunningState.getLocalRoot().getControl(WeatherControl.class).isRaining()) {
                 gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
                 // }
+            }
+            if (name.equals("switchStats") && !isPressed) {
+                displayStatView = !displayStatView;
+                app.setDisplayStatView(displayStatView);
+                app.getContext().restart();
             }
 
             if (name.equals("fpsSwitch_trigger") && !isPressed) {

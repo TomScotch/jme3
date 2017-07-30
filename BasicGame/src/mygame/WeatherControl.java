@@ -115,21 +115,17 @@ public class WeatherControl extends AbstractControl {
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/rain.png"));
         rain.setMaterial(rainMat);
-        rain.setEndColor(ColorRGBA.DarkGray);
-        rain.setStartColor(ColorRGBA.DarkGray);
-        rain.setStartSize(0.5f);
-        rain.setEndSize(0.25f);
+        rain.setStartSize(0.25f);
+        rain.setEndSize(0.1f);
         rain.setGravity(0, 1750, 0);
-        rain.setHighLife(3f);
-        rain.setLowLife(1.5f);
+        rain.setHighLife(2.5f);
+        rain.setLowLife(1.25f);
         rain.setInWorldSpace(true);
         rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(false);
-        //rain.getParticleInfluencer().setVelocityVariation(3f);
         rain.setLocalTranslation(0, 75, 0);
         rain.center();
-        //rain.setQueueBucket(RenderQueue.Bucket.Opaque);
         this.localRoot.attachChild(rain);
 
         clouds = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, cloudThickness);
@@ -150,26 +146,19 @@ public class WeatherControl extends AbstractControl {
         clouds.setLocalTranslation(0, 75, 0);
         clouds.center();
         clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
-        //clouds.setQueueBucket(RenderQueue.Bucket.Opaque);
         this.localRoot.attachChild(clouds);
 
         debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 128);
         Material debrisMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         debrisMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/splash.png"));
         debrisEffect.setMaterial(debrisMat);
-        debrisEffect.setStartSize(0.25f);
+        debrisEffect.setStartSize(0.1f);
         debrisEffect.setEndSize(0.01f);
-        debrisEffect.setRotateSpeed(0.75f);
-        debrisEffect.setHighLife(1f);
-        debrisEffect.setLowLife(1f);
+        debrisEffect.setHighLife(0.5f);
+        debrisEffect.setLowLife(0.25f);
         debrisEffect.setInWorldSpace(true);
         debrisEffect.setFacingVelocity(false);
-        debrisEffect.setShape(new EmitterSphereShape(Vector3f.ZERO, 128));
-        // debrisEffect.setParticlesPerSec(0);
-        //debrisEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 4, 0));
-        debrisEffect.setStartColor(ColorRGBA.White);
-        //debrisEffect.setGravity(0f, 1f, 0f);
-        //debrisEffect.getParticleInfluencer().setVelocityVariation(.60f);
+        debrisEffect.setShape(new EmitterSphereShape(Vector3f.ZERO, 64));
         this.localRoot.attachChild(debrisEffect);
 
         sun = new DirectionalLight();
@@ -213,47 +202,34 @@ public class WeatherControl extends AbstractControl {
 
     private void makeMisty() {
 
-        Node n = (Node) spatial;
-
-        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-            n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.LightGray, 0.25f);
-        }
-
         misty = true;
 
-        switch (getRandomNumberInRange(0, 2)) {
-            case 0:
+        switch (getRandomNumberInRange(0, 5)) {
+            case 3:
                 misty_low = true;
                 misty_med = false;
                 misty_high = false;
                 System.out.println("misty low");
                 break;
-            case 1:
+            case 4:
                 misty_low = false;
                 misty_med = true;
                 misty_high = false;
                 System.out.println("misty med");
                 break;
-            case 2:
+            case 5:
                 misty_low = false;
                 misty_med = false;
                 misty_high = true;
                 System.out.println("misty high");
                 break;
         }
-        //suny = false;
     }
 
     public void makeRain() {
 
-        /*        Node n = (Node) spatial;
-        
-        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-        n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.Gray, 0.25f);
-        }*/
         makeCloudy();
         raining = true;
-        //suny = false;
 
         switch (getRandomNumberInRange(0, 2)) {
             case 0:
@@ -306,20 +282,16 @@ public class WeatherControl extends AbstractControl {
                 break;
         }
         if (lightnungStrikes_high) {
-            flashLimit = (float) getRandomNumberInRange(2, 4);
+            flashLimit = (float) getRandomNumberInRange(3, 6);
         } else if (lightnungStrikes_med) {
-            flashLimit = (float) getRandomNumberInRange(4, 6);
+            flashLimit = (float) getRandomNumberInRange(4, 8);
         } else if (lightnungStrikes_low) {
-            flashLimit = (float) getRandomNumberInRange(6, 8);
+            flashLimit = (float) getRandomNumberInRange(5, 10);
         }
     }
 
     public void makeCloudy() {
-        /*        Node n = (Node) spatial;
-        if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-        n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.DarkGray, 0.25f);
-        }*/
-        //suny = false;
+
         clouded = true;
         switch (getRandomNumberInRange(0, 1)) {
             case 0:
@@ -345,29 +317,11 @@ public class WeatherControl extends AbstractControl {
 
     public void makeSuny() {
 
-        Node n = (Node) spatial;
-
         clouded = false;
         raining = false;
         misty = false;
         lightnungStrikes = false;
-
-        if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).isEvening()) {
-            if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).isNight()) {
-
-                /*                if (n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-                n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.White, 0.75f);
-                n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().interpolateLocal(n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor(), ColorRGBA.Orange, 0.75f);
-                n.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().getColor().clamp();
-                }*/
-                //suny = true;
-                System.out.println("sunny");
-            } else {
-                System.out.println("too late to get Sunny");
-            }
-        } else {
-            System.out.println("sunny");
-        }
+        System.out.println("sunny");
     }
 
     @Override
@@ -383,21 +337,6 @@ public class WeatherControl extends AbstractControl {
                 limit = (float) getRandomNumberInRange(minimumWeatherLength, maximumWeatherLength);
             }
 
-            /*
-            
-            if (suny) {
-            if (clouds.getNumVisibleParticles() > 0) {
-            clouds.killParticle(0);
-            }
-            if (rain.getParticlesPerSec() > 0) {
-            rain.setParticlesPerSec(0);
-            }
-            if (flash.getParticlesPerSec() > 0) {
-            flash.setParticlesPerSec(0);
-            }
-            }
-            
-             */
             if (clouded) {
                 if (clouded_high) {
                     if (clouds.getNumVisibleParticles() < cloudThickness * 2) {
@@ -476,11 +415,11 @@ public class WeatherControl extends AbstractControl {
                 flashCounter += tpf;
 
                 if (lightnungStrikes_high) {
-                    flashLimit = (float) getRandomNumberInRange(2, 4);
+                    flashLimit = (float) getRandomNumberInRange(3, 6);
                 } else if (lightnungStrikes_med) {
-                    flashLimit = (float) getRandomNumberInRange(4, 6);
+                    flashLimit = (float) getRandomNumberInRange(4, 8);
                 } else if (lightnungStrikes_low) {
-                    flashLimit = (float) getRandomNumberInRange(6, 8);
+                    flashLimit = (float) getRandomNumberInRange(5, 10);
                 }
 
                 if (flashCounter >= flashLimit) {
@@ -488,30 +427,34 @@ public class WeatherControl extends AbstractControl {
                     flashCounter = 0;
 
                     if (lightnungStrikes_high) {
-                        flash.emitParticles(getRandomNumberInRange(3, 4));
+                        flash.emitParticles(getRandomNumberInRange(1, 3));
                     } else if (lightnungStrikes_med) {
-                        flash.emitParticles(getRandomNumberInRange(2, 3));
-                    } else if (lightnungStrikes_low) {
                         flash.emitParticles(getRandomNumberInRange(1, 2));
+                    } else if (lightnungStrikes_low) {
+                        flash.emitParticles(getRandomNumberInRange(1, 1));
                     }
 
-                    Node n = new Node();
-                    Spatial spat = (Spatial) n;
-
                     for (Particle p : flash.getParticles()) {
+
+                        Node n = new Node();
+                        Spatial spat = (Spatial) n;
 
                         spat.setLocalTranslation((p.position));
                         spat.lookAt(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
-                        sun.setDirection(spat.getLocalRotation().getRotationColumn(2));
-                        this.localRoot.addLight(sun);
+                        DirectionalLight clone = localRoot.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().clone();
+                        clone.setColor(ColorRGBA.White);
+                        clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
+                        clone.setEnabled(enabled);
+                        localRoot.addLight(clone);
 
                         flash.addControl(new TimedActionControl(getRandomNumberInRange(1, 2) - 0.75f) {
 
                             @Override
                             void action() {
 
-                                localRoot.removeLight(sun);
+                                clone.setEnabled(false);
+                                localRoot.removeLight(clone);
                             }
                         });
                     }
@@ -542,27 +485,27 @@ public class WeatherControl extends AbstractControl {
 
                         if (misty_high) {
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance) {
-                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 4);
+                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf);
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity) {
-                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 4);
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf);
                             }
                         } else if (misty_med) {
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance / 1.25f) {
-                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 2);
-                            }
-
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.25) {
-                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 2);
-                            }
-                        } else if (misty_low) {
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance / 1.5) {
-                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf * 2);
+                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf);
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5) {
-                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf * 2);
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf);
+                            }
+                        } else if (misty_low) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() < fogDistance / 1.75) {
+                                spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + tpf);
+                            }
+
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.75) {
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf);
                             }
                         }
                     }
@@ -573,11 +516,11 @@ public class WeatherControl extends AbstractControl {
                     misty_high = false;
 
                     if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
-                        spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - tpf * 2);
+                        spatial.getControl(FogPostFilter.class).setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - (tpf * 10));
                     }
 
                     if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
-                        spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - tpf * 2);
+                        spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - (tpf * 10));
                     }
                 }
             }
@@ -594,13 +537,6 @@ public class WeatherControl extends AbstractControl {
         //
     }
 
-    /*    public boolean isSuny() {
-    return suny;
-    }
-    
-    public void setSuny(boolean suny) {
-    this.suny = suny;
-    }*/
     public boolean isClouded() {
         return clouded;
     }
