@@ -24,6 +24,7 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.shadow.SpotLightShadowRenderer;
+import com.jme3.system.AppSettings;
 
 public class GlobalLightingControl extends AbstractControl {
 
@@ -31,6 +32,7 @@ public class GlobalLightingControl extends AbstractControl {
     private final ParticleEmitter fire;
     private float rotation;
     private final SpotLight dummySpotLight;
+    private final AppSettings as;
 
     public DirectionalLight getSun() {
         return sun;
@@ -56,9 +58,10 @@ public class GlobalLightingControl extends AbstractControl {
     private boolean night = false;
     private float clock = 0;
 
-    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
+    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode, AppSettings as) {
 
         this.sl = sl;
+        this.as = as;
 
         dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
 
@@ -145,12 +148,12 @@ public class GlobalLightingControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
-            if (clock > 6.2f) {
+            if (clock > 2.54f) {
                 clock = 0f;
             }
 
-            clock += tpf / timeDelay;
-
+            clock += tpf / as.getFrameRate();
+            //System.out.println(clock);
             if (sl.isEnabled()) {
 
                 slsr.setLight(sl);
@@ -176,7 +179,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-                if (clock > 0 && clock < 1f) {
+                if (clock > 0 && clock < 0.5f) {
                     //morning
                     morning = true;
                     day = false;
@@ -194,14 +197,14 @@ public class GlobalLightingControl extends AbstractControl {
                         System.out.println("Sun is Up");
                     }
 
-                    sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay / 1.25f));
+                    sun.getColor().interpolateLocal(ColorRGBA.White, getRotation() / 8);
 
                     tmp.interpolateLocal(ColorRGBA.Yellow, tpf / timeDelay / 1.25f);
                     tmp.interpolateLocal(ColorRGBA.Gray, tpf / timeDelay / 1.25f);
                     sunMat.setColor("Color", tmp);
                     fire.setEndColor(sun.getColor());
                     fire.setStartColor(tmp);
-                } else if (clock > 1f && clock < 2) {
+                } else if (clock > 0.5f && clock < 0.9f) {
                     //day
                     morning = false;
                     day = true;
@@ -212,27 +215,30 @@ public class GlobalLightingControl extends AbstractControl {
                     tmp.interpolateLocal(ColorRGBA.Orange, tpf / timeDelay / 1.25f);
                     sunMat.setColor("Color", tmp);
 
-                    if (sun.getColor().getBlue() < 0.5f) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Blue, ((tpf / timeDelay) / 1.25f));
-                    } else {
-                        sun.getColor().b = 0.5f;
-                    }
+                    sun.getColor().interpolateLocal(ColorRGBA.Orange, getRotation() / 2);
+
                     if (sl != null) {
                         slsr.setShadowIntensity(0.35f);
                     }
-                } else if (clock > 2f && clock < 3.2f) {
+                } else if (clock > 0.9f && clock < 1.27) {
                     //evening
                     morning = false;
                     day = false;
                     evening = true;
                     night = false;
-                } else if (clock > 3.2f && clock < 6.2f) {
+
+                    if (sun.getColor().getBlue() < 0.5f) {
+                        sun.getColor().interpolateLocal(ColorRGBA.Blue, getRotation());
+                    } else {
+                        sun.getColor().b = 0.5f;
+                    }
+                } else if (clock > 1.27f && clock < 2.54f) {
                     //night
                     morning = false;
                     day = false;
                     evening = false;
                     night = true;
-
+                    sun.setColor(ColorRGBA.Orange);
                     if (isSun == true) {
                         tmp = ColorRGBA.Orange;
                         isSun = false;

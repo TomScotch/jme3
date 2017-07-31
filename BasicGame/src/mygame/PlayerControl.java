@@ -364,7 +364,7 @@ public class PlayerControl extends AbstractControl {
             camDir.y = 0;
             camLeft.y = 0;
 
-            if (idleCounter > 30f) {
+            if (idleCounter > 90f) {
                 if (!rotateAround) {
                     System.out.println("start idleing");
                     makeRotateAround(true);
@@ -528,8 +528,8 @@ public class PlayerControl extends AbstractControl {
     public SpotLight getLamp() {
         return lamp;
     }
-    
-    public boolean isRotating(){
+
+    public boolean isRotating() {
         return rotateAround;
     }
 }

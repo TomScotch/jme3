@@ -86,7 +86,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private boolean isGl3 = false;
     private boolean shadows = false;
     private static boolean showFps = false;
-
+    private boolean displayStatView = false;
     private boolean wireframe = false;
     private static Platform selectedPlatform;
     private Node settingsNode;
@@ -245,19 +245,17 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
         cfg.setFullscreen(device.isFullScreenSupported());
         cfg.setVSync(false);
-        cfg.setFrameRate(30);
         cfg.setSamples(0);
         app.setDisplayFps(showFps);
         app.setDisplayStatView(false);
-
         //cfg.setOpenCLSupport(true);
         //cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
         //
         cfg.load(cfg.getTitle());
         //
-
         cfg.setDepthBits(modes[0].getBitDepth());
         cfg.setGammaCorrection(true);
+        cfg.setFrameRate(60);
 
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
@@ -395,8 +393,6 @@ public class Main extends SimpleApplication implements ScreenController {
             app.restart();
         }
     }
-
-    private boolean displayStatView = false;
 
     private final ActionListener actionListener = new ActionListener() {
         @Override

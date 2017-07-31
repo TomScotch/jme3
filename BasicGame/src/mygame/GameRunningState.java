@@ -123,7 +123,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      SUN
         Node sunNode = new Node("sunNode");
-        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
+        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode, app.getContext().getSettings());
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
@@ -157,7 +157,7 @@ public class GameRunningState extends AbstractAppState {
         //      Weather
         if (weatherEnabled) {
             if (localRootNode.getControl(WeatherControl.class) == null) {
-                weatherControl = new WeatherControl(assetManager, localRootNode, viewPort.getCamera(),terrainControl.getHeightmap());
+                weatherControl = new WeatherControl(assetManager, localRootNode, viewPort.getCamera(), terrainControl.getHeightmap());
                 weatherControl.setEnabled(false);
                 localRootNode.addControl(weatherControl);
             }
@@ -171,11 +171,11 @@ public class GameRunningState extends AbstractAppState {
 //      PosterizationFilter
         localRootNode.addControl(new PosterizationFilterControl(fpp));
 
-        //DOF
+        //Depth of Field
         dof = new DepthOfField(fpp, app.getContext(), viewPort, assetManager);
         localRootNode.addControl(dof);
 
-        //SSAO
+        //Screen Space Ambient Occlusion
         ssao = new SSAO(assetManager);
         localRootNode.addControl(ssao);
 

@@ -25,10 +25,6 @@ public class SkyControl extends AbstractControl {
     private final Material matDay;
     private final Material matEvening;
     private final Material matNight;
-    private float morningAlpha;
-    private float nightAlpha;
-    private float eveningAlpha;
-    private float dayAlpha;
 
     public SkyControl(AssetManager assetManager, GlobalLightingControl glc, Node localRootNode) {
 
@@ -73,26 +69,26 @@ public class SkyControl extends AbstractControl {
 
         Geometry morningGeom = (Geometry) morning;
         matMorning = morningGeom.getMaterial();
-        matMorning.setTransparent(true);
-        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Color);
+        //matMorning.setTransparent(true);
+        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         morningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry dayGeom = (Geometry) day;
         matDay = dayGeom.getMaterial();
-        matDay.setTransparent(true);
-        matDay.getAdditionalRenderState().setBlendMode(BlendMode.Color);
+        //matDay.setTransparent(true);
+        matDay.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         dayGeom.setQueueBucket(Bucket.Sky);
 
         Geometry eveningGeom = (Geometry) evening;
         matEvening = eveningGeom.getMaterial();
-        matEvening.setTransparent(true);
-        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Color);
+        //matEvening.setTransparent(true);
+        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         eveningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry nightGeom = (Geometry) night;
         matNight = nightGeom.getMaterial();
-        matNight.setTransparent(true);
-        matNight.getAdditionalRenderState().setBlendMode(BlendMode.Color);
+        //matNight.setTransparent(true);
+        matNight.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         nightGeom.setQueueBucket(Bucket.Sky);
 
         localRootNode.attachChild(day);
@@ -124,14 +120,14 @@ public class SkyControl extends AbstractControl {
 
             } else if (glc.isDay()) {
                 night.setCullHint(Spatial.CullHint.Always);
-                morning.setCullHint(Spatial.CullHint.Never);
+                morning.setCullHint(Spatial.CullHint.Always);
                 evening.setCullHint(Spatial.CullHint.Always);
                 day.setCullHint(Spatial.CullHint.Never);
 
             } else if (glc.isEvening()) {
                 morning.setCullHint(Spatial.CullHint.Always);
                 day.setCullHint(Spatial.CullHint.Always);
-                night.setCullHint(Spatial.CullHint.Never);
+                night.setCullHint(Spatial.CullHint.Always);
                 evening.setCullHint(Spatial.CullHint.Never);
 
             } else if (glc.isNight()) {
