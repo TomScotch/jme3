@@ -143,7 +143,7 @@ public class WeatherControl extends AbstractControl {
         clouds.setInWorldSpace(true);
         clouds.setFaceNormal(new Vector3f(0, -1, 0));
         clouds.getParticleInfluencer().setVelocityVariation(3f);
-        clouds.setLocalTranslation(0, 75, 0);
+        clouds.setLocalTranslation(0, 120, 0);
         clouds.center();
         clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
         this.localRoot.attachChild(clouds);
@@ -159,6 +159,7 @@ public class WeatherControl extends AbstractControl {
         debrisEffect.setInWorldSpace(true);
         debrisEffect.setFacingVelocity(false);
         debrisEffect.setShape(new EmitterSphereShape(Vector3f.ZERO, 64));
+        debrisEffect.setLocalTranslation(0, 4, 0);
         this.localRoot.attachChild(debrisEffect);
 
         sun = new DirectionalLight();

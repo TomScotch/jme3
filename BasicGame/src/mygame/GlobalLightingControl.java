@@ -163,7 +163,8 @@ public class GlobalLightingControl extends AbstractControl {
                 rotation = tpf / timeDelay;
 
                 pivot.rotate(rotation, 0, 0);
-                float w = pivot.getWorldRotation().getW();
+                float z = sphereGeo.getWorldTranslation().getZ();
+                float y = sphereGeo.getWorldTranslation().getY();
 
                 if (isSun) {
                     sun.setEnabled(true);
@@ -171,9 +172,10 @@ public class GlobalLightingControl extends AbstractControl {
                     sun.setEnabled(false);
                 }
 
+                sun.getColor().interpolateLocal(ColorRGBA.Orange, ColorRGBA.Red, getRotation() / 1.25f);
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-                if (w > 0.8f && w < 0.9f) {
+                if (y > 90 && z < -233) {
                     //morning
                     morning = true;
                     day = false;
@@ -191,42 +193,33 @@ public class GlobalLightingControl extends AbstractControl {
                         System.out.println("Sun is Up");
                     }
 
-                    sun.getColor().interpolateLocal(ColorRGBA.White, getRotation() / 8);
-
-                    tmp.interpolateLocal(ColorRGBA.Yellow, tpf / timeDelay / 1.25f);
-                    tmp.interpolateLocal(ColorRGBA.Gray, tpf / timeDelay / 1.25f);
+                    tmp.interpolateLocal(ColorRGBA.Red, getRotation() / 1.25f);
                     sunMat.setColor("Color", tmp);
                     fire.setEndColor(sun.getColor());
                     fire.setStartColor(tmp);
-                } else if (w > 0.4f && w < 0.8f) {
+                } else if (z > 0 && y > 433) {
                     //day
                     morning = false;
                     day = true;
                     evening = false;
                     night = false;
 
-                    tmp.interpolateLocal(ColorRGBA.Red, tpf / timeDelay / 1.25f);
-                    tmp.interpolateLocal(ColorRGBA.Orange, tpf / timeDelay / 1.25f);
+                    tmp.interpolateLocal(ColorRGBA.Orange, getRotation() / 1.25f);
                     sunMat.setColor("Color", tmp);
 
-                    sun.getColor().interpolateLocal(ColorRGBA.Orange, getRotation() / 2);
-
+                    // sun.getColor().interpolateLocal(ColorRGBA.Red, getRotation() / 1.25f);
                     if (sl != null) {
                         slsr.setShadowIntensity(0.35f);
                     }
-                } else if (w > 0.0f && w < 0.4f) {
+                } else if (y > 90 && z > 233) {
                     //evening
                     morning = false;
                     day = false;
                     evening = true;
                     night = false;
-
-                    if (sun.getColor().getBlue() < 0.5f) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Blue, getRotation());
-                    } else {
-                        sun.getColor().b = 0.5f;
-                    }
-                } else if (w > -0.9f && w < 0.0f) {
+                    //tmp.interpolateLocal(ColorRGBA.Blue, getRotation() / 1.25f);
+                    sun.getColor().interpolateLocal(ColorRGBA.Blue, getRotation());
+                } else if (y < 0 && z > 433) {
                     //night
                     morning = false;
                     day = false;
