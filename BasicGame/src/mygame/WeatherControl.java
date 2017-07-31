@@ -213,7 +213,7 @@ public class WeatherControl extends AbstractControl {
     private void makeMisty() {
 
         misty = true;
-
+        clouded = false;
         switch (getRandomNumberInRange(0, 2)) {
             case 0:
                 misty_low = true;
@@ -237,9 +237,9 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeRain() {
-
+        misty = false;
         raining = true;
-
+        makeCloudy();
         switch (getRandomNumberInRange(0, 2)) {
             case 0:
                 raining_high = true;
@@ -270,6 +270,7 @@ public class WeatherControl extends AbstractControl {
 
     public void makeLightning() {
         lightnungStrikes = true;
+
         switch (getRandomNumberInRange(0, 2)) {
             case 0:
                 lightnungStrikes_high = true;
@@ -300,7 +301,7 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeCloudy() {
-
+        misty = false;
         clouded = true;
         switch (getRandomNumberInRange(0, 1)) {
             case 0:
@@ -372,8 +373,6 @@ public class WeatherControl extends AbstractControl {
             }
 
             if (raining) {
-
-                makeCloudy();
 
                 if (raining_high) {
                     rain.setParticlesPerSec(rainStrength * 2);
@@ -456,7 +455,20 @@ public class WeatherControl extends AbstractControl {
                         clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
                         localRoot.addLight(clone);
 
-                        flash.addControl(new TimedActionControl(getRandomNumberInRange(0, 1) + 0.25f) {
+                        float lightDelay = 1;
+                        switch (getRandomNumberInRange(0, 2)) {
+                            case 0:
+                                lightDelay = 0.2f;
+                                break;
+                            case 1:
+                                lightDelay = 0.3f;
+                                break;
+                            case 2:
+                                lightDelay = 0.4f;
+                                break;
+                        }
+
+                        flash.addControl(new TimedActionControl(lightDelay) {
 
                             @Override
                             void action() {
