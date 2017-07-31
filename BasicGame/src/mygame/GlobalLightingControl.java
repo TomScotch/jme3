@@ -56,7 +56,6 @@ public class GlobalLightingControl extends AbstractControl {
     private boolean day = false;
     private boolean evening = false;
     private boolean night = false;
-    private float clock = 0;
 
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode, AppSettings as) {
 
@@ -148,12 +147,6 @@ public class GlobalLightingControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
-            if (clock > 2.54f) {
-                clock = 0f;
-            }
-
-            clock += tpf / as.getFrameRate();
-            //System.out.println(clock);
             if (sl.isEnabled()) {
 
                 slsr.setLight(sl);
@@ -170,6 +163,7 @@ public class GlobalLightingControl extends AbstractControl {
                 rotation = tpf / timeDelay;
 
                 pivot.rotate(rotation, 0, 0);
+                float w = pivot.getWorldRotation().getW();
 
                 if (isSun) {
                     sun.setEnabled(true);
@@ -179,7 +173,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-                if (clock > 0 && clock < 0.5f) {
+                if (w > 0.8f && w < 0.9f) {
                     //morning
                     morning = true;
                     day = false;
@@ -204,7 +198,7 @@ public class GlobalLightingControl extends AbstractControl {
                     sunMat.setColor("Color", tmp);
                     fire.setEndColor(sun.getColor());
                     fire.setStartColor(tmp);
-                } else if (clock > 0.5f && clock < 0.9f) {
+                } else if (w > 0.4f && w < 0.8f) {
                     //day
                     morning = false;
                     day = true;
@@ -220,7 +214,7 @@ public class GlobalLightingControl extends AbstractControl {
                     if (sl != null) {
                         slsr.setShadowIntensity(0.35f);
                     }
-                } else if (clock > 0.9f && clock < 1.27) {
+                } else if (w > 0.0f && w < 0.4f) {
                     //evening
                     morning = false;
                     day = false;
@@ -232,7 +226,7 @@ public class GlobalLightingControl extends AbstractControl {
                     } else {
                         sun.getColor().b = 0.5f;
                     }
-                } else if (clock > 1.27f && clock < 2.54f) {
+                } else if (w > -0.9f && w < 0.0f) {
                     //night
                     morning = false;
                     day = false;
