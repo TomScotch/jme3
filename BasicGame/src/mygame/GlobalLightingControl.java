@@ -173,7 +173,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-                if (y > 90 && z < -233) {
+                if (y > 87 && z < -233) {
                     //morning
                     if (isSun) {
                         sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) / 4);/// 0.0005f
@@ -220,7 +220,7 @@ public class GlobalLightingControl extends AbstractControl {
                     }
                 }
 
-                if (y < 0 && z > 433) {
+                if (y < 0 && z > 440) {
                     //night
                     morning = false;
                     day = false;
