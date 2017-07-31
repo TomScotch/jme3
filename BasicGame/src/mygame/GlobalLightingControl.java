@@ -187,9 +187,12 @@ public class GlobalLightingControl extends AbstractControl {
                         }
                         isSun = true;
                         System.out.println("Sun is Up");
+                        sun.setColor(ColorRGBA.Orange);
                     }
 
-                } else if (z > 0 && y > 433) {
+                }
+
+                if (z > 0 && y > 433) {
                     //day
                     morning = false;
                     day = true;
@@ -199,21 +202,25 @@ public class GlobalLightingControl extends AbstractControl {
                         slsr.setShadowIntensity(0.35f);
                     }
                     sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) / 2);/// 0.0005f
-                } else if (y > 90 && z > 233) {
+                }
+
+                if (y > 90 && z > 233) {
                     //evening
                     morning = false;
                     day = false;
                     evening = true;
                     night = false;
                     sun.getColor().interpolateLocal(ColorRGBA.Blue, (tpf / timeDelay) / 3);/// 0.0005f
-                } else if (y < 0 && z > 433) {
+                }
+
+                if (y < 0 && z > 433) {
                     //night
                     morning = false;
                     day = false;
                     evening = false;
                     night = true;
                     if (isSun == true) {
-                        sun.setColor(ColorRGBA.Orange);
+
                         isSun = false;
                         System.out.println("Sun is Down");
                         if (sl != null) {

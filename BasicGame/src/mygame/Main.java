@@ -400,9 +400,9 @@ public class Main extends SimpleApplication implements ScreenController {
         public void onAction(String name, boolean isPressed, float tpf) {
 
             if (name.equals("rain_trigger") && !isPressed) {
-                //if (!gameRunningState.getLocalRoot().getControl(WeatherControl.class).isRaining()) {
-                gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
-                // }
+                if (stateManager.hasState(gameRunningState)) {
+                    gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
+                }
             }
             if (name.equals("switchStats") && !isPressed) {
                 displayStatView = !displayStatView;
@@ -428,8 +428,9 @@ public class Main extends SimpleApplication implements ScreenController {
             }
 
             if (name.equals("Game Pause Unpause") && !isPressed) {
-
-                switchGameState();
+                if (gameRunningState != null) {
+                    switchGameState();
+                }
             }
 
             if (name.equals("restart") && !isPressed) {

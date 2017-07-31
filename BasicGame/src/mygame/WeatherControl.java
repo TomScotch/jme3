@@ -115,10 +115,10 @@ public class WeatherControl extends AbstractControl {
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/rain.png"));
         rain.setMaterial(rainMat);
-        rain.setStartSize(0.25f);
-        rain.setEndSize(0.1f);
+        rain.setStartSize(0.6f);
+        rain.setEndSize(0.4f);
         rain.setGravity(0, 1750, 0);
-        rain.setEndColor(ColorRGBA.DarkGray);
+        rain.setEndColor(ColorRGBA.White);
         rain.setStartColor(ColorRGBA.LightGray);
         rain.setHighLife(2.5f);
         rain.setLowLife(1.25f);
@@ -126,7 +126,8 @@ public class WeatherControl extends AbstractControl {
         rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(false);
-        rain.setLocalTranslation(0, 75, 0);
+        rain.setLocalTranslation(0, 50, 0);
+        //  rain.setQueueBucket(RenderQueue.Bucket.Translucent);
         rain.center();
         this.localRoot.attachChild(rain);
 
@@ -154,14 +155,18 @@ public class WeatherControl extends AbstractControl {
         Material debrisMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         debrisMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/splash.png"));
         debrisEffect.setMaterial(debrisMat);
-        debrisEffect.setStartSize(0.1f);
-        debrisEffect.setEndSize(0.01f);
+        debrisEffect.setStartSize(0.25f);
+        debrisEffect.setEndSize(0.05f);
+        debrisEffect.setEndColor(ColorRGBA.White);
+        debrisEffect.setStartColor(ColorRGBA.LightGray);
+
         debrisEffect.setHighLife(0.5f);
         debrisEffect.setLowLife(0.25f);
         debrisEffect.setInWorldSpace(true);
         debrisEffect.setFacingVelocity(false);
         debrisEffect.setShape(new EmitterSphereShape(Vector3f.ZERO, 64));
-        debrisEffect.setLocalTranslation(0, 4, 0);
+        //debrisEffect.setQueueBucket(RenderQueue.Bucket.Opaque);
+        debrisEffect.getWorldTranslation().set(0, 6, 0);
         this.localRoot.attachChild(debrisEffect);
 
         sun = new DirectionalLight();
@@ -384,17 +389,15 @@ public class WeatherControl extends AbstractControl {
 
                         try {
                             Vector3f position = rain.getParticles()[c].position;
-                            float trueHeightAtPoint = hm.getTrueHeightAtPoint((int) position.getX(), (int) position.getZ());
-                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint + 0.0001f, position.getZ()); //
-                            float distance = cam.getLocation().distance(position);
+                            float trueHeightAtPoint = hm.getScaledHeightAtPoint((int) position.getX(), (int) position.getZ());
+                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint + 0.00001f, position.getZ()); //
+                            //float distance = cam.getLocation().distance(position);
 
-                            if (distance < 1000) {
-                                debrisEffect.setStartSize(0.25f);
-                                if (distance < 500) {
-                                    debrisEffect.setStartSize(0.5f);
-                                }
-                                debrisEffect.emitParticles(1);
-                            }
+                            //    if (distance < 20) {
+                            //  debrisEffect.setStartSize(0f);
+                            //  debrisEffect.setEndSize(0.0f);
+                            // }
+                            debrisEffect.emitParticles(1);
                         } catch (Exception e) {
                         }
                     }
