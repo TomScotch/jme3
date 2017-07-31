@@ -138,7 +138,7 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setEdgesThickness(5);
 
         sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
-        sun.setColor(ColorRGBA.Orange.addLocal(ColorRGBA.Red));
+        sun.setColor(ColorRGBA.Orange);
     }
 
     @Override
@@ -188,7 +188,7 @@ public class GlobalLightingControl extends AbstractControl {
                         }
                         isSun = true;
                         System.out.println("Sun is Up");
-                        sun.setColor(ColorRGBA.Orange.addLocal(ColorRGBA.Red));
+                        sun.setColor(ColorRGBA.Orange);
                         fire.setEnabled(true);
                         sun.setEnabled(true);
                     }
