@@ -115,8 +115,8 @@ public class WeatherControl extends AbstractControl {
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/rain.png"));
         rain.setMaterial(rainMat);
-        rain.setStartSize(0.6f);
-        rain.setEndSize(0.4f);
+        rain.setStartSize(0.4f);
+        rain.setEndSize(0.2f);
         rain.setGravity(0, 1750, 0);
         rain.setEndColor(ColorRGBA.White);
         rain.setStartColor(ColorRGBA.LightGray);
@@ -155,8 +155,8 @@ public class WeatherControl extends AbstractControl {
         Material debrisMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         debrisMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/splash.png"));
         debrisEffect.setMaterial(debrisMat);
-        debrisEffect.setStartSize(0.25f);
-        debrisEffect.setEndSize(0.05f);
+        debrisEffect.setStartSize(0.1f);
+        debrisEffect.setEndSize(0.025f);
         debrisEffect.setEndColor(ColorRGBA.White);
         debrisEffect.setStartColor(ColorRGBA.LightGray);
 
@@ -391,13 +391,13 @@ public class WeatherControl extends AbstractControl {
                             Vector3f position = rain.getParticles()[c].position;
                             float trueHeightAtPoint = hm.getScaledHeightAtPoint((int) position.getX(), (int) position.getZ());
                             debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint + 0.00001f, position.getZ()); //
-                            //float distance = cam.getLocation().distance(position);
-
-                            //    if (distance < 20) {
-                            //  debrisEffect.setStartSize(0f);
-                            //  debrisEffect.setEndSize(0.0f);
-                            // }
+                            float distance = cam.getLocation().distance(position);
                             debrisEffect.emitParticles(1);
+                            if (distance < 2) {
+                                debrisEffect.setStartSize(0f);
+                                debrisEffect.setEndSize(0.0f);
+                            }
+
                         } catch (Exception e) {
                         }
                     }
@@ -449,10 +449,9 @@ public class WeatherControl extends AbstractControl {
                         spat.setLocalTranslation((p.position));
                         spat.lookAt(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
-                        DirectionalLight clone = localRoot.getChild("sunNode").getControl(GlobalLightingControl.class).getSun().clone();
+                        DirectionalLight clone = new DirectionalLight();
                         clone.setColor(ColorRGBA.White);
                         clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
-                        clone.setEnabled(enabled);
                         localRoot.addLight(clone);
 
                         flash.addControl(new TimedActionControl(getRandomNumberInRange(1, 2) - 0.75f) {
@@ -460,7 +459,6 @@ public class WeatherControl extends AbstractControl {
                             @Override
                             void action() {
 
-                                clone.setEnabled(false);
                                 localRoot.removeLight(clone);
                             }
                         });

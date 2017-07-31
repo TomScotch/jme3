@@ -137,8 +137,8 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setShadowIntensity(0.30f);
         slsr.setEdgesThickness(5);
 
-        sun.setColor(ColorRGBA.Orange);
         sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
+        sun.setColor(ColorRGBA.Orange.addLocal(ColorRGBA.Red));
     }
 
     @Override
@@ -175,8 +175,9 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (y > 90 && z < -233) {
                     //morning
-                    sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) / 4);/// 0.0005f
-
+                    if (isSun) {
+                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) / 4);/// 0.0005f
+                    }
                     morning = true;
                     day = false;
                     evening = false;
@@ -187,7 +188,9 @@ public class GlobalLightingControl extends AbstractControl {
                         }
                         isSun = true;
                         System.out.println("Sun is Up");
-                        sun.setColor(ColorRGBA.Orange);
+                        sun.setColor(ColorRGBA.Orange.addLocal(ColorRGBA.Red));
+                        fire.setEnabled(true);
+                        sun.setEnabled(true);
                     }
 
                 }
@@ -201,7 +204,9 @@ public class GlobalLightingControl extends AbstractControl {
                     if (sl != null) {
                         slsr.setShadowIntensity(0.35f);
                     }
-                    sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) / 2);/// 0.0005f
+                    if (isSun) {
+                        sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) / 2);/// 0.0005f
+                    }
                 }
 
                 if (y > 90 && z > 233) {
@@ -210,7 +215,9 @@ public class GlobalLightingControl extends AbstractControl {
                     day = false;
                     evening = true;
                     night = false;
-                    sun.getColor().interpolateLocal(ColorRGBA.Blue, (tpf / timeDelay) / 3);/// 0.0005f
+                    if (isSun) {
+                        sun.getColor().interpolateLocal(ColorRGBA.Blue, (tpf / timeDelay) / 3);/// 0.0005f
+                    }
                 }
 
                 if (y < 0 && z > 433) {
@@ -220,7 +227,9 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = false;
                     night = true;
                     if (isSun == true) {
-
+                        sun.setEnabled(false);
+                        fire.setEnabled(false);
+                        fire.killAllParticles();
                         isSun = false;
                         System.out.println("Sun is Down");
                         if (sl != null) {
