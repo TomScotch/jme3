@@ -373,6 +373,8 @@ public class WeatherControl extends AbstractControl {
 
             if (raining) {
 
+                makeCloudy();
+
                 if (raining_high) {
                     rain.setParticlesPerSec(rainStrength * 2);
                 } else if (raining_med) {
@@ -454,7 +456,7 @@ public class WeatherControl extends AbstractControl {
                         clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
                         localRoot.addLight(clone);
 
-                        flash.addControl(new TimedActionControl(getRandomNumberInRange(1, 2) - 0.75f) {
+                        flash.addControl(new TimedActionControl(getRandomNumberInRange(0, 1) + 0.25f) {
 
                             @Override
                             void action() {
