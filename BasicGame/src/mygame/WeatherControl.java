@@ -118,6 +118,8 @@ public class WeatherControl extends AbstractControl {
         rain.setStartSize(0.25f);
         rain.setEndSize(0.1f);
         rain.setGravity(0, 1750, 0);
+        rain.setEndColor(ColorRGBA.DarkGray);
+        rain.setStartColor(ColorRGBA.LightGray);
         rain.setHighLife(2.5f);
         rain.setLowLife(1.25f);
         rain.setInWorldSpace(true);

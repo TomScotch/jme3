@@ -85,16 +85,16 @@ public class GlobalLightingControl extends AbstractControl {
         fire.setShape(new EmitterSphereShape(Vector3f.ZERO, 0.1f));
         fire.setImagesX(2);
         fire.setImagesY(2);
-        fire.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f));
-        fire.setStartColor(new ColorRGBA(1f, 1f, 0f, 0.5f));
+        fire.setEndColor(ColorRGBA.Red);//new ColorRGBA(1f, 0f, 0f, 1f)
+        fire.setStartColor(ColorRGBA.Orange);//new ColorRGBA(1f, 1f, 0f, 0.5f)
         fire.setStartSize(sunSize * 2);
-        fire.setEndSize(0.01f);
-        fire.setGravity(0, -0.3f, 0);
+        fire.setEndSize(sunSize * 1.5f);
+        fire.setGravity(0, -3, 0);
         fire.setInWorldSpace(false);
-        fire.setLowLife(0.4f);
-        fire.setHighLife(2f);
-        fire.setParticlesPerSec(25);
-        fire.setNumParticles(100);
+        fire.setLowLife(0.75f);
+        fire.setHighLife(1.5f);
+        fire.setParticlesPerSec(30);
+        fire.setNumParticles(120);
         fire.setShadowMode(RenderQueue.ShadowMode.Off);
         fire.setQueueBucket(RenderQueue.Bucket.Transparent);
         localRootNode.attachChild(fire);
@@ -138,9 +138,8 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setEdgesThickness(5);
 
         sun.setColor(ColorRGBA.Orange);
+        sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
     }
-
-    private ColorRGBA tmp = ColorRGBA.Orange;
 
     @Override
     protected void controlUpdate(float tpf) {
@@ -172,62 +171,49 @@ public class GlobalLightingControl extends AbstractControl {
                     sun.setEnabled(false);
                 }
 
-                sun.getColor().interpolateLocal(ColorRGBA.Orange, ColorRGBA.Red, getRotation() / 1.25f);
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
                 if (y > 90 && z < -233) {
                     //morning
+                    sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) / 4);/// 0.0005f
+
                     morning = true;
                     day = false;
                     evening = false;
                     night = false;
-
                     if (isSun == false) {
                         if (sl != null) {
                             slsr.setShadowIntensity(0.25f);
                         }
-
                         isSun = true;
-                        sun.setColor(ColorRGBA.Orange);
-                        tmp = ColorRGBA.Orange;
                         System.out.println("Sun is Up");
                     }
 
-                    tmp.interpolateLocal(ColorRGBA.Red, getRotation() / 1.25f);
-                    sunMat.setColor("Color", tmp);
-                    fire.setEndColor(sun.getColor());
-                    fire.setStartColor(tmp);
                 } else if (z > 0 && y > 433) {
                     //day
                     morning = false;
                     day = true;
                     evening = false;
                     night = false;
-
-                    tmp.interpolateLocal(ColorRGBA.Orange, getRotation() / 1.25f);
-                    sunMat.setColor("Color", tmp);
-
-                    // sun.getColor().interpolateLocal(ColorRGBA.Red, getRotation() / 1.25f);
                     if (sl != null) {
                         slsr.setShadowIntensity(0.35f);
                     }
+                    sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) / 2);/// 0.0005f
                 } else if (y > 90 && z > 233) {
                     //evening
                     morning = false;
                     day = false;
                     evening = true;
                     night = false;
-                    //tmp.interpolateLocal(ColorRGBA.Blue, getRotation() / 1.25f);
-                    sun.getColor().interpolateLocal(ColorRGBA.Blue, getRotation());
+                    sun.getColor().interpolateLocal(ColorRGBA.Blue, (tpf / timeDelay) / 3);/// 0.0005f
                 } else if (y < 0 && z > 433) {
                     //night
                     morning = false;
                     day = false;
                     evening = false;
                     night = true;
-                    sun.setColor(ColorRGBA.Orange);
                     if (isSun == true) {
-                        tmp = ColorRGBA.Orange;
+                        sun.setColor(ColorRGBA.Orange);
                         isSun = false;
                         System.out.println("Sun is Down");
                         if (sl != null) {
