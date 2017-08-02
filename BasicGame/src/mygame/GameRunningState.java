@@ -494,6 +494,10 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
         localRootNode.getControl(PosterizationFilterControl.class).setStrength(1.75f);
 
+        if (!viewPort.getProcessors().contains(glc.getDlsr())) {
+            viewPort.addProcessor(glc.getDlsr());
+        }
+
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
                 viewPort.addProcessor(glc.getSlsr());
@@ -543,6 +547,10 @@ public class GameRunningState extends AbstractAppState {
         weatherControl.setEnabled(false);
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
+        }
+
+        if (viewPort.getProcessors().contains(glc.getDlsr())) {
+            viewPort.removeProcessor(glc.getDlsr());
         }
 
         if (shadows) {

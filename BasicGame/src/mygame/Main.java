@@ -390,7 +390,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
                 gameRunningState = null;
-                viewPort.clearProcessors();
+                //app.restart();
                 switchGameState();
             }
         }

@@ -317,4 +317,8 @@ public class GlobalLightingControl extends AbstractControl {
     public float getRotation() {
         return rotation;
     }
+
+    public DirectionalLightShadowRenderer getDlsr() {
+        return dlsr;
+    }
 }
