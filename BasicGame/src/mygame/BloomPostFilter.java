@@ -9,16 +9,18 @@ import com.jme3.scene.control.AbstractControl;
 public class BloomPostFilter extends AbstractControl {
 
     private final BloomFilter bloom;
-    private final float density = 2;//2
-    private final float sampling = 1;//1
+    private float density = 1.5f;//2
+    private float sampling = 1;//1
+    private float blurScale = 1f;//1.5f
+    private float exposurePower = 3.75f;//5
 
     public BloomPostFilter(FilterPostProcessor fpp) {
 
         bloom = new BloomFilter(BloomFilter.GlowMode.Objects);
         bloom.setBloomIntensity(density);
         bloom.setDownSamplingFactor(sampling);
-        bloom.setBlurScale(1f);//1.5f
-        bloom.setExposurePower(4.0f);//5.0f
+        bloom.setBlurScale(blurScale);
+        bloom.setExposurePower(exposurePower);
         fpp.addFilter(bloom);
     }
 
@@ -33,19 +35,23 @@ public class BloomPostFilter extends AbstractControl {
     }
 
     public void setBloomIntensity(float bloomIntensity) {
+        this.density = bloomIntensity;
         bloom.setBloomIntensity(bloomIntensity);
     }
 
     public void setBlurScale(float blurScale) {
+        this.blurScale = blurScale;
         bloom.setBlurScale(blurScale);
     }
 
-    public void setDownSamplingFactor(float downSamplingFactor) {
-        bloom.setDownSamplingFactor(downSamplingFactor);
+    public void setSampling(float sampling) {
+        bloom.setDownSamplingFactor(sampling);
+        this.sampling = sampling;
     }
 
     public void setExposurePower(float exposurePower) {
-        bloom.setExposurePower(exposurePower);
+        this.exposurePower = exposurePower;
+        this.bloom.setExposurePower(exposurePower);
     }
 
     public float getBloomIntensity() {
@@ -56,7 +62,7 @@ public class BloomPostFilter extends AbstractControl {
         return bloom.getBlurScale();
     }
 
-    public float getDownSamplingFactor() {
+    public float getSampling() {
         return bloom.getDownSamplingFactor();
     }
 

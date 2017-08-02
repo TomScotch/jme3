@@ -74,7 +74,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-    private final SSAO ssao;
+    //private final SSAO ssao;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -123,7 +123,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      SUN
         Node sunNode = new Node("sunNode");
-        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode, app.getContext().getSettings());
+        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
@@ -157,7 +157,7 @@ public class GameRunningState extends AbstractAppState {
         //      Weather
         if (weatherEnabled) {
             if (localRootNode.getControl(WeatherControl.class) == null) {
-                weatherControl = new WeatherControl(assetManager, localRootNode, viewPort.getCamera(), terrainControl.getHeightmap());
+                weatherControl = new WeatherControl(assetManager, localRootNode, terrainControl.getHeightmap());
                 weatherControl.setEnabled(false);
                 localRootNode.addControl(weatherControl);
             }
@@ -176,9 +176,9 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.addControl(dof);
 
         //Screen Space Ambient Occlusion
-        ssao = new SSAO(assetManager);
-        localRootNode.addControl(ssao);
-
+        //ssao = new SSAO(assetManager, fpp);
+        //localRootNode.addControl(ssao);
+        //
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
@@ -194,7 +194,6 @@ public class GameRunningState extends AbstractAppState {
         EntityControl ec3 = new EntityControl(assetManager, spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
         spider.addControl(ec3);
         localRootNode.attachChild(spider);
-        setupKeys();
 
         //Second Camera View
         cam2 = app.getCamera().clone();
@@ -227,6 +226,16 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(amb2);
 
         limit = getRandomNumberInRange(15, 45);
+
+        addListener();
+        setupKeys();
+    }
+
+    private void addListener() {
+        inputManager.addListener(actionListener, "write");
+        inputManager.addListener(actionListener, "treeoutroot");
+        inputManager.addListener(actionListener, "debug");
+        inputManager.addListener(actionListener, "switchCam");
     }
 
     public final void attachBird() {
@@ -302,22 +311,15 @@ public class GameRunningState extends AbstractAppState {
         inputManager.addMapping("write",
                 new KeyTrigger(KeyInput.KEY_F9));
 
-        inputManager.addListener(actionListener, "write");
-
         inputManager.addMapping("treeoutroot",
                 new KeyTrigger(KeyInput.KEY_O));
-
-        inputManager.addListener(actionListener, "treeoutroot");
 
         inputManager.addMapping("debug",
                 new KeyTrigger(KeyInput.KEY_Q));
 
-        inputManager.addListener(actionListener, "debug");
-
         inputManager.addMapping("switchCam",
                 new KeyTrigger(KeyInput.KEY_P));
 
-        inputManager.addListener(actionListener, "switchCam");
     }
 
     private void treeoutroot(Node node) {
@@ -483,6 +485,7 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateAttach() {
         playerControl.setEnabled(true);
+
         sc.setEnabled(true);
         glc.setEnabled(true);
         weatherControl.setEnabled(true);
@@ -511,6 +514,7 @@ public class GameRunningState extends AbstractAppState {
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
+        //inputManager.clearMappings();
         stateDetach();
         setIsRunning(false);
     }

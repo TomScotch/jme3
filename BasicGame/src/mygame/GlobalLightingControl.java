@@ -24,7 +24,6 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.shadow.SpotLightShadowRenderer;
-import com.jme3.system.AppSettings;
 
 public class GlobalLightingControl extends AbstractControl {
 
@@ -32,7 +31,8 @@ public class GlobalLightingControl extends AbstractControl {
     private final ParticleEmitter fire;
     private float rotation;
     private final SpotLight dummySpotLight;
-    private final AppSettings as;
+
+    private final Node localRootNode;
 
     public DirectionalLight getSun() {
         return sun;
@@ -49,7 +49,7 @@ public class GlobalLightingControl extends AbstractControl {
     private final Geometry sphereGeo;
     private final SpotLightShadowRenderer slsr;
     private final DirectionalLightShadowRenderer dlsr;
-    private final int shadowmapSize = 1024;
+    private final int shadowmapSize = 512;
     private boolean globalLightning = true;
 
     private boolean morning = true;
@@ -57,11 +57,10 @@ public class GlobalLightingControl extends AbstractControl {
     private boolean evening = false;
     private boolean night = false;
 
-    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode, AppSettings as) {
+    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
         this.sl = sl;
-        this.as = as;
-
+        this.localRootNode = localRootNode;
         dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
 
         //PointLightSunPivotNode
@@ -123,7 +122,7 @@ public class GlobalLightingControl extends AbstractControl {
         }
 
         //Directional Light Shadow Renderer
-        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 2);
+        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
         dlsr.setLight(sun);
         dlsr.setShadowCompareMode(CompareMode.Hardware);
         dlsr.setShadowIntensity(0.30f);
@@ -173,7 +172,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
-                if (y > 87 && z < -233) {
+                if (y > -(sunSize / 1.1f) && z < -222) {
                     //morning
                     if (isSun) {
                         sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) / 4);/// 0.0005f
@@ -195,7 +194,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 }
 
-                if (z > 0 && y > 433) {
+                if (y > 422 && z > 0) {
                     //day
                     morning = false;
                     day = true;
@@ -220,7 +219,7 @@ public class GlobalLightingControl extends AbstractControl {
                     }
                 }
 
-                if (y < 0 && z > 440) {
+                if (y < -(sunSize * 1.1f) && z > 444) {
                     //night
                     morning = false;
                     day = false;
@@ -246,6 +245,14 @@ public class GlobalLightingControl extends AbstractControl {
             }
         } else {
             System.out.println("glc stopped");
+        }
+
+        if (localRootNode.getControl(LightScatterFilter.class) != null) {
+            if (night) {
+                localRootNode.getControl(LightScatterFilter.class).setEnabled(false);
+            } else {
+                localRootNode.getControl(LightScatterFilter.class).setEnabled(true);
+            }
         }
     }
 

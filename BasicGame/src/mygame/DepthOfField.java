@@ -11,8 +11,6 @@ import com.jme3.post.filters.DepthOfFieldFilter;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.system.JmeContext;
 
@@ -22,9 +20,9 @@ public class DepthOfField extends AbstractControl {
     private final JmeContext context;
     private final Camera cam;
 
-    private final float distance = 0;
-    private final float range = 25;
-    private final float scale = 1;
+    private float focusDistance = 10; // 10f
+    private final float range = 50; // 50f
+    private final float scale = 1.2f; // 1.4f
 
     public DepthOfField(FilterPostProcessor fpp, JmeContext context, ViewPort vp, AssetManager assetManager) {
 
@@ -32,7 +30,6 @@ public class DepthOfField extends AbstractControl {
         this.cam = vp.getCamera();
 
         dofFilter = new DepthOfFieldFilter();
-        dofFilter.setFocusDistance(distance);
         dofFilter.setFocusRange(range);
         dofFilter.setBlurScale(scale);
         fpp.addFilter(dofFilter);
@@ -41,19 +38,16 @@ public class DepthOfField extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        Node n = (Node) this.spatial;
-        Spatial s = n.getChild("terrainNode");
-        if (s != null) {
-            Vector3f origin = cam.getWorldCoordinates(new Vector2f(context.getSettings().getWidth() / 2, context.getSettings().getHeight() / 2), 0.0f);
-            Vector3f direction = cam.getWorldCoordinates(new Vector2f(context.getSettings().getWidth() / 2, context.getSettings().getHeight() / 2), 0.3f);
-            direction.subtractLocal(origin).normalizeLocal();
-            Ray ray = new Ray(origin, direction);
-            CollisionResults results = new CollisionResults();
-            int numCollisions = s.collideWith(ray, results);
-            if (numCollisions > 0) {
-                CollisionResult hit = results.getClosestCollision();
-                dofFilter.setFocusDistance(hit.getDistance() / 5.0f);
-            }
+        Vector3f origin = cam.getWorldCoordinates(new Vector2f(context.getSettings().getWidth() / 2, context.getSettings().getHeight() / 2), 0.0f);
+        Vector3f direction = cam.getWorldCoordinates(new Vector2f(context.getSettings().getWidth() / 2, context.getSettings().getHeight() / 2), 0.3f);
+        direction.subtractLocal(origin).normalizeLocal();
+        Ray ray = new Ray(origin, direction);
+        CollisionResults results = new CollisionResults();
+        int numCollisions = this.spatial.collideWith(ray, results);
+        if (numCollisions > 0) {
+            CollisionResult hit = results.getClosestCollision();
+            dofFilter.setFocusDistance(hit.getDistance() / focusDistance);
+
         }
     }
 
@@ -63,15 +57,19 @@ public class DepthOfField extends AbstractControl {
         //not called when spatial is culled.
     }
 
-    public float getDistance() {
-        return distance;
-    }
-
     public float getRange() {
         return range;
     }
 
     public float getScale() {
         return scale;
+    }
+
+    public float getFocusDistance() {
+        return focusDistance;
+    }
+
+    public void setFocusDistance(float focusDistance) {
+        this.focusDistance = focusDistance;
     }
 }

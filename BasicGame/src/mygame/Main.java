@@ -88,7 +88,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private static boolean showFps = false;
     private boolean displayStatView = false;
     private boolean wireframe = false;
-    private static Platform selectedPlatform;
+    //private static Platform selectedPlatform;
     private Node settingsNode;
 
     private static final Object sync = new Object();
@@ -256,6 +256,7 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setDepthBits(modes[0].getBitDepth());
         cfg.setGammaCorrection(true);
         cfg.setFrameRate(60);
+        cfg.setFrequency(cfg.getFrameRate());
 
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
@@ -323,6 +324,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
         stateManager.attach(startScreenState);
 
+        addListener();
         add_mapping();
 
         niftyDisplay = new NiftyJmeDisplay(
@@ -334,30 +336,26 @@ public class Main extends SimpleApplication implements ScreenController {
         initStartGui();
     }
 
+    private void addListener() {
+        inputManager.addListener(actionListener, new String[]{"record"});
+        inputManager.addListener(actionListener, new String[]{"restart"});
+        inputManager.addListener(actionListener, new String[]{"exit"});
+        inputManager.addListener(actionListener, new String[]{"switchStats"});
+        inputManager.addListener(actionListener, new String[]{"rain_trigger"});
+        inputManager.addListener(actionListener, new String[]{"Game Pause Unpause"});
+        inputManager.addListener(actionListener, new String[]{"superDebug"});
+        inputManager.addListener(actionListener, new String[]{"fpsSwitch_trigger"});
+    }
+
     public void add_mapping() {
         inputManager.addMapping("rain_trigger", rain_trigger);
-        inputManager.addListener(actionListener, new String[]{"rain_trigger"});
-
         inputManager.addMapping("fpsSwitch_trigger", fpsSwitch_trigger);
-        inputManager.addListener(actionListener, new String[]{"fpsSwitch_trigger"});
-
         inputManager.addMapping("superDebug", superDebug_trigger);
-        inputManager.addListener(actionListener, new String[]{"superDebug"});
-
         inputManager.addMapping("Game Pause Unpause", pause_trigger);
-        inputManager.addListener(actionListener, new String[]{"Game Pause Unpause"});
-
         inputManager.addMapping("record", record_trigger);
-        inputManager.addListener(actionListener, new String[]{"record"});
-
         inputManager.addMapping("restart", restart_trigger);
-        inputManager.addListener(actionListener, new String[]{"restart"});
-
         inputManager.addMapping("exit", exit_trigger);
-        inputManager.addListener(actionListener, new String[]{"exit"});
-
         inputManager.addMapping("switchStats", statsViewTrigger);
-        inputManager.addListener(actionListener, new String[]{"switchStats"});
     }
 
     public int getDisplayMode() {
@@ -379,13 +377,14 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
-                inputManager.clearMappings();
+                //inputManager.clearMappings();
                 stateManager.attach(startScreenState);
                 //app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
                 gameRunningState = null;
                 viewPort.clearProcessors();
                 switchGameState();
+                addListener();
                 add_mapping();
             }
         } else {
@@ -753,13 +752,14 @@ public class Main extends SimpleApplication implements ScreenController {
                 if (guiViewPort.getProcessors().contains(niftyDisplay)) {
                     guiViewPort.removeProcessor(niftyDisplay);
                 }
-
+                inputEnabled = false;
                 loadFuture = exec.submit(loadingCallable);
             } else {
                 if (stateManager.hasState(startScreenState)) {
                     app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                     stateManager.detach(startScreenState);
                     stateManager.attach(gameRunningState);
+
                     if (guiViewPort.getProcessors().contains(niftyDisplay)) {
                         guiViewPort.removeProcessor(niftyDisplay);
                     }
@@ -793,6 +793,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
             if (stateManager.hasState(startScreenState)) {
                 startScreenState.attachBox();
+                //inputManager.clearMappings();
                 enqueue(new Callable() {
                     @Override
                     public Object call() throws Exception {
@@ -809,6 +810,8 @@ public class Main extends SimpleApplication implements ScreenController {
                 stateManager.detach(startScreenState);
                 stateManager.attach(gameRunningState);
                 loadFuture = null;
+                add_mapping();
+                inputEnabled = true;
             }
         }
     }
@@ -875,7 +878,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
                 Platform platform = platforms.get(0);
                 availableDevices = platform.getDevices();
-                selectedPlatform = platform;
+                //selectedPlatform = platform;
 
                 Device device = platform.getDevices().get(currentDeviceIndex);
                 currentDeviceIndex++;

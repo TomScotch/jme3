@@ -79,6 +79,7 @@ public class PlayerControl extends AbstractControl {
     private boolean rotateAround = false;
     private float idleCounter = 0;
     private final JmeContext context;
+    private final float idleTimeOutValue = 90f;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -364,7 +365,7 @@ public class PlayerControl extends AbstractControl {
             camDir.y = 0;
             camLeft.y = 0;
 
-            if (idleCounter > 90f) {
+            if (idleCounter >= idleTimeOutValue) {
                 if (!rotateAround) {
                     System.out.println("start idleing");
                     makeRotateAround(true);
@@ -377,8 +378,9 @@ public class PlayerControl extends AbstractControl {
                     makeRotateAround(false);
                 }
             }
-
-            idleCounter += tpf;
+            if (idleCounter <= idleTimeOutValue) {
+                idleCounter += tpf;
+            }
 
             if (chaseEnabled) {
                 viewDirection.set(camDir);

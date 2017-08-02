@@ -9,21 +9,18 @@ import com.jme3.scene.control.AbstractControl;
 
 public class SSAO extends AbstractControl {
 
-    private float intensity = 2f;//1.2f
+    private final SSAOFilter ssaoFilter;
 
-    public float getIntensity() {
-        return intensity;
-    }
+    private float sampleRadius = 2.9299974f; // 2.9299974f;
+    private float intensity = 32.920483f; // 32.920483f;
+    private float scale = 5.8100376f; // 5.8100376f;
+    private float bias = 0.091000035f; //0.091000035f;
+    private boolean approximateNormals = true;
 
-    public void setIntensity(float intensity) {
-        this.intensity = intensity;
-    }
+    public SSAO(AssetManager assetManager, FilterPostProcessor fpp) {
 
-    public SSAO(AssetManager assetManager) {
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        SSAOFilter ssaoFilter = new SSAOFilter(5.1f, 1.2f, 0.2f, 0.1f);
-        ssaoFilter.setApproximateNormals(true);
-        ssaoFilter.setIntensity(intensity);
+        ssaoFilter = new SSAOFilter(sampleRadius, intensity, scale, bias);
+        ssaoFilter.setApproximateNormals(approximateNormals);
         fpp.addFilter(ssaoFilter);
     }
 
@@ -37,6 +34,46 @@ public class SSAO extends AbstractControl {
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations,
         //not called when spatial is culled.
+    }
+
+    public float getIntensity() {
+        return intensity;
+    }
+
+    public void setIntensity(float intensity) {
+        this.intensity = intensity;
+    }
+
+    public float getSampleRadius() {
+        return sampleRadius;
+    }
+
+    public void setSampleRadius(float sampleRadius) {
+        this.sampleRadius = sampleRadius;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
+    public float getBias() {
+        return bias;
+    }
+
+    public void setBias(float bias) {
+        this.bias = bias;
+    }
+
+    public boolean isApproximateNormals() {
+        return approximateNormals;
+    }
+
+    public void setApproximateNormals(boolean approximateNormals) {
+        this.approximateNormals = approximateNormals;
     }
 
 }

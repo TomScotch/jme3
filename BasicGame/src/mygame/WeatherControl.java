@@ -10,7 +10,6 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
@@ -69,16 +68,15 @@ public class WeatherControl extends AbstractControl {
 
     private final int maximumWeatherLength = 38;
     private final int minimumWeatherLength = 8;
-    private final Camera cam;
+
     private final AbstractHeightMap hm;
     private final AssetManager am;
     private final ParticleEmitter debrisEffect;
     private final Node localRoot;
     private final DirectionalLight sun;
 
-    public WeatherControl(AssetManager am, Node localRoot, Camera cam, AbstractHeightMap hm) {
+    public WeatherControl(AssetManager am, Node localRoot, AbstractHeightMap hm) {
 
-        this.cam = cam;
         this.hm = hm;
         this.am = am;
         this.localRoot = localRoot;
@@ -115,13 +113,13 @@ public class WeatherControl extends AbstractControl {
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/rain.png"));
         rain.setMaterial(rainMat);
-        rain.setStartSize(0.4f);
-        rain.setEndSize(0.2f);
-        rain.setGravity(0, 1750, 0);
+        rain.setStartSize(0.375f);
+        rain.setEndSize(0.275f);
+        rain.setGravity(0, 900, 0);
         rain.setEndColor(ColorRGBA.White);
-        rain.setStartColor(ColorRGBA.LightGray);
-        rain.setHighLife(2.5f);
-        rain.setLowLife(1.25f);
+        rain.setStartColor(ColorRGBA.White);
+        rain.setHighLife(1f);
+        rain.setLowLife(1f);
         rain.setInWorldSpace(true);
         rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
         rain.setParticlesPerSec(0);
@@ -156,10 +154,9 @@ public class WeatherControl extends AbstractControl {
         debrisMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/splash.png"));
         debrisEffect.setMaterial(debrisMat);
         debrisEffect.setStartSize(0.1f);
-        debrisEffect.setEndSize(0.025f);
+        debrisEffect.setEndSize(0.01f);
         debrisEffect.setEndColor(ColorRGBA.White);
-        debrisEffect.setStartColor(ColorRGBA.LightGray);
-
+        debrisEffect.setStartColor(ColorRGBA.White);
         debrisEffect.setHighLife(0.5f);
         debrisEffect.setLowLife(0.25f);
         debrisEffect.setInWorldSpace(true);
@@ -269,6 +266,7 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeLightning() {
+
         lightnungStrikes = true;
 
         switch (getRandomNumberInRange(0, 2)) {
@@ -291,13 +289,7 @@ public class WeatherControl extends AbstractControl {
                 System.out.println("lightnungStrikes_low");
                 break;
         }
-        if (lightnungStrikes_high) {
-            flashLimit = (float) getRandomNumberInRange(3, 6);
-        } else if (lightnungStrikes_med) {
-            flashLimit = (float) getRandomNumberInRange(4, 8);
-        } else if (lightnungStrikes_low) {
-            flashLimit = (float) getRandomNumberInRange(5, 10);
-        }
+        setLightningFrequency();
     }
 
     public void makeCloudy() {
@@ -390,15 +382,17 @@ public class WeatherControl extends AbstractControl {
 
                         try {
                             Vector3f position = rain.getParticles()[c].position;
-                            float trueHeightAtPoint = hm.getScaledHeightAtPoint((int) position.getX(), (int) position.getZ());
-                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint + 0.00001f, position.getZ()); //
-                            float distance = cam.getLocation().distance(position);
-                            debrisEffect.emitParticles(1);
-                            if (distance < 2) {
-                                debrisEffect.setStartSize(0f);
-                                debrisEffect.setEndSize(0.0f);
-                            }
+                            float trueHeightAtPoint = hm.getTrueHeightAtPoint((int) position.getX(), (int) position.getZ());
 
+                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint, position.getZ()); //
+                            debrisEffect.emitParticles(1);
+                            rain.killParticle(c);
+                            /*
+                            float distance = cam.getLocation().distance(position);
+                            if (distance < 0.05f) {
+                            debrisEffect.setStartSize(0f);
+                            debrisEffect.setEndSize(0.0f);
+                            }*/
                         } catch (Exception e) {
                         }
                     }
@@ -422,13 +416,7 @@ public class WeatherControl extends AbstractControl {
 
                 flashCounter += tpf;
 
-                if (lightnungStrikes_high) {
-                    flashLimit = (float) getRandomNumberInRange(3, 6);
-                } else if (lightnungStrikes_med) {
-                    flashLimit = (float) getRandomNumberInRange(4, 8);
-                } else if (lightnungStrikes_low) {
-                    flashLimit = (float) getRandomNumberInRange(5, 10);
-                }
+                setLightningFrequency();
 
                 if (flashCounter >= flashLimit) {
 
@@ -442,41 +430,41 @@ public class WeatherControl extends AbstractControl {
                         flash.emitParticles(getRandomNumberInRange(1, 1));
                     }
 
-                    for (Particle p : flash.getParticles()) {
+                    // for (Particle p : flash.getParticles()) {
+                    Particle p = flash.getParticles()[0];
+                    Node n = new Node();
+                    Spatial spat = (Spatial) n;
 
-                        Node n = new Node();
-                        Spatial spat = (Spatial) n;
+                    spat.setLocalTranslation((p.position));
+                    spat.lookAt(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
-                        spat.setLocalTranslation((p.position));
-                        spat.lookAt(Vector3f.ZERO, Vector3f.UNIT_XYZ);
+                    DirectionalLight clone = new DirectionalLight();
+                    clone.setColor(ColorRGBA.White);
+                    clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
+                    localRoot.addLight(clone);
 
-                        DirectionalLight clone = new DirectionalLight();
-                        clone.setColor(ColorRGBA.White);
-                        clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
-                        localRoot.addLight(clone);
-
-                        float lightDelay = 1;
-                        switch (getRandomNumberInRange(0, 2)) {
-                            case 0:
-                                lightDelay = 0.2f;
-                                break;
-                            case 1:
-                                lightDelay = 0.3f;
-                                break;
-                            case 2:
-                                lightDelay = 0.4f;
-                                break;
-                        }
-
-                        flash.addControl(new TimedActionControl(lightDelay) {
-
-                            @Override
-                            void action() {
-
-                                localRoot.removeLight(clone);
-                            }
-                        });
+                    float lightDelay = 1;
+                    switch (getRandomNumberInRange(0, 2)) {
+                        case 0:
+                            lightDelay = 0.25f; 
+                            break;
+                        case 1:
+                            lightDelay = 0.3f;
+                            break;
+                        case 2:
+                            lightDelay = 0.35f;
+                            break;
                     }
+
+                    flash.addControl(new TimedActionControl(lightDelay) {
+
+                        @Override
+                        void action() {
+
+                            localRoot.removeLight(clone);
+                        }
+                    });
+                    //}
 
                 }
 
@@ -543,6 +531,16 @@ public class WeatherControl extends AbstractControl {
                     }
                 }
             }
+        }
+    }
+
+    private void setLightningFrequency() {
+        if (lightnungStrikes_high) {
+            flashLimit = (float) getRandomNumberInRange(4, 8);
+        } else if (lightnungStrikes_med) {
+            flashLimit = (float) getRandomNumberInRange(6, 12);
+        } else if (lightnungStrikes_low) {
+            flashLimit = (float) getRandomNumberInRange(8, 16);
         }
     }
 
