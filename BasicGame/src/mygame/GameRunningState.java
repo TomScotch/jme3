@@ -227,15 +227,17 @@ public class GameRunningState extends AbstractAppState {
 
         limit = getRandomNumberInRange(15, 45);
 
-        addListener();
-        setupKeys();
     }
 
-    private void addListener() {
+    public void addListener() {
         inputManager.addListener(actionListener, "write");
         inputManager.addListener(actionListener, "treeoutroot");
         inputManager.addListener(actionListener, "debug");
         inputManager.addListener(actionListener, "switchCam");
+    }
+
+    public void removeListener() {
+        inputManager.removeListener(actionListener);
     }
 
     public final void attachBird() {
@@ -509,12 +511,16 @@ public class GameRunningState extends AbstractAppState {
         }
         attachLocalGuiNode();
         attachLocalRootNode();
+        addListener();
+        setupKeys();
+        playerControl.setupListener();
+        playerControl.setupMappings();
     }
 
     @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
-        //inputManager.clearMappings();
+
         stateDetach();
         setIsRunning(false);
     }
@@ -524,6 +530,10 @@ public class GameRunningState extends AbstractAppState {
         amb.stop();
         amb1.stop();
         amb2.stop();
+
+        removeMappings();
+        playerControl.removeMappings();
+        playerControl.removeListeners();
 
         view2.setEnabled(false);
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
@@ -550,6 +560,13 @@ public class GameRunningState extends AbstractAppState {
 
         dettachLocalRootNode();
         detachLocalGuiNode();
+    }
+
+    private void removeMappings() {
+        inputManager.deleteMapping("write");
+        inputManager.deleteMapping("treeoutroot");
+        inputManager.deleteMapping("debug");
+        inputManager.deleteMapping("debug");
     }
 
     public boolean getIsRunning() {

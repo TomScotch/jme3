@@ -55,6 +55,8 @@ public class Main extends SimpleApplication implements ScreenController {
 
     private static AppSettings cfg;
     private static Main app;
+    private static final boolean opencl = false;
+    private static final boolean openAl = true;
 
     private VideoRecorderAppState videoRecorderAppState;
     private static DisplayMode[] modes;
@@ -88,7 +90,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private static boolean showFps = false;
     private boolean displayStatView = false;
     private boolean wireframe = false;
-    //private static Platform selectedPlatform;
+    private static Platform selectedPlatform;
     private Node settingsNode;
 
     private static final Object sync = new Object();
@@ -246,18 +248,25 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setFullscreen(device.isFullScreenSupported());
         cfg.setVSync(false);
         cfg.setSamples(0);
-        app.setDisplayFps(showFps);
-        app.setDisplayStatView(false);
-        //cfg.setOpenCLSupport(true);
-        //cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
-        //
-        cfg.load(cfg.getTitle());
-        //
-        cfg.setDepthBits(modes[0].getBitDepth());
+        cfg.setDepthBits(-1);
         cfg.setGammaCorrection(true);
         cfg.setFrameRate(60);
         cfg.setFrequency(cfg.getFrameRate());
+        app.setDisplayFps(showFps);
+        app.setDisplayStatView(false);
 
+        cfg.load(cfg.getTitle());
+
+        if (openAl) {
+            cfg.setAudioRenderer(AppSettings.LWJGL_OPENAL);
+        }
+
+        if (opencl) {
+            cfg.setOpenCLSupport(true);
+            cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
+        }
+
+        //
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
 
@@ -377,19 +386,13 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
-                //inputManager.clearMappings();
                 stateManager.attach(startScreenState);
-                //app.getStateManager().detach(gameRunningState.getBulletAppState());
+                app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
                 gameRunningState = null;
                 viewPort.clearProcessors();
                 switchGameState();
-                addListener();
-                add_mapping();
             }
-        } else {
-            app.getContext().restart();
-            app.restart();
         }
     }
 
@@ -878,7 +881,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
                 Platform platform = platforms.get(0);
                 availableDevices = platform.getDevices();
-                //selectedPlatform = platform;
+                selectedPlatform = platform;
 
                 Device device = platform.getDevices().get(currentDeviceIndex);
                 currentDeviceIndex++;

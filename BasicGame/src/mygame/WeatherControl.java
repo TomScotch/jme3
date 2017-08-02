@@ -25,7 +25,6 @@ public class WeatherControl extends AbstractControl {
     private final ParticleEmitter flash;
     private final ParticleEmitter clouds;
 
-    //private boolean suny = false;
     private boolean misty = false;
     private boolean clouded = false;
     private boolean raining = false;
@@ -173,10 +172,8 @@ public class WeatherControl extends AbstractControl {
 
     public final void startRandomWeather() {
 
-        misty = false;
-
-        switch (getRandomNumberInRange(0, 8)) {
-            case 8:
+        switch (getRandomNumberInRange(0, 6)) {
+            case 5:
                 makeMisty();
                 break;
         }
@@ -234,7 +231,6 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeRain() {
-        misty = false;
         raining = true;
         makeCloudy();
         switch (getRandomNumberInRange(0, 2)) {
@@ -293,7 +289,6 @@ public class WeatherControl extends AbstractControl {
     }
 
     public void makeCloudy() {
-        misty = false;
         clouded = true;
         switch (getRandomNumberInRange(0, 1)) {
             case 0:
@@ -446,7 +441,7 @@ public class WeatherControl extends AbstractControl {
                     float lightDelay = 1;
                     switch (getRandomNumberInRange(0, 2)) {
                         case 0:
-                            lightDelay = 0.25f; 
+                            lightDelay = 0.25f;
                             break;
                         case 1:
                             lightDelay = 0.3f;
@@ -496,7 +491,7 @@ public class WeatherControl extends AbstractControl {
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity) {
-                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf);
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + (tpf * 6));
                             }
                         } else if (misty_med) {
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.5) {
@@ -504,7 +499,7 @@ public class WeatherControl extends AbstractControl {
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5) {
-                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf);
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + (tpf * 4));
                             }
                         } else if (misty_low) {
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.75) {
@@ -512,23 +507,23 @@ public class WeatherControl extends AbstractControl {
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.75) {
-                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf);
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + (tpf * 2));
                             }
                         }
                     }
-                } else {
+                }
+            } else {
 
-                    misty_low = false;
-                    misty_med = false;
-                    misty_high = false;
+                misty_low = false;
+                misty_med = false;
+                misty_high = false;
 
-                    if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != 1000) {
-                        spatial.getControl(FogPostFilter.class).setFogDistance(1000);//spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - (tpf * 20)
-                    }
+                if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
+                    spatial.getControl(FogPostFilter.class).getFog().setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - (tpf * fogDistance));
+                }
 
-                    if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
-                        spatial.getControl(FogPostFilter.class).setFogDensity(0);//spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - (tpf * 20)
-                    }
+                if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
+                    spatial.getControl(FogPostFilter.class).getFog().setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - (tpf * fogDensity));
                 }
             }
         }

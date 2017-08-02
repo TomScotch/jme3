@@ -66,10 +66,11 @@ public class PlayerControl extends AbstractControl {
     private final Node characterNode;
     boolean rotate = false;
     private final ChaseCamera chaseCam;
-    private final float flashLightStrength = 1.25f;
-    private final float flashLightSpotRange = 33;
-    private final int outerLamp = 30;
-    private final int innerLamp = 15;
+    private final float flashLightStrength = 1.5f;
+    private final float flashLightSpotRange = 25;
+    private final float outerLamp = 15 * FastMath.PI;
+    private final float innerLamp = 15 * FastMath.HALF_PI;
+    private final ColorRGBA flashLightColor = ColorRGBA.Orange.mult(flashLightStrength).addLocal(ColorRGBA.LightGray);
 
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
@@ -112,10 +113,10 @@ public class PlayerControl extends AbstractControl {
         camNode.setLocalTranslation(new Vector3f(0, 4.4f, 0)); //-18f
         camNode.setEnabled(false);
         lamp = new SpotLight();
-        lamp.setSpotRange(flashLightSpotRange);
+        lamp.setSpotRange(flashLightSpotRange * flashLightStrength);
         lamp.setSpotInnerAngle(innerLamp * FastMath.DEG_TO_RAD);
         lamp.setSpotOuterAngle(outerLamp * FastMath.DEG_TO_RAD);
-        lamp.setColor(ColorRGBA.Orange.mult(flashLightStrength));
+        lamp.setColor(flashLightColor);
         lamp.setFrustumCheckNeeded(true);
         lamp.setIntersectsFrustum(true);
         lamp.setEnabled(false);
@@ -146,7 +147,7 @@ public class PlayerControl extends AbstractControl {
         doAnim("player", "Idle", LoopMode.Loop);
         characterNode.setQueueBucket(RenderQueue.Bucket.Opaque);
 
-        setupKeys();
+
 
         if (aniCon.getClass() == null) {
             aniCon.createChannel();
@@ -284,8 +285,35 @@ public class PlayerControl extends AbstractControl {
         characterNode.addControl(chaseCam);
     }
 
-    private void setupKeys() {
+    public void setupListener() {
+        inputManager.addListener(actionListener, "leftRotate", "rightRotate");
+        inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
+        inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
+        inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
+        inputManager.addListener(actionListener, "chase");
+        inputManager.addListener(actionListener, "changeFPS");
+        inputManager.addListener(actionListener, "Jump", "Shoot", "flashlight");
+    }
 
+    public void removeListeners() {
+        inputManager.removeListener(actionListener);
+    }
+
+    public void removeMappings() {
+        inputManager.deleteMapping("flashlight");
+        inputManager.deleteMapping("leftRotate");
+        inputManager.deleteMapping("rightRotate");
+        inputManager.deleteMapping("Strafe Left");
+        inputManager.deleteMapping("Strafe Right");
+        inputManager.deleteMapping("chase");
+        inputManager.deleteMapping("Walk Forward");
+        inputManager.deleteMapping("Walk Backward");
+        inputManager.deleteMapping("Jump");
+        inputManager.deleteMapping("Shoot");
+        inputManager.deleteMapping("changeFPS");
+    }
+
+    public void setupMappings() {
         inputManager.addMapping("flashlight",
                 new KeyTrigger(KeyInput.KEY_F));
         inputManager.addMapping("leftRotate",
@@ -308,15 +336,6 @@ public class PlayerControl extends AbstractControl {
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("changeFPS",
                 new KeyTrigger(KeyInput.KEY_T));
-
-        inputManager.addListener(actionListener, "leftRotate", "rightRotate");
-        inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
-        inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
-        inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
-        inputManager.addListener(actionListener, "chase");
-        inputManager.addListener(actionListener, "changeFPS");
-        inputManager.addListener(actionListener, "Jump", "Shoot", "flashlight");
-
     }
 
     public void makeRotateAround(Boolean bol) {
