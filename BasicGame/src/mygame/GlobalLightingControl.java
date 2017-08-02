@@ -49,7 +49,7 @@ public class GlobalLightingControl extends AbstractControl {
     private final Geometry sphereGeo;
     private final SpotLightShadowRenderer slsr;
     private final DirectionalLightShadowRenderer dlsr;
-    private final int shadowmapSize = 512;
+    private final int shadowmapSize = 1024;
     private boolean globalLightning = true;
 
     private boolean morning = true;
@@ -122,7 +122,7 @@ public class GlobalLightingControl extends AbstractControl {
         }
 
         //Directional Light Shadow Renderer
-        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 1);
+        dlsr = new DirectionalLightShadowRenderer(assetManager, shadowmapSize, 2);
         dlsr.setLight(sun);
         dlsr.setShadowCompareMode(CompareMode.Hardware);
         dlsr.setShadowIntensity(0.30f);
