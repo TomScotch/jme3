@@ -44,10 +44,10 @@ public class GameRunningState extends AbstractAppState {
     private final ViewPort view2;
 
     private final ViewPort viewPort;
-    private final Node rootNode;
+    private Node rootNode;
     private final Node guiNode;
     private final AssetManager assetManager;
-    private final Node localRootNode = new Node("Game Screen RootNode");
+    private Node localRootNode = new Node("Game Screen RootNode");
     private final Node localGuiNode = new Node("Game Screen GuiNode");
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
@@ -262,7 +262,9 @@ public class GameRunningState extends AbstractAppState {
     public Node getLocalRoot() {
         return localRootNode;
     }
-
+    public void setLocalRoot(Node n) {
+        this.localRootNode = n;
+    }
     public void switchSecondView() {
 
         view2.setEnabled(!view2.isEnabled());
@@ -536,6 +538,7 @@ public class GameRunningState extends AbstractAppState {
         amb2.stop();
 
         removeMappings();
+        removeListener();
         playerControl.removeMappings();
         playerControl.removeListeners();
 

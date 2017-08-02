@@ -386,11 +386,15 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
+                inputEnabled = false;
+                viewPort.detachScene(gameRunningState.getLocalRoot());
+                rootNode.detachAllChildren();
                 stateManager.attach(startScreenState);
                 app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
+                viewPort.clearProcessors();
                 gameRunningState = null;
-                //app.restart();
+                app.restart();
                 switchGameState();
             }
         }
@@ -755,11 +759,11 @@ public class Main extends SimpleApplication implements ScreenController {
                 if (guiViewPort.getProcessors().contains(niftyDisplay)) {
                     guiViewPort.removeProcessor(niftyDisplay);
                 }
-                inputEnabled = false;
+
                 loadFuture = exec.submit(loadingCallable);
             } else {
                 if (stateManager.hasState(startScreenState)) {
-                    app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
+
                     stateManager.detach(startScreenState);
                     stateManager.attach(gameRunningState);
 
@@ -767,6 +771,8 @@ public class Main extends SimpleApplication implements ScreenController {
                         guiViewPort.removeProcessor(niftyDisplay);
                     }
                     System.out.println("switching to game...");
+
+//                    app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                 }
             }
         }
