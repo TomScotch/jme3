@@ -44,7 +44,7 @@ public class GameRunningState extends AbstractAppState {
     private final ViewPort view2;
 
     private final ViewPort viewPort;
-    private Node rootNode;
+    private final Node rootNode;
     private final Node guiNode;
     private final AssetManager assetManager;
     private Node localRootNode = new Node("Game Screen RootNode");
@@ -58,7 +58,7 @@ public class GameRunningState extends AbstractAppState {
     private boolean bgmOn = false;
     private int bgmVolume = 8;
     private int anisotrpy_samples = 4;
-    private final GlobalLightingControl glc;
+    private GlobalLightingControl glc;
 
     private boolean bloomEnabled;
     private boolean fogEnabled;
@@ -262,9 +262,11 @@ public class GameRunningState extends AbstractAppState {
     public Node getLocalRoot() {
         return localRootNode;
     }
+
     public void setLocalRoot(Node n) {
         this.localRootNode = n;
     }
+
     public void switchSecondView() {
 
         view2.setEnabled(!view2.isEnabled());
@@ -521,6 +523,12 @@ public class GameRunningState extends AbstractAppState {
         setupKeys();
         playerControl.setupListener();
         playerControl.setupMappings();
+    }
+
+    @Override
+    public void cleanup() {
+        super.cleanup();
+        glc = null;
     }
 
     @Override

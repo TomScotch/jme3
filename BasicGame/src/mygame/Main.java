@@ -70,9 +70,9 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger fpsSwitch_trigger = new KeyTrigger(KeyInput.KEY_F2);
     private final Trigger statsViewTrigger = new KeyTrigger(KeyInput.KEY_F3);
 
-    private GameRunningState gameRunningState;
-    private StartScreenState startScreenState;
-    private SettingsScreenState settingsScreenState;
+    private static GameRunningState gameRunningState;
+    private static StartScreenState startScreenState;
+    private static SettingsScreenState settingsScreenState;
 
     private Future loadFuture = null;
     private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
@@ -387,12 +387,12 @@ public class Main extends SimpleApplication implements ScreenController {
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
                 inputEnabled = false;
-                viewPort.detachScene(gameRunningState.getLocalRoot());
                 rootNode.detachAllChildren();
                 stateManager.attach(startScreenState);
                 app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
                 viewPort.clearProcessors();
+                gameRunningState.cleanup();
                 gameRunningState = null;
                 app.restart();
                 switchGameState();

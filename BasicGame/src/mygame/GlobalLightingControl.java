@@ -175,7 +175,7 @@ public class GlobalLightingControl extends AbstractControl {
                 if (y > -(sunSize / 1.1f) && z < -222) {
                     //morning
                     if (isSun) {
-                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) / 4);/// 0.0005f
+                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
                     }
                     morning = true;
                     day = false;
