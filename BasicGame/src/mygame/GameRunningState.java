@@ -251,10 +251,10 @@ public class GameRunningState extends AbstractAppState {
         localGuiNode.attachChild(hudText);
 
         hudText2 = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
-        hudText2.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 1.75f);      // font size
+        hudText2.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 2.25f);      // font size
         hudText2.setColor(ColorRGBA.Red);
         hudText2.setText("... : ...         ");
-        hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - hudText.getLineWidth(), hudText.getLineHeight(), 0); // position
+        hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - hudText.getLineWidth(), hudText.getLineHeight() * 3, 0); // position
         // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
 
@@ -427,17 +427,11 @@ public class GameRunningState extends AbstractAppState {
 
                 case "timeDemo":
                     if (value && isRunning) {
-
-                        isTimeDemo = !isTimeDemo;
-
-                        if (isTimeDemo) {
+                        if (!isTimeDemo) {
+                            isTimeDemo = true;
                             System.out.println("Running Timedemo");
                             fps = new ArrayList<>();
                             hudText2.setText("... : ...         ");
-                            //        hudText2.setAlpha(1);
-
-                        } else {
-                            System.out.println("Stopped Timedemo");
                         }
                     }
                     break;
@@ -525,6 +519,7 @@ public class GameRunningState extends AbstractAppState {
                     hudText2.setText(" collecting data : tablesize = " + fps.size() + " of 500");
                     fps.add(1 / tpf);
                 } else {
+                    isTimeDemo = false;
                     for (int i = 1; i < fps.size(); i++) {
                         for (int j = 0; j < fps.size(); j++) {
                             if (fps.get(j) < fps.get(i)) {
@@ -536,6 +531,18 @@ public class GameRunningState extends AbstractAppState {
                     }
                     minMaxFps = new Vector2f(fps.get(fps.size() - 1), fps.get(0));
                     hudText2.setText("min :   " + minMaxFps.getX() + " max : " + minMaxFps.getY() + " - FPS ");
+                    System.out.println("finished Timedemo");
+                    System.out.println(hudText2.getText());
+                    hudText2.addControl(new TimedActionControl(15) {
+                        @Override
+                        void action() {
+                            if (isTimeDemo == false) {
+                                if (fps.size() >= 500) {
+                                    hudText2.setText("... : ...         ");
+                                }
+                            }
+                        }
+                    });
                 }
             }
 
