@@ -39,7 +39,7 @@ public class GlobalLightingControl extends AbstractControl {
     }
 
     private final Node pivot = new Node();
-    private int timeDelay = 24;// INSTANE=24  to REALISTIC = 8192  
+    private int timeDelay = 32;// INSTANE=32  to REALISTIC = 8192  
     private boolean isSun = true;
     private final SpotLight sl;
     private final DirectionalLight sun;

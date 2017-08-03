@@ -11,10 +11,12 @@ import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
+import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -75,6 +77,7 @@ public class GameRunningState extends AbstractAppState {
     private float limit = 0;
     private final DepthOfField dof;
     //private final SSAO ssao;
+    private BitmapText hudText;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -229,11 +232,23 @@ public class GameRunningState extends AbstractAppState {
 
     }
 
+    private void setupHudText() {
+        hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
+        hudText.setText("delay : ");
+        hudText.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 2);      // font size
+        hudText.setColor(ColorRGBA.White);
+        hudText.setLocalTranslation(hudText.getLineWidth(), hudText.getLineHeight(), 0); // position
+        hudText.setAlpha(-1);
+        guiNode.attachChild(hudText);
+    }
+
     public void addListener() {
         inputManager.addListener(actionListener, "write");
         inputManager.addListener(actionListener, "treeoutroot");
         inputManager.addListener(actionListener, "debug");
         inputManager.addListener(actionListener, "switchCam");
+        inputManager.addListener(actionListener, "delayUp");
+        inputManager.addListener(actionListener, "delayDown");
     }
 
     public void removeListener() {
@@ -313,6 +328,12 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void setupKeys() {
+
+        inputManager.addMapping("delayUp",
+                new KeyTrigger(KeyInput.KEY_UP));
+
+        inputManager.addMapping("delayDown",
+                new KeyTrigger(KeyInput.KEY_DOWN));
 
         inputManager.addMapping("write",
                 new KeyTrigger(KeyInput.KEY_F9));
@@ -405,6 +426,31 @@ public class GameRunningState extends AbstractAppState {
                         getBulletAppState().setDebugEnabled(!bulletAppState.isDebugEnabled());
                     }
                     break;
+
+                case "delayUp":
+                    if (value && isRunning) {
+
+                        glc.setTimeDelay((int) glc.getTimeDelay() * 2);
+                        hudText.setText("delay : " + glc.getTimeDelay());
+                        if (glc.getTimeDelay() > 8192) {
+                            glc.setTimeDelay(8192);
+                        }
+                        hudText.setAlpha(-1);
+
+                    }
+                    break;
+                case "delayDown":
+                    if (value && isRunning) {
+
+                        glc.setTimeDelay((int) glc.getTimeDelay() / 2);
+                        hudText.setText("delay : " + glc.getTimeDelay());
+                        if (glc.getTimeDelay() < 8) {
+                            glc.setTimeDelay(8);
+                        }
+                        hudText.setAlpha(-1);
+
+                    }
+                    break;
             }
 
         }
@@ -434,6 +480,10 @@ public class GameRunningState extends AbstractAppState {
         if (isRunning) {
 
             super.update(tpf);
+
+            if (hudText.getAlpha() < 0) {
+                hudText.setAlpha(hudText.getAlpha() + (tpf * tpf));
+            }
 
             if (globalLightningEnabled) {
                 if (view2.isEnabled()) {
@@ -490,21 +540,22 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateAttach() {
+        setupHudText();
         playerControl.setEnabled(true);
-
         sc.setEnabled(true);
-        glc.setEnabled(true);
         weatherControl.setEnabled(true);
+
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
         localRootNode.getControl(PosterizationFilterControl.class).setStrength(1.75f);
 
-        if (!viewPort.getProcessors().contains(glc.getDlsr())) {
-            viewPort.addProcessor(glc.getDlsr());
-        }
+        glc.setEnabled(true);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
                 viewPort.addProcessor(glc.getSlsr());
+            }
+            if (!viewPort.getProcessors().contains(glc.getDlsr())) {
+                viewPort.addProcessor(glc.getDlsr());
             }
         }
 
@@ -517,6 +568,7 @@ public class GameRunningState extends AbstractAppState {
                 viewPort.addProcessor((SimpleWaterProcessor) localRootNode.getControl(simpleWaterControl.class).getWaterProcessor());
             }
         }
+
         attachLocalGuiNode();
         attachLocalRootNode();
         addListener();
@@ -526,17 +578,10 @@ public class GameRunningState extends AbstractAppState {
     }
 
     @Override
-    public void cleanup() {
-        super.cleanup();
-        glc = null;
-    }
-
-    @Override
     public void stateDetached(AppStateManager stateManager) {
         System.out.println("Game State is being detached");
-
-        stateDetach();
         setIsRunning(false);
+        stateDetach();
     }
 
     public void stateDetach() {
@@ -544,6 +589,7 @@ public class GameRunningState extends AbstractAppState {
         amb.stop();
         amb1.stop();
         amb2.stop();
+        hudText.removeFromParent();
 
         removeMappings();
         removeListener();
@@ -553,9 +599,14 @@ public class GameRunningState extends AbstractAppState {
         view2.setEnabled(false);
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
         playerControl.setEnabled(false);
+
         sc.setEnabled(false);
         glc.setEnabled(false);
-        weatherControl.setEnabled(false);
+
+        if (weatherControl != null) {
+            weatherControl.setEnabled(false);
+        }
+
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
         }
@@ -563,11 +614,8 @@ public class GameRunningState extends AbstractAppState {
         if (viewPort.getProcessors().contains(glc.getDlsr())) {
             viewPort.removeProcessor(glc.getDlsr());
         }
-
-        if (shadows) {
-            if (viewPort.getProcessors().contains(glc.getSlsr())) {
-                viewPort.removeProcessor(glc.getSlsr());
-            }
+        if (viewPort.getProcessors().contains(glc.getSlsr())) {
+            viewPort.removeProcessor(glc.getSlsr());
         }
 
         if (!waterPostProcessing) {
