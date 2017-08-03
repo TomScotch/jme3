@@ -28,12 +28,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
 import com.jme3.water.SimpleWaterProcessor;
-import java.awt.DisplayMode;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -436,6 +433,7 @@ public class GameRunningState extends AbstractAppState {
                         if (isTimeDemo) {
                             System.out.println("Running Timedemo");
                             fps = new ArrayList<>();
+                            hudText2.setText("... : ...         ");
                             //        hudText2.setAlpha(1);
 
                         } else {
@@ -539,7 +537,6 @@ public class GameRunningState extends AbstractAppState {
                     minMaxFps = new Vector2f(fps.get(fps.size() - 1), fps.get(0));
                     hudText2.setText("min :   " + minMaxFps.getX() + " max : " + minMaxFps.getY() + " - FPS ");
                 }
-
             }
 
             if (hudText.getAlpha() >= -2 && hudText.getAlpha() <= 2) {
@@ -601,6 +598,7 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateAttach() {
         setupHudText();
+        hudText2.setText("... : ...         ");
         glc.setEnabled(true);
         playerControl.setEnabled(true);
         sc.setEnabled(true);
@@ -645,11 +643,14 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
+        hudText.removeFromParent();
+        hudText2.removeFromParent();
+
+        hudText2.setText("... : ...         ");
 
         amb.stop();
         amb1.stop();
         amb2.stop();
-        hudText.removeFromParent();
 
         removeMappings();
         removeListener();
