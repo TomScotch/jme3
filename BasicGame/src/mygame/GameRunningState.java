@@ -18,6 +18,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Camera;
@@ -27,8 +28,13 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
 import com.jme3.water.SimpleWaterProcessor;
+import java.awt.DisplayMode;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
@@ -78,6 +84,10 @@ public class GameRunningState extends AbstractAppState {
     private final DepthOfField dof;
     //private final SSAO ssao;
     private BitmapText hudText;
+    private boolean isTimeDemo = false;
+    private List<Float> fps;
+    private BitmapText hudText2;
+    private Vector2f minMaxFps;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -98,6 +108,8 @@ public class GameRunningState extends AbstractAppState {
         this.guiNode = app.getGuiNode();
         this.assetManager = app.getAssetManager();
         this.inputManager = app.getInputManager();
+
+        fps = new ArrayList<>();
 
         fpp = new FilterPostProcessor(assetManager);
 
@@ -206,7 +218,7 @@ public class GameRunningState extends AbstractAppState {
 
         view2 = app.getRenderManager().createMainView("Bottom Left", cam2);
         view2.setClearFlags(true, true, true);
-        view2.attachScene(localRootNode);
+        //view2.attachScene(localRootNode);
         view2.setEnabled(false);
 
         //Audio
@@ -234,12 +246,21 @@ public class GameRunningState extends AbstractAppState {
 
     private void setupHudText() {
         hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
-        hudText.setText("delay : ");
-        hudText.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 2);      // font size
-        hudText.setColor(ColorRGBA.White);
-        hudText.setLocalTranslation(hudText.getLineWidth(), hudText.getLineHeight(), 0); // position
-        hudText.setAlpha(-1);
-        guiNode.attachChild(hudText);
+        hudText.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 1.75f);      // font size
+        hudText.setColor(ColorRGBA.Blue);
+        hudText.setText("          ");
+        hudText.setLocalTranslation(hudText.getLineWidth() * 2.5f, hudText.getLineHeight(), 0); // position
+        hudText.setAlpha(-2);
+        localGuiNode.attachChild(hudText);
+
+        hudText2 = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
+        hudText2.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 1.75f);      // font size
+        hudText2.setColor(ColorRGBA.Red);
+        hudText2.setText("... : ...         ");
+        hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - hudText.getLineWidth(), hudText.getLineHeight(), 0); // position
+        // hudText2.setAlpha(-2);
+        localGuiNode.attachChild(hudText2);
+
     }
 
     public void addListener() {
@@ -249,6 +270,7 @@ public class GameRunningState extends AbstractAppState {
         inputManager.addListener(actionListener, "switchCam");
         inputManager.addListener(actionListener, "delayUp");
         inputManager.addListener(actionListener, "delayDown");
+        inputManager.addListener(actionListener, "timeDemo");
     }
 
     public void removeListener() {
@@ -329,6 +351,9 @@ public class GameRunningState extends AbstractAppState {
 
     private void setupKeys() {
 
+        inputManager.addMapping("switchCam",
+                new KeyTrigger(KeyInput.KEY_P));
+
         inputManager.addMapping("delayUp",
                 new KeyTrigger(KeyInput.KEY_UP));
 
@@ -344,8 +369,8 @@ public class GameRunningState extends AbstractAppState {
         inputManager.addMapping("debug",
                 new KeyTrigger(KeyInput.KEY_Q));
 
-        inputManager.addMapping("switchCam",
-                new KeyTrigger(KeyInput.KEY_P));
+        inputManager.addMapping("timeDemo",
+                new KeyTrigger(KeyInput.KEY_F10));
 
     }
 
@@ -403,6 +428,22 @@ public class GameRunningState extends AbstractAppState {
 
             switch (binding) {
 
+                case "timeDemo":
+                    if (value && isRunning) {
+
+                        isTimeDemo = !isTimeDemo;
+
+                        if (isTimeDemo) {
+                            System.out.println("Running Timedemo");
+                            fps = new ArrayList<>();
+                            //        hudText2.setAlpha(1);
+
+                        } else {
+                            System.out.println("Stopped Timedemo");
+                        }
+                    }
+                    break;
+
                 case "write":
                     if (value && isRunning) {
                         write(localRootNode, "localRootNode");
@@ -432,10 +473,10 @@ public class GameRunningState extends AbstractAppState {
 
                         glc.setTimeDelay((int) glc.getTimeDelay() * 2);
                         hudText.setText("delay : " + glc.getTimeDelay());
-                        if (glc.getTimeDelay() > 8192) {
-                            glc.setTimeDelay(8192);
+                        if (glc.getTimeDelay() >= 65536) {
+                            glc.setTimeDelay(65536);
                         }
-                        hudText.setAlpha(-1);
+                        hudText.setAlpha(1);
 
                     }
                     break;
@@ -444,10 +485,10 @@ public class GameRunningState extends AbstractAppState {
 
                         glc.setTimeDelay((int) glc.getTimeDelay() / 2);
                         hudText.setText("delay : " + glc.getTimeDelay());
-                        if (glc.getTimeDelay() < 8) {
+                        if (glc.getTimeDelay() <= 4) {
                             glc.setTimeDelay(8);
                         }
-                        hudText.setAlpha(-1);
+                        hudText.setAlpha(1);
 
                     }
                     break;
@@ -481,10 +522,29 @@ public class GameRunningState extends AbstractAppState {
 
             super.update(tpf);
 
-            if (hudText.getAlpha() < 0) {
-                hudText.setAlpha(hudText.getAlpha() + (tpf * tpf));
+            if (isTimeDemo) {
+                if (fps.size() < 500) {
+                    hudText2.setText(" collecting data : tablesize = " + fps.size() + " of 500");
+                    fps.add(1 / tpf);
+                } else {
+                    for (int i = 1; i < fps.size(); i++) {
+                        for (int j = 0; j < fps.size(); j++) {
+                            if (fps.get(j) < fps.get(i)) {
+                                Float temp = fps.get(i);
+                                fps.set(i, fps.get(j));
+                                fps.set(j, temp);
+                            }
+                        }
+                    }
+                    minMaxFps = new Vector2f(fps.get(fps.size() - 1), fps.get(0));
+                    hudText2.setText("min :   " + minMaxFps.getX() + " max : " + minMaxFps.getY() + " - FPS ");
+                }
+
             }
 
+            if (hudText.getAlpha() >= -2 && hudText.getAlpha() <= 2) {
+                hudText.setAlpha(hudText.getAlpha() + (1 / tpf));
+            }
             if (globalLightningEnabled) {
                 if (view2.isEnabled()) {
                     cam2.setLocation(glc.getSunPosition());
@@ -541,14 +601,12 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateAttach() {
         setupHudText();
+        glc.setEnabled(true);
         playerControl.setEnabled(true);
         sc.setEnabled(true);
         weatherControl.setEnabled(true);
-
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
         localRootNode.getControl(PosterizationFilterControl.class).setStrength(1.75f);
-
-        glc.setEnabled(true);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
@@ -575,6 +633,8 @@ public class GameRunningState extends AbstractAppState {
         setupKeys();
         playerControl.setupListener();
         playerControl.setupMappings();
+        view2.attachScene(localRootNode);
+
     }
 
     @Override
@@ -597,6 +657,7 @@ public class GameRunningState extends AbstractAppState {
         playerControl.removeListeners();
 
         view2.setEnabled(false);
+        view2.detachScene(localRootNode);
         localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
         playerControl.setEnabled(false);
 

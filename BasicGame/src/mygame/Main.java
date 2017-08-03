@@ -386,6 +386,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
+                
                 inputEnabled = false;
                 rootNode.detachAllChildren();
                 stateManager.attach(startScreenState);
