@@ -62,7 +62,7 @@ public class GameRunningState extends AbstractAppState {
 
     private boolean bgmOn = false;
     private int bgmVolume = 8;
-    private int anisotrpy_samples = 4;
+    private int anisotrpy_samples = 16;
     private GlobalLightingControl glc;
 
     private boolean bloomEnabled;
