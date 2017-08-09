@@ -1,0 +1,34 @@
+
+
+
+MaterialDef Gradient {
+
+
+
+MaterialParameters {
+
+
+
+}
+
+
+
+Technique {
+
+VertexShader GLSL100: Materials/Gradient.vert
+
+FragmentShader GLSL100: Materials/Gradient.frag
+
+
+
+WorldParameters {
+
+WorldViewProjectionMatrix
+
+}
+
+}
+
+
+
+}

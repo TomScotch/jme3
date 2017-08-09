@@ -814,7 +814,7 @@ public class Main extends SimpleApplication implements ScreenController {
             }
 
             if (gameRunningState != null) {
-                app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
+              //  app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                 startScreenState.detachBox();
                 stateManager.detach(startScreenState);
                 stateManager.attach(gameRunningState);
