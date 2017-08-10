@@ -7,10 +7,12 @@ import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoader;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.export.binary.BinaryImporter;
+import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.Trigger;
+import com.jme3.math.ColorRGBA;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -69,7 +71,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger superDebug_trigger = new KeyTrigger(KeyInput.KEY_F1);
     private final Trigger fpsSwitch_trigger = new KeyTrigger(KeyInput.KEY_F2);
     private final Trigger statsViewTrigger = new KeyTrigger(KeyInput.KEY_F3);
-
+    private final Trigger helpTrigger = new KeyTrigger(KeyInput.KEY_H);
     private static GameRunningState gameRunningState;
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
@@ -96,6 +98,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private static final Object sync = new Object();
     private static List<? extends Device> availableDevices;
     private static int currentDeviceIndex;
+    private BitmapText helloText;
 
     public void switchShadows() {
         shadows = !shadows;
@@ -294,6 +297,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
         super.stop();
     }
+    protected String s;
 
     @Override
     public void simpleInitApp() {
@@ -333,16 +337,50 @@ public class Main extends SimpleApplication implements ScreenController {
 
         stateManager.attach(startScreenState);
 
-        addListener();
-        add_mapping();
-
         niftyDisplay = new NiftyJmeDisplay(
                 assetManager, app.getInputManager(), app.getAudioRenderer(), app.getGuiViewPort());
         nifty = niftyDisplay.getNifty();
 
         app.getGuiViewPort().addProcessor(niftyDisplay);
 
+        s
+                = "F1          - Super Vision\n"
+                + "F2          - show FPS\n"
+                + "F3          - show Statistics\n"
+                + "F6          - Record Video\n"
+                + "F10         - Timedemo \n"
+                + "F11         - Restart\n"
+                + "F12         - Quit\n"
+                + "Q           - Debug Vision\n"
+                + "Up          - Speed up Time\n"
+                + "Down        - Speed down Time\n"
+                + "W           - forward\n"
+                + "a           - strafe left\n"
+                + "d           - strafe right \n"
+                + "s           - backwards\n"
+                + "space       - jump\n"
+                + "r           - change weather randomly\n"
+                + "f           - flashlight\n"
+                + "e           - switch to rotation mode\n"
+                + "t           - disable fps restriction 30 / 60\n"
+                + "o           - print nodes in rootnode to terminal\n"
+                + "p           - open second viewport - ie the sun\n"
+                + "back        - open menu\n"
+                + "leftmouse   - attack\n"
+                + "rightmouse  - rotate view ( rotation mode only  ) \n"
+                + "mouse wheel - zoom in or out";
+        System.out.println(s);
         initStartGui();
+        addListener();
+        add_mapping();
+
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        helloText = new BitmapText(guiFont, false);
+        helloText.setSize(guiFont.getCharSet().getRenderedSize());
+        helloText.setText(s);
+        helloText.setLocalTranslation(75, (cam.getHeight()) - (cam.getHeight() / 6), 0);
+        guiNode.attachChild(helloText);
+        helloText.setCullHint(Spatial.CullHint.Always);
     }
 
     private void addListener() {
@@ -354,6 +392,7 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addListener(actionListener, new String[]{"Game Pause Unpause"});
         inputManager.addListener(actionListener, new String[]{"superDebug"});
         inputManager.addListener(actionListener, new String[]{"fpsSwitch_trigger"});
+        inputManager.addListener(actionListener, new String[]{"help"});
     }
 
     public void add_mapping() {
@@ -365,6 +404,7 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addMapping("restart", restart_trigger);
         inputManager.addMapping("exit", exit_trigger);
         inputManager.addMapping("switchStats", statsViewTrigger);
+        inputManager.addMapping("help", helpTrigger);
     }
 
     public int getDisplayMode() {
@@ -399,11 +439,24 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
     }
-
+    protected boolean isRecording;
     private final ActionListener actionListener = new ActionListener() {
+
         @Override
         @SuppressWarnings("Convert2Lambda")
         public void onAction(String name, boolean isPressed, float tpf) {
+
+            if (name.equals("help") && !isPressed) {
+
+                if (!isRecording) {
+                    if (helloText.getCullHint() == Spatial.CullHint.Always) {
+                        helloText.setCullHint(Spatial.CullHint.Never);
+                    } else if (helloText.getCullHint() == Spatial.CullHint.Never) {
+                        helloText.setCullHint(Spatial.CullHint.Always);
+                    }
+                }
+
+            }
 
             if (name.equals("rain_trigger") && !isPressed) {
                 if (stateManager.hasState(gameRunningState)) {
@@ -452,10 +505,18 @@ public class Main extends SimpleApplication implements ScreenController {
                 if (stateManager.hasState(gameRunningState)) {
                     if (stateManager.hasState(videoRecorderAppState)) {
                         stateManager.detach(videoRecorderAppState);
+                        isRecording = false;
+                        if (helloText.getCullHint() == Spatial.CullHint.Always) {
+                            helloText.setCullHint(Spatial.CullHint.Never);
+                        }
                         System.out.println("finished recording");
                     } else if (!stateManager.hasState(videoRecorderAppState)) {
-                        stateManager.attach(videoRecorderAppState);
-                        System.out.println("start record");
+                        if (!gameRunningState.isTimeDemo) {
+                            stateManager.attach(videoRecorderAppState);
+                            helloText.setCullHint(Spatial.CullHint.Never);
+                            isRecording = true;
+                            System.out.println("start record");
+                        }
                     }
                 } else {
                     System.out.println("start game to begin recording");
@@ -798,6 +859,32 @@ public class Main extends SimpleApplication implements ScreenController {
     @Override
     @SuppressWarnings("Convert2Lambda")
     public void simpleUpdate(final float tpf) {
+
+        if (isRecording) {
+            helloText.setColor(ColorRGBA.Red);
+            helloText.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+            helloText.setText(" REC ");
+            if (helloText.getControl(FlipFlopControl.class) == null) {
+                helloText.addControl(new FlipFlopControl(0.3f) {
+                    @Override
+                    void action() {
+                        if (helloText.getCullHint() == Spatial.CullHint.Always) {
+                            helloText.setCullHint(Spatial.CullHint.Never);
+                        } else {
+                            helloText.setCullHint(Spatial.CullHint.Always);
+                        }
+                    }
+                });
+            }
+        } else {
+            if (helloText.getControl(FlipFlopControl.class) != null) {
+                helloText.setCullHint(Spatial.CullHint.Always);
+                helloText.removeControl(FlipFlopControl.class);
+            }
+            helloText.setColor(ColorRGBA.White);
+            helloText.setSize(guiFont.getCharSet().getRenderedSize());
+            helloText.setText(s);
+        }
 
         if (loadFuture != null) {
 

@@ -5,6 +5,7 @@ import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.app.state.VideoRecorderAppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
@@ -81,10 +82,11 @@ public class GameRunningState extends AbstractAppState {
     private final DepthOfField dof;
     //private final SSAO ssao;
     private BitmapText hudText;
-    private boolean isTimeDemo = false;
+    protected boolean isTimeDemo = false;
     private List<Float> fps;
     private BitmapText hudText2;
     private Vector2f minMaxFps;
+    private final AppStateManager stateManager;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -98,6 +100,7 @@ public class GameRunningState extends AbstractAppState {
         this.globalLightningEnabled = globalLightningEnabled;
         this.shadows = shadows;
         this.weatherEnabled = true;
+        this.stateManager = app.getStateManager();
 
 //      CONSTRUKTOR
         this.rootNode = app.getRootNode();
@@ -190,7 +193,6 @@ public class GameRunningState extends AbstractAppState {
         //Screen Space Ambient Occlusion
         //ssao = new SSAO(assetManager, fpp);
         //localRootNode.addControl(ssao);
-        //
 //      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
@@ -247,7 +249,7 @@ public class GameRunningState extends AbstractAppState {
         hudText.setColor(ColorRGBA.Blue);
         hudText.setText("          ");
         hudText.setLocalTranslation(hudText.getLineWidth() * 2.5f, hudText.getLineHeight(), 0); // position
-        hudText.setAlpha(-2);
+        hudText.setCullHint(Spatial.CullHint.Always);
         localGuiNode.attachChild(hudText);
 
         hudText2 = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
@@ -290,6 +292,7 @@ public class GameRunningState extends AbstractAppState {
             wildlifeControl.getSkeletonControl().setHardwareSkinningPreferred(false);
             localRootNode.attachChild(bird);
             wildlifeControl.setAnim("fly", LoopMode.Loop);
+            bird.scale(getRandomNumberInRange(0, 2) - 0.5f);
         }
     }
 
@@ -428,10 +431,12 @@ public class GameRunningState extends AbstractAppState {
                 case "timeDemo":
                     if (value && isRunning) {
                         if (!isTimeDemo) {
-                            isTimeDemo = true;
-                            System.out.println("Running Timedemo");
-                            fps = new ArrayList<>();
-                            hudText2.setText("... : ...         ");
+                            if (stateManager.getState(VideoRecorderAppState.class) == null) {
+                                isTimeDemo = true;
+                                System.out.println("Running Timedemo");
+                                fps = new ArrayList<>();
+                                hudText2.setText("... : ...         ");
+                            }
                         }
                     }
                     break;
@@ -468,7 +473,13 @@ public class GameRunningState extends AbstractAppState {
                         if (glc.getTimeDelay() >= 65536) {
                             glc.setTimeDelay(65536);
                         }
-                        hudText.setAlpha(1);
+                        hudText.setCullHint(Spatial.CullHint.Never);
+                        hudText.addControl(new TimedActionControl(3f) {
+                            @Override
+                            void action() {
+                                hudText.setCullHint(Spatial.CullHint.Always);
+                            }
+                        });
 
                     }
                     break;
@@ -480,7 +491,13 @@ public class GameRunningState extends AbstractAppState {
                         if (glc.getTimeDelay() <= 4) {
                             glc.setTimeDelay(8);
                         }
-                        hudText.setAlpha(1);
+                        hudText.setCullHint(Spatial.CullHint.Never);
+                        hudText.addControl(new TimedActionControl(3f) {
+                            @Override
+                            void action() {
+                                hudText.setCullHint(Spatial.CullHint.Always);
+                            }
+                        });
 
                     }
                     break;
@@ -529,8 +546,13 @@ public class GameRunningState extends AbstractAppState {
                             }
                         }
                     }
+                    float t = 0;
+                    for (float f : fps) {
+                        t += f;
+                    }
+
                     minMaxFps = new Vector2f(fps.get(fps.size() - 1), fps.get(0));
-                    hudText2.setText("min :   " + minMaxFps.getX() + " max : " + minMaxFps.getY() + " - FPS ");
+                    hudText2.setText("min :   " + minMaxFps.getX() + " max : " + minMaxFps.getY() + " avg : " + (t / fps.size()));
                     System.out.println("finished Timedemo");
                     System.out.println(hudText2.getText());
                     hudText2.addControl(new TimedActionControl(15) {
@@ -546,9 +568,9 @@ public class GameRunningState extends AbstractAppState {
                 }
             }
 
-            if (hudText.getAlpha() >= -2 && hudText.getAlpha() <= 2) {
-                hudText.setAlpha(hudText.getAlpha() + (1 / tpf));
-            }
+            /*            if (hudText.getAlpha() >= -2 && hudText.getAlpha() <= 2) {
+            hudText.setAlpha(hudText.getAlpha() + (1 / tpf));
+            }*/
             if (globalLightningEnabled) {
                 if (view2.isEnabled()) {
                     cam2.setLocation(glc.getSunPosition());
@@ -704,7 +726,7 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void removeMappings() {
-        
+
         inputManager.deleteMapping("write");
         inputManager.deleteMapping("treeoutroot");
         inputManager.deleteMapping("debug");

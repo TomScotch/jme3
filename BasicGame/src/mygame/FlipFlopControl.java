@@ -6,23 +6,23 @@ import com.jme3.scene.control.AbstractControl;
 
 public abstract class FlipFlopControl extends AbstractControl {
 
-    private int flipflop = 1;
+    private float flipflop = 0;
     private boolean paused = false;
+    private final float delay;
+
+    public FlipFlopControl(float delay) {
+        this.delay = delay;
+    }
 
     @Override
     protected void controlUpdate(float tpf) {
 
         if (!paused) {
-            if (flipflop < 3) {
-                flipflop += 1;
+            if (flipflop < delay) {
+                flipflop += tpf;
             } else {
-                flipflop = 1;
-            }
-
-            if ((flipflop % 2) == 0) {
-                action(true);
-            } else {
-                action(false);
+                action();
+                flipflop = 0;
             }
         }
     }
@@ -37,5 +37,5 @@ public abstract class FlipFlopControl extends AbstractControl {
         //not called when spatial is culled.
     }
 
-    abstract void action(boolean flipflop);
+    abstract void action();
 }
