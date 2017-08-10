@@ -70,25 +70,25 @@ public class SkyControl extends AbstractControl {
         Geometry morningGeom = (Geometry) morning;
         matMorning = morningGeom.getMaterial();
         matMorning.setTransparent(true);
-        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
+        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         morningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry dayGeom = (Geometry) day;
         matDay = dayGeom.getMaterial();
         matDay.setTransparent(true);
-        matDay.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
+        matDay.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         dayGeom.setQueueBucket(Bucket.Sky);
 
         Geometry eveningGeom = (Geometry) evening;
         matEvening = eveningGeom.getMaterial();
         matEvening.setTransparent(true);
-        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
+        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         eveningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry nightGeom = (Geometry) night;
         matNight = nightGeom.getMaterial();
         matNight.setTransparent(true);
-        matNight.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
+        matNight.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         nightGeom.setQueueBucket(Bucket.Sky);
 
         localRootNode.attachChild(day);
@@ -99,6 +99,7 @@ public class SkyControl extends AbstractControl {
         evening.setCullHint(Spatial.CullHint.Always);
         morning.setCullHint(Spatial.CullHint.Always);
         night.setCullHint(Spatial.CullHint.Never);
+        
     }
 
     @Override
