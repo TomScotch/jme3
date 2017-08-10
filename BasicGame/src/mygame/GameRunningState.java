@@ -292,7 +292,7 @@ public class GameRunningState extends AbstractAppState {
             wildlifeControl.getSkeletonControl().setHardwareSkinningPreferred(false);
             localRootNode.attachChild(bird);
             wildlifeControl.setAnim("fly", LoopMode.Loop);
-            bird.scale(getRandomNumberInRange(0, 2) - 0.5f);
+            bird.scale(getRandomNumberInRange(0, 1) - 0.5f);
         }
     }
 
