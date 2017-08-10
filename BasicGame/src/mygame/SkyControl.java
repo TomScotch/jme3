@@ -70,25 +70,25 @@ public class SkyControl extends AbstractControl {
         Geometry morningGeom = (Geometry) morning;
         matMorning = morningGeom.getMaterial();
         matMorning.setTransparent(true);
-        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+        matMorning.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
         morningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry dayGeom = (Geometry) day;
         matDay = dayGeom.getMaterial();
         matDay.setTransparent(true);
-        matDay.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+        matDay.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
         dayGeom.setQueueBucket(Bucket.Sky);
 
         Geometry eveningGeom = (Geometry) evening;
         matEvening = eveningGeom.getMaterial();
         matEvening.setTransparent(true);
-        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+        matEvening.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
         eveningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry nightGeom = (Geometry) night;
         matNight = nightGeom.getMaterial();
         matNight.setTransparent(true);
-        matNight.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
+        matNight.getAdditionalRenderState().setBlendMode(BlendMode.AlphaAdditive);
         nightGeom.setQueueBucket(Bucket.Sky);
 
         localRootNode.attachChild(day);
