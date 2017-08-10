@@ -386,7 +386,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
-                
+
                 inputEnabled = false;
                 rootNode.detachAllChildren();
                 stateManager.attach(startScreenState);
@@ -747,6 +747,7 @@ public class Main extends SimpleApplication implements ScreenController {
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
             stateManager.attach(startScreenState);
+
             if (!guiViewPort.getProcessors().contains(niftyDisplay)) {
                 guiViewPort.addProcessor(niftyDisplay);
             }
@@ -814,13 +815,13 @@ public class Main extends SimpleApplication implements ScreenController {
             }
 
             if (gameRunningState != null) {
-              //  app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
+                //  app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                 startScreenState.detachBox();
                 stateManager.detach(startScreenState);
                 stateManager.attach(gameRunningState);
                 loadFuture = null;
-                add_mapping();
                 inputEnabled = true;
+                //add_mapping();
             }
         }
     }

@@ -688,9 +688,14 @@ public class GameRunningState extends AbstractAppState {
         }
 
         if (!waterPostProcessing) {
-            if (viewPort.getProcessors().contains(localRootNode.getControl(simpleWaterControl.class).getWaterProcessor())) {
-                SimpleWaterProcessor swp = localRootNode.getControl(simpleWaterControl.class).getWaterProcessor();
-                viewPort.removeProcessor(swp);
+            simpleWaterControl control = localRootNode.getControl(simpleWaterControl.class);
+            if (control != null) {
+                if (viewPort.getProcessors().contains(control.getWaterProcessor())) {
+                    SimpleWaterProcessor swp = control.getWaterProcessor();
+                    if (swp != null) {
+                        viewPort.removeProcessor(swp);
+                    }
+                }
             }
         }
 
@@ -699,10 +704,14 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void removeMappings() {
+        
         inputManager.deleteMapping("write");
         inputManager.deleteMapping("treeoutroot");
         inputManager.deleteMapping("debug");
-        inputManager.deleteMapping("debug");
+        inputManager.deleteMapping("switchCam");
+        inputManager.deleteMapping("delayUp");
+        inputManager.deleteMapping("delayDown");
+        inputManager.deleteMapping("timeDemo");
     }
 
     public boolean getIsRunning() {
