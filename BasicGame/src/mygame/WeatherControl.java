@@ -373,7 +373,7 @@ public class WeatherControl extends AbstractControl {
 
                     debrisEffect.setNumParticles((int) rain.getParticlesPerSec());
 
-                    for (int c = rain.getParticles().length; c >= 0; c--) {
+                    for (int c = rain.getParticles().length / 2; c >= 0; c--) {
 
                         try {
                             Vector3f position = rain.getParticles()[c].position;

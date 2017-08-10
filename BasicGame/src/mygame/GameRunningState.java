@@ -63,7 +63,7 @@ public class GameRunningState extends AbstractAppState {
 
     private boolean bgmOn = false;
     private int bgmVolume = 8;
-    private int anisotrpy_samples = 8;
+    private int anisotrpy_samples = 4;
     private GlobalLightingControl glc;
 
     private boolean bloomEnabled;
@@ -292,7 +292,7 @@ public class GameRunningState extends AbstractAppState {
             wildlifeControl.getSkeletonControl().setHardwareSkinningPreferred(false);
             localRootNode.attachChild(bird);
             wildlifeControl.setAnim("fly", LoopMode.Loop);
-            bird.scale(getRandomNumberInRange(0, 1) - 0.5f);
+            // bird.scale(getRandomNumberInRange(0, 1) - 0.5f);
         }
     }
 
