@@ -46,21 +46,21 @@ public class SkyControl extends AbstractControl {
         Texture down1 = assetManager.loadTexture("Textures/skybox/ThickCloudsWater/ThickCloudsWaterDown2048.png");
         morning = SkyFactory.createSky(assetManager, west1, east1, north1, south1, up1, down1);
 
-        Texture west2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyLeft2048.png");
+        /*Texture west2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyLeft2048.png");
         Texture east2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyRight2048.png");
         Texture north2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyBack2048.png");
         Texture south2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyFront2048.png");
         Texture up2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyUp2048.png");
-        Texture down2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyDown2048.png");
-        evening = SkyFactory.createSky(assetManager, west2, east2, north2, south2, up2, down2);
+        Texture down2 = assetManager.loadTexture("Textures/skybox/Evening/DarkStormyDown2048.png");*/
+        evening = morning; //SkyFactory.createSky(assetManager, west2, east2, north2, south2, up2, down2);
 
-        Texture west3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetLeft2048.png");
+        /*Texture west3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetLeft2048.png");
         Texture east3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetRight2048.png");
         Texture north3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetBack2048.png");
         Texture south3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetFront2048.png");
         Texture up3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetUp2048.png");
-        Texture down3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetDown2048.png");
-        day = SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
+        Texture down3 = assetManager.loadTexture("Textures/skybox/Morning/SunSetDown2048.png");*/
+        day = morning;//SkyFactory.createSky(assetManager, west3, east3, north3, south3, up3, down3);
 
         morning.setLocalTranslation(0, -1000, 0);
         evening.setLocalTranslation(0, -1000, 0);
@@ -69,25 +69,25 @@ public class SkyControl extends AbstractControl {
 
         Geometry morningGeom = (Geometry) morning;
         matMorning = morningGeom.getMaterial();
-        //matMorning.setTransparent(true);
+        matMorning.setTransparent(true);
         matMorning.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         morningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry dayGeom = (Geometry) day;
         matDay = dayGeom.getMaterial();
-        //matDay.setTransparent(true);
+        matDay.setTransparent(true);
         matDay.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         dayGeom.setQueueBucket(Bucket.Sky);
 
         Geometry eveningGeom = (Geometry) evening;
         matEvening = eveningGeom.getMaterial();
-        //matEvening.setTransparent(true);
+        matEvening.setTransparent(true);
         matEvening.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         eveningGeom.setQueueBucket(Bucket.Sky);
 
         Geometry nightGeom = (Geometry) night;
         matNight = nightGeom.getMaterial();
-        //matNight.setTransparent(true);
+        matNight.setTransparent(true);
         matNight.getAdditionalRenderState().setBlendMode(BlendMode.Additive);
         nightGeom.setQueueBucket(Bucket.Sky);
 
@@ -106,7 +106,6 @@ public class SkyControl extends AbstractControl {
 
         if (this.isEnabled()) {
 
-            //  bgMaterial.setColor("gl_FragColor",glColor.interpolateLocal(ColorRGBA.Black,  tpf) );
             night.rotate(0, glc.getRotation() / 4, 0);
             day.rotate(0, glc.getRotation() / 4, 0);
             evening.rotate(0, glc.getRotation() / 4, 0);
@@ -127,7 +126,7 @@ public class SkyControl extends AbstractControl {
             } else if (glc.isEvening()) {
                 morning.setCullHint(Spatial.CullHint.Always);
                 day.setCullHint(Spatial.CullHint.Always);
-                night.setCullHint(Spatial.CullHint.Always);
+                night.setCullHint(Spatial.CullHint.Never);
                 evening.setCullHint(Spatial.CullHint.Never);
 
             } else if (glc.isNight()) {
