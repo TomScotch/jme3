@@ -81,6 +81,8 @@ public class PlayerControl extends AbstractControl {
     private float idleCounter = 0;
     private final JmeContext context;
     private final float idleTimeOutValue = 90f;
+    private int x;
+    private int y;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -90,6 +92,9 @@ public class PlayerControl extends AbstractControl {
         this.inputManager = app.getInputManager();
         this.bulletAppState = bulletState;
         this.localRootNode = localRootNode;
+
+        this.x = viewPort.getCamera().getWidth();
+        this.y = viewPort.getCamera().getHeight();
 
         characterNode = new Node("player");
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
@@ -146,8 +151,6 @@ public class PlayerControl extends AbstractControl {
         this.localRootNode.attachChild(characterNode);
         doAnim("player", "Idle", LoopMode.Loop);
         characterNode.setQueueBucket(RenderQueue.Bucket.Opaque);
-
-
 
         if (aniCon.getClass() == null) {
             aniCon.createChannel();
@@ -246,6 +249,19 @@ public class PlayerControl extends AbstractControl {
                     backward = value;
 
                     break;
+
+                case "changeFOV":
+                    if (value) {
+                        if (x == viewPort.getCamera().getWidth()) {
+                            x = 3200;
+                        } else {
+                            x = 1600;
+                        }
+                        viewPort.getCamera().resize(x, 900, true);
+                    }
+
+                    break;
+
                 case "Jump":
                     if (value) {
                         if (getPhysicsCharacter().isOnGround()) {
@@ -292,6 +308,7 @@ public class PlayerControl extends AbstractControl {
         inputManager.addListener(actionListener, "Walk Forward", "Walk Backward");
         inputManager.addListener(actionListener, "chase");
         inputManager.addListener(actionListener, "changeFPS");
+        inputManager.addListener(actionListener, "changeFOV");
         inputManager.addListener(actionListener, "Jump", "Shoot", "flashlight");
     }
 
@@ -310,6 +327,7 @@ public class PlayerControl extends AbstractControl {
         inputManager.deleteMapping("Walk Backward");
         inputManager.deleteMapping("Jump");
         inputManager.deleteMapping("Shoot");
+        inputManager.deleteMapping("changeFOV");
         inputManager.deleteMapping("changeFPS");
     }
 
@@ -336,6 +354,8 @@ public class PlayerControl extends AbstractControl {
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("changeFPS",
                 new KeyTrigger(KeyInput.KEY_T));
+        inputManager.addMapping("changeFOV",
+                new KeyTrigger(KeyInput.KEY_L));
     }
 
     public void makeRotateAround(Boolean bol) {
