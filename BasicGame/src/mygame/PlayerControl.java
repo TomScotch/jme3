@@ -253,9 +253,9 @@ public class PlayerControl extends AbstractControl {
                 case "changeFOV":
                     if (value) {
                         if (x == viewPort.getCamera().getWidth()) {
-                            x = 3200;
+                            x = viewPort.getCamera().getWidth() * 2;
                         } else {
-                            x = 1600;
+                            x = viewPort.getCamera().getWidth();
                         }
                         viewPort.getCamera().resize(x, 900, true);
                     }
