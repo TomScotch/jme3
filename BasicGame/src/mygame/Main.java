@@ -359,6 +359,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 + "d           - strafe right \n"
                 + "s           - backwards\n"
                 + "space       - jump\n"
+                + "l           - Change FOV\n"
                 + "r           - change weather randomly\n"
                 + "f           - flashlight\n"
                 + "e           - switch to rotation mode\n"

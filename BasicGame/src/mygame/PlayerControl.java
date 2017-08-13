@@ -82,7 +82,6 @@ public class PlayerControl extends AbstractControl {
     private final JmeContext context;
     private final float idleTimeOutValue = 90f;
     private int x;
-    private int y;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -94,7 +93,6 @@ public class PlayerControl extends AbstractControl {
         this.localRootNode = localRootNode;
 
         this.x = viewPort.getCamera().getWidth();
-        this.y = viewPort.getCamera().getHeight();
 
         characterNode = new Node("player");
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
@@ -257,7 +255,7 @@ public class PlayerControl extends AbstractControl {
                         } else {
                             x = viewPort.getCamera().getWidth();
                         }
-                        viewPort.getCamera().resize(x, 900, true);
+                        viewPort.getCamera().resize(x, viewPort.getCamera().getHeight(), true);
                     }
 
                     break;
