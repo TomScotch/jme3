@@ -64,7 +64,7 @@ public class PlayerControl extends AbstractControl {
     private final float playerDmg = 30f;
     private final Spatial model;
     private BetterCharacterControl physicsCharacter;
-    private final Node characterNode;
+    public final Node characterNode;
     boolean rotate = false;
     private final ChaseCamera chaseCam;
     private final float flashLightStrength = 1.5f;
@@ -83,9 +83,9 @@ public class PlayerControl extends AbstractControl {
     private final JmeContext context;
     private final float idleTimeOutValue = 90f;
     private int x;
-    private int health = 100;
+    private float health = 100;
     private boolean dead = false;
-    private final float armor = 70f;
+    private final float armor = 10;
     private float deadDelay = 3f;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
@@ -146,7 +146,7 @@ public class PlayerControl extends AbstractControl {
         skelCon.setHardwareSkinningPreferred(false);
         physicsCharacter = new BetterCharacterControl(1f, 6, playerMass);
         physicsCharacter.setEnabled(false);
-        physicsCharacter.warp(new Vector3f(0, 2, 0));
+        physicsCharacter.warp(new Vector3f(5, 2, -10));
         physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
         physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
         characterNode.addControl(physicsCharacter);
@@ -483,13 +483,19 @@ public class PlayerControl extends AbstractControl {
             }
             //dead
             if (deadDelay <= 0) {
-                System.out.println("YOUR ARE DEAD");
+
+                bulletAppState.getPhysicsSpace().remove(physicsCharacter);
+                this.spatial.removeControl(BetterCharacterControl.class);
+                this.spatial.removeFromParent();
+                this.spatial.removeControl(this);
+                
             }
 
             if (dead) {
                 if (deadDelay >= 3f) {
-
-                    // doAnim("player", "Dying", LoopMode.DontLoop);
+                    System.out.println("YOU ARE DEAD");
+                    inputManager.clearMappings();
+                    doAnim("player", "Die", LoopMode.DontLoop);
                 }
                 deadDelay -= tpf;
             }
@@ -560,7 +566,7 @@ public class PlayerControl extends AbstractControl {
             doAnim("player", "Attack", LoopMode.DontLoop);
             attackTimer = attackTime;
 
-            Ray ray1 = new Ray(model.getWorldTranslation(), physicsCharacter.getViewDirection());
+            Ray ray1 = new Ray(model.getWorldTranslation(), viewPort.getCamera().getDirection());
             CollisionResults results1 = new CollisionResults();
             localRootNode.collideWith(ray1, results1);
 
@@ -602,30 +608,32 @@ public class PlayerControl extends AbstractControl {
         return rotateAround;
     }
 
-    public void hit(float dmg, String name) {
+    public boolean hit(float dmg, String name) {
+
         if (!dead) {
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
                 hitAnimationDelay = 1.5f;
-                doAnim("player", "Hit", LoopMode.Loop);
-
+                // doAnim("player", "Hit", LoopMode.Loop);
+                System.out.println("ouch" + dmg + " damage " + " from " + name + "");
                 PointLight shine = new PointLight();
                 shine.setPosition(Vector3f.ZERO);
                 shine.setColor(ColorRGBA.Red);
-                this.spatial.addLight(shine);
+                characterNode.addLight(shine);
                 shine.setRadius(42);
-                this.spatial.addControl(new TimedActionControl(0.30f) {
+                this.characterNode.addControl(new TimedActionControl(0.30f) {
                     @Override
                     void action() {
-                        this.spatial.removeLight(shine);
+                        characterNode.removeLight(shine);
                     }
                 });
 
                 // hit.play();
                 if (health >= 0) {
-                    this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
+                    characterNode.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) characterNode));
                 }
             }
         }
+        return dead;
     }
 }

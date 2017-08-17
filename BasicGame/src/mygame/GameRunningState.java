@@ -239,7 +239,7 @@ public class GameRunningState extends AbstractAppState {
         amb2.setVolume(ambienceVolume + 1.5f);
         localRootNode.attachChild(amb2);
 
-        enemyControl = new EnemyControl(assetManager, localRootNode, bulletAppState);
+        enemyControl = new EnemyControl(assetManager, localRootNode, bulletAppState, playerControl);
 
         limit = getRandomNumberInRange(15, 45);
     }

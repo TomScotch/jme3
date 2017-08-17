@@ -22,6 +22,7 @@ public class EnemyControl extends AbstractControl {
     private final Node localRoot;
     private final AssetManager assetManager;
     private EntityControl ec3;
+    private final PlayerControl pc;
 
     public int countEnemys() {
         int c = 0;
@@ -43,11 +44,11 @@ public class EnemyControl extends AbstractControl {
         return c;
     }
 
-    public EnemyControl(AssetManager assetManager, Node localRoot, BulletAppState bulletAppState) {
+    public EnemyControl(AssetManager assetManager, Node localRoot, BulletAppState bulletAppState, PlayerControl pc) {
 
         this.localRoot = localRoot;
         this.assetManager = assetManager;
-
+        this.pc = pc;
         path = new MotionPath();
         path.addWayPoint(new Vector3f(10, 1.75f, 0));
         path.addWayPoint(new Vector3f(-40, 4, 0));
@@ -100,7 +101,7 @@ public class EnemyControl extends AbstractControl {
         localRoot.attachChild(forestmonster);*/
 
         Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
-        ec3 = new EntityControl(assetManager, spider, "spider", new Vector3f(-10, 0, -10));
+        ec3 = new EntityControl(assetManager, spider, "spider", new Vector3f(-10, 0, -10), pc);
         spider.addControl(ec3);
         localRoot.attachChild(spider);
 

@@ -19,6 +19,9 @@ import com.jme3.renderer.queue.RenderQueue;
 
 public class EntityControl extends AbstractControl {
 
+    private final float damage = 20;
+    private final PlayerControl pc;
+
     public boolean isFighting() {
         return fighting;
     }
@@ -40,10 +43,11 @@ public class EntityControl extends AbstractControl {
     //private final AudioNode hit;
     private boolean fighting = false;
 
-    public EntityControl(AssetManager assetManager, Spatial hostile, String name, Vector3f pos) {
+    public EntityControl(AssetManager assetManager, Spatial hostile, String name, Vector3f pos, PlayerControl pc) {
 
         this.spatial = hostile;
         this.assetManager = assetManager;
+        this.pc = pc;
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
 
         /*        bcc = new BetterCharacterControl(3, 7, mass);
@@ -217,7 +221,14 @@ public class EntityControl extends AbstractControl {
         if (attackTimer <= 0) {
             setAnim("Attack", LoopMode.DontLoop);
             attackTimer = attackTime;
-            System.out.println("OM NOM NOM");
+
+            if (pc.hit(damage, this.spatial.getName())) {
+                fighting = false;
+                attacking = false;
+                targetName = "";
+
+            }
+
         }
     }
 }
