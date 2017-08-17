@@ -6,7 +6,6 @@ import com.jme3.animation.SkeletonControl;
 import com.jme3.asset.AssetManager;
 //import com.jme3.audio.AudioData;
 //import com.jme3.audio.AudioNode;
-import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
@@ -14,12 +13,19 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
-import com.jme3.bullet.BulletAppState;
 import com.jme3.light.PointLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.queue.RenderQueue;
 
 public class EntityControl extends AbstractControl {
+
+    public boolean isFighting() {
+        return fighting;
+    }
+
+    public void setFighting(boolean fighting) {
+        this.fighting = fighting;
+    }
 
     private float health = 100;
     private final float armor = 10;
@@ -29,22 +35,23 @@ public class EntityControl extends AbstractControl {
     private final float fleeDistance = 40;
     private String targetName = "";
     private Spatial targetSpatial;
-    private final BetterCharacterControl bcc;
     private final AssetManager assetManager;
     public int mass = 1000;
     //private final AudioNode hit;
+    private boolean fighting = false;
 
-    public EntityControl(AssetManager assetManager, Spatial hostile, BulletAppState bulletState, String name, Vector3f pos) {
+    public EntityControl(AssetManager assetManager, Spatial hostile, String name, Vector3f pos) {
 
         this.spatial = hostile;
         this.assetManager = assetManager;
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
-        bcc = new BetterCharacterControl(3, 7, mass);
+
+        /*        bcc = new BetterCharacterControl(3, 7, mass);
         bcc.setSpatial(hostile);
         hostile.addControl(bcc);
-        bulletState.getPhysicsSpace().add(bcc);
-        bcc.warp(new Vector3f(pos));
-        setAnim("Idle", LoopMode.Loop);
+        bulletState.getPhysicsSpace().add(bcc);s
+        bcc.warp(new Vector3f(pos));*/
+        setAnim("walk", LoopMode.Loop);
         getSkeletonControl().setHardwareSkinningPreferred(false);
         this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
 
@@ -57,28 +64,47 @@ public class EntityControl extends AbstractControl {
         Node localRootNode = (Node) this.spatial.getParent();
         localRootNode.attachChild(hit);*/
         this.spatial.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-
+        // this.spatial.lookAt(new Vector3f(1, 0, 0), Vector3f.UNIT_X);
     }
+    private float attackTimer = 0f;
+    private final float attackTime = 1.5f;
+    private boolean attacking = false;
 
     @Override
     protected void controlUpdate(float tpf) {
 
         if (!dead) {
-
+            if (attackTimer <= 0) {
+                if (attacking) {
+                    attack();
+                }
+            }
+            if (attackTimer > 0) {
+                attackTimer -= tpf;
+            }
             if (!targetName.equals("")) {
+                fighting = true;
                 Node n = (Node) this.spatial;
                 targetSpatial = n.getParent().getChild(targetName);
                 Vector3f a = targetSpatial.getWorldTranslation();
                 Vector3f b = this.spatial.getWorldTranslation();
-                bcc.setViewDirection(a.subtract(b));
+
                 float distance = a.distance(b);
                 if (distance > fleeDistance) {
+                    fighting = false;
                     targetName = "";
-                    bcc.setViewDirection(new Vector3f(0, 0, 0));
+                } else {
+                    spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
+                    spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_Z);
+                    spatial.lookAt(targetSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
                 }
+            }
+            if (fighting) {
+                attacking = true;
             }
 
             if (health < 0) {
+
                 dead = true;
                 setAnim("Idle", LoopMode.DontLoop);
             }
@@ -93,10 +119,10 @@ public class EntityControl extends AbstractControl {
 
         if (deadDelay <= 0) {
 
-            BetterCharacterControl control = this.spatial.
-                    getControl(BetterCharacterControl.class);
+            /*            BetterCharacterControl control = this.spatial.
+            getControl(BetterCharacterControl.class);
             control.getPhysicsSpace().remove(control);
-            this.spatial.removeControl(BetterCharacterControl.class);
+            this.spatial.removeControl(BetterCharacterControl.class);*/
             this.spatial.removeFromParent();
             this.spatial.removeControl(this);
         }
@@ -123,7 +149,7 @@ public class EntityControl extends AbstractControl {
         return e.getControl(AnimControl.class);
     }
 
-    private void setAnim(String name, LoopMode mode) {
+    public final void setAnim(String name, LoopMode mode) {
 
         if (getAnimControl().getClass() != null) {
             getAnimControl().clearChannels();
@@ -159,7 +185,9 @@ public class EntityControl extends AbstractControl {
 
                 // hit.play();
                 hitParticles();
-                this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
+                if (health >= 0) {
+                    this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
+                }
             }
         }
     }
@@ -182,5 +210,14 @@ public class EntityControl extends AbstractControl {
         Node n1 = (Node) n.getChild("death");
         ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
         child.setParticlesPerSec(num);
+    }
+
+    private void attack() {
+
+        if (attackTimer <= 0) {
+            setAnim("Attack", LoopMode.DontLoop);
+            attackTimer = attackTime;
+            System.out.println("OM NOM NOM");
+        }
     }
 }

@@ -17,6 +17,7 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -82,6 +83,10 @@ public class PlayerControl extends AbstractControl {
     private final JmeContext context;
     private final float idleTimeOutValue = 90f;
     private int x;
+    private int health = 100;
+    private boolean dead = false;
+    private final float armor = 70f;
+    private float deadDelay = 3f;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -374,99 +379,124 @@ public class PlayerControl extends AbstractControl {
             chaseCam.setDragToRotate(false);
         }
     }
+    private float hitAnimationDelay = 0;
 
     @Override
     protected void controlUpdate(float tpf) {
 
         if (isEnabled()) {
 
-            checkIdleforPlayer();
+            if (!dead) {
+                checkIdleforPlayer();
 
-            if (attackTimer <= 0) {
-                if (attacking) {
-                    attack();
+                if (attackTimer <= 0) {
+                    if (attacking) {
+                        attack();
+                    }
                 }
-            }
+                if (health < 0) {
 
-            if (attackTimer > 0) {
-                attackTimer -= tpf;
-            }
-
-            if (model.getWorldTranslation().y < -300f) {
-                getPhysicsCharacter().warp(new Vector3f(0, 2, 0));
-            }
-
-            Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
-            Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
-
-            camDir.y = 0;
-            camLeft.y = 0;
-
-            if (idleCounter >= idleTimeOutValue) {
-                if (!rotateAround) {
-                    System.out.println("start idleing");
-                    makeRotateAround(true);
+                    dead = true;
+                    // doAnim("player", "Idle", LoopMode.DontLoop);
                 }
-            }
+                if (hitAnimationDelay > 0) {
+                    hitAnimationDelay -= tpf;
+                    if (hitAnimationDelay <= 0) {
+                        // doAnim("player", "Idle", LoopMode.Loop);
+                    }
+                }
+                if (attackTimer > 0) {
+                    attackTimer -= tpf;
+                }
 
-            if (idleCounter == 0) {
+                if (model.getWorldTranslation().y < -300f) {
+                    getPhysicsCharacter().warp(new Vector3f(0, 2, 0));
+                }
+
+                Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
+                Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
+
+                camDir.y = 0;
+                camLeft.y = 0;
+
+                if (idleCounter >= idleTimeOutValue) {
+                    if (!rotateAround) {
+                        System.out.println("start idleing");
+                        makeRotateAround(true);
+                    }
+                }
+
+                if (idleCounter == 0) {
+                    if (rotateAround) {
+                        System.out.println("stop idleing");
+                        makeRotateAround(false);
+                    }
+                }
+                if (idleCounter <= idleTimeOutValue) {
+                    idleCounter += tpf;
+                }
+
+                if (chaseEnabled) {
+                    viewDirection.set(camDir);
+                }
+
                 if (rotateAround) {
-                    System.out.println("stop idleing");
-                    makeRotateAround(false);
+                    viewDirection.addLocal(camLeft.mult((rotationSpeed * 1.5f) * tpf));
+                }
+
+                walkDirection.set(0, 0, 0);
+
+                if (leftStrafe) {
+                    footsteps.play();
+                    walkDirection.addLocal(camLeft);
+                } else if (rightStrafe) {
+                    footsteps.play();
+                    walkDirection.addLocal(camLeft.negate());
+                }
+
+                getPhysicsCharacter().setWalkDirection(walkDirection);
+
+                if (forward) {
+                    footsteps.play();
+                    walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
+                } else if (backward) {
+                    footsteps.play();
+                    walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
+                }
+
+                if (!forward && !backward && !rightStrafe && !leftStrafe) {
+                    footsteps.stop();
+                }
+
+                getPhysicsCharacter().setViewDirection(viewDirection);
+                getPhysicsCharacter().setWalkDirection(walkDirection);
+
+                if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
+                    model.setCullHint(Spatial.CullHint.Always);
+                    lamp.setDirection(viewPort.getCamera().getDirection());
+                } else {
+                    if (!rotateAround) {
+                        model.setCullHint(Spatial.CullHint.Dynamic);
+                    }
+                    lamp.setDirection(model.getWorldRotation().getRotationColumn(2));
                 }
             }
-            if (idleCounter <= idleTimeOutValue) {
-                idleCounter += tpf;
+            //dead
+            if (deadDelay <= 0) {
+                System.out.println("YOUR ARE DEAD");
             }
 
-            if (chaseEnabled) {
-                viewDirection.set(camDir);
-            }
+            if (dead) {
+                if (deadDelay >= 3f) {
 
-            if (rotateAround) {
-                viewDirection.addLocal(camLeft.mult((rotationSpeed * 1.5f) * tpf));
-            }
-
-            walkDirection.set(0, 0, 0);
-
-            if (leftStrafe) {
-                footsteps.play();
-                walkDirection.addLocal(camLeft);
-            } else if (rightStrafe) {
-                footsteps.play();
-                walkDirection.addLocal(camLeft.negate());
-            }
-
-            getPhysicsCharacter().setWalkDirection(walkDirection);
-
-            if (forward) {
-                footsteps.play();
-                walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
-            } else if (backward) {
-                footsteps.play();
-                walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
-            }
-
-            if (!forward && !backward && !rightStrafe && !leftStrafe) {
-                footsteps.stop();
-            }
-
-            getPhysicsCharacter().setViewDirection(viewDirection);
-            getPhysicsCharacter().setWalkDirection(walkDirection);
-
-            if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
-                model.setCullHint(Spatial.CullHint.Always);
-                lamp.setDirection(viewPort.getCamera().getDirection());
-            } else {
-                if (!rotateAround) {
-                    model.setCullHint(Spatial.CullHint.Dynamic);
+                    // doAnim("player", "Dying", LoopMode.DontLoop);
                 }
-                lamp.setDirection(model.getWorldRotation().getRotationColumn(2));
+                deadDelay -= tpf;
             }
         }
     }
 
-    private void hit(final String name) {
+    private void attack(final String name) {
         @SuppressWarnings("Convert2Lambda")
         SceneGraphVisitor visitor = new SceneGraphVisitor() {
             @Override
@@ -539,7 +569,7 @@ public class PlayerControl extends AbstractControl {
                 if (!target.equals("terrain")) {
                     if (!target.equals("")) {
                         if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 10) {
-                            hit(target);
+                            attack(target);
                         }
                     }
                 }
@@ -570,5 +600,32 @@ public class PlayerControl extends AbstractControl {
 
     public boolean isRotating() {
         return rotateAround;
+    }
+
+    public void hit(float dmg, String name) {
+        if (!dead) {
+            if ((dmg - armor) > 0) {
+                health -= (dmg - armor);
+                hitAnimationDelay = 1.5f;
+                doAnim("player", "Hit", LoopMode.Loop);
+
+                PointLight shine = new PointLight();
+                shine.setPosition(Vector3f.ZERO);
+                shine.setColor(ColorRGBA.Red);
+                this.spatial.addLight(shine);
+                shine.setRadius(42);
+                this.spatial.addControl(new TimedActionControl(0.30f) {
+                    @Override
+                    void action() {
+                        this.spatial.removeLight(shine);
+                    }
+                });
+
+                // hit.play();
+                if (health >= 0) {
+                    this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
+                }
+            }
+        }
     }
 }

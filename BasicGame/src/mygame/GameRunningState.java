@@ -87,6 +87,7 @@ public class GameRunningState extends AbstractAppState {
     private BitmapText hudText2;
     private Vector2f minMaxFps;
     private final AppStateManager stateManager;
+    private final EnemyControl enemyControl;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -193,22 +194,21 @@ public class GameRunningState extends AbstractAppState {
         //Screen Space Ambient Occlusion
         //ssao = new SSAO(assetManager, fpp);
         //localRootNode.addControl(ssao);
-//      HOSTILE
+        /*//      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
         demon.addControl(ec1);
         localRootNode.attachChild(demon);
-
+        
         Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
         EntityControl ec2 = new EntityControl(assetManager, forestmonster, bulletAppState, "forestmonster", new Vector3f(-10, 0, 10));
         forestmonster.addControl(ec2);
         localRootNode.attachChild(forestmonster);
-
+        
         Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
         EntityControl ec3 = new EntityControl(assetManager, spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
         spider.addControl(ec3);
-        localRootNode.attachChild(spider);
-
+        localRootNode.attachChild(spider);*/
         //Second Camera View
         cam2 = app.getCamera().clone();
         cam2.setViewPort(0f, 0.5f, 0f, 0.5f);
@@ -239,8 +239,9 @@ public class GameRunningState extends AbstractAppState {
         amb2.setVolume(ambienceVolume + 1.5f);
         localRootNode.attachChild(amb2);
 
-        limit = getRandomNumberInRange(15, 45);
+        enemyControl = new EnemyControl(assetManager, localRootNode, bulletAppState);
 
+        limit = getRandomNumberInRange(15, 45);
     }
 
     private void setupHudText() {
@@ -270,6 +271,7 @@ public class GameRunningState extends AbstractAppState {
         inputManager.addListener(actionListener, "delayUp");
         inputManager.addListener(actionListener, "delayDown");
         inputManager.addListener(actionListener, "timeDemo");
+        inputManager.addListener(actionListener, "switchPath");
     }
 
     public void removeListener() {
@@ -371,7 +373,8 @@ public class GameRunningState extends AbstractAppState {
 
         inputManager.addMapping("timeDemo",
                 new KeyTrigger(KeyInput.KEY_F10));
-
+        inputManager.addMapping("switchPath",
+                new KeyTrigger(KeyInput.KEY_I));
     }
 
     private void treeoutroot(Node node) {
@@ -456,6 +459,12 @@ public class GameRunningState extends AbstractAppState {
                 case "treeoutroot":
                     if (value && isRunning) {
                         treeoutroot(localRootNode);
+                    }
+                    break;
+
+                case "switchPath":
+                    if (value && isRunning) {
+                        enemyControl.setPlaying(!enemyControl.isPlaying());
                     }
                     break;
 
@@ -661,7 +670,7 @@ public class GameRunningState extends AbstractAppState {
         playerControl.setupListener();
         playerControl.setupMappings();
         view2.attachScene(localRootNode);
-
+        localRootNode.addControl(enemyControl);
     }
 
     @Override
@@ -720,7 +729,7 @@ public class GameRunningState extends AbstractAppState {
                 }
             }
         }
-
+        localRootNode.removeControl(enemyControl);
         dettachLocalRootNode();
         detachLocalGuiNode();
     }
