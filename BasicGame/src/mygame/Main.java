@@ -861,6 +861,8 @@ public class Main extends SimpleApplication implements ScreenController {
     @SuppressWarnings("Convert2Lambda")
     public void simpleUpdate(final float tpf) {
 
+
+        
         if (isRecording) {
             helloText.setColor(ColorRGBA.Red);
             helloText.setSize(guiFont.getCharSet().getRenderedSize() * 2);

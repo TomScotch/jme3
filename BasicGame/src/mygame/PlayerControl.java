@@ -27,6 +27,7 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.CameraNode;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
@@ -488,7 +489,7 @@ public class PlayerControl extends AbstractControl {
                 this.spatial.removeControl(BetterCharacterControl.class);
                 this.spatial.removeFromParent();
                 this.spatial.removeControl(this);
-                
+
             }
 
             if (dead) {
@@ -571,11 +572,24 @@ public class PlayerControl extends AbstractControl {
             localRootNode.collideWith(ray1, results1);
 
             if (results1.size() > 1) {
-                String target = results1.getCollision(1).getGeometry().getParent().getParent().getParent().getName();
-                if (!target.equals("terrain")) {
-                    if (!target.equals("")) {
-                        if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 10) {
-                            attack(target);
+
+                Geometry g = results1.getCollision(1).getGeometry();
+
+                if (g != null) {
+
+                    Node n = g.getParent().getParent().getParent();
+
+                    if (n != null) {
+
+                        String target = n.getName();
+                        if (target != null) {
+                            if (!target.equals("")) {
+                                if (!target.equals("terrain")) {
+                                    if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 10) {
+                                        attack(target);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
