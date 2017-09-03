@@ -48,12 +48,22 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import com.jme3.opencl.*;
 import com.jme3.system.AppSettings;
+import de.lessvoid.nifty.builder.EffectBuilder;
+import de.lessvoid.nifty.controls.console.builder.ConsoleBuilder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
 @SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
+
+    public static Platform getSelectedPlatform() {
+        return selectedPlatform;
+    }
+
+    public static void setSelectedPlatform(Platform aSelectedPlatform) {
+        selectedPlatform = aSelectedPlatform;
+    }
 
     private static AppSettings cfg;
     private static Main app;
@@ -72,6 +82,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger fpsSwitch_trigger = new KeyTrigger(KeyInput.KEY_F2);
     private final Trigger statsViewTrigger = new KeyTrigger(KeyInput.KEY_F3);
     private final Trigger helpTrigger = new KeyTrigger(KeyInput.KEY_H);
+    private final Trigger consoleTrigger = new KeyTrigger(KeyInput.KEY_F4);
     private static GameRunningState gameRunningState;
     private static StartScreenState startScreenState;
     private static SettingsScreenState settingsScreenState;
@@ -101,7 +112,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private BitmapText helloText;
     private float deathCounter = 0;
     private BitmapText deathText;
-    private boolean dead;
+    private boolean showConsole = false;
 
     public void switchShadows() {
         shadows = !shadows;
@@ -405,6 +416,7 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addListener(actionListener, new String[]{"superDebug"});
         inputManager.addListener(actionListener, new String[]{"fpsSwitch_trigger"});
         inputManager.addListener(actionListener, new String[]{"help"});
+        inputManager.addListener(actionListener, new String[]{"console"});
     }
 
     public void add_mapping() {
@@ -417,6 +429,7 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addMapping("exit", exit_trigger);
         inputManager.addMapping("switchStats", statsViewTrigger);
         inputManager.addMapping("help", helpTrigger);
+        inputManager.addMapping("console", consoleTrigger);
     }
 
     public int getDisplayMode() {
@@ -447,7 +460,6 @@ public class Main extends SimpleApplication implements ScreenController {
                 viewPort.clearProcessors();
                 gameRunningState = null;
                 deathCounter = 0;
-                dead = false;
                 app.restart();
                 switchGameState();
             }
@@ -459,6 +471,27 @@ public class Main extends SimpleApplication implements ScreenController {
         @Override
         @SuppressWarnings("Convert2Lambda")
         public void onAction(String name, boolean isPressed, float tpf) {
+
+            if (name.equals("console") && !isPressed) {
+
+                showConsole = !showConsole;
+
+                if (stateManager.hasState(gameRunningState) && gameRunningState != null) {
+                    if (showConsole) {
+                        nifty.gotoScreen("console");
+                    } else {
+                        nifty.gotoScreen("game");
+                        showConsole = false;
+                    }
+                } /*else if (stateManager.hasState(startScreenState) && gameRunningState != null) {
+                    nifty.gotoScreen("start");
+                    showConsole = false;
+                } else if (stateManager.hasState(settingsScreenState) && gameRunningState != null) {
+                    nifty.gotoScreen("settings");
+                    showConsole = false;
+                }*/
+
+            }
 
             if (name.equals("help") && !isPressed) {
 
@@ -562,6 +595,48 @@ public class Main extends SimpleApplication implements ScreenController {
 
         nifty.loadStyleFile("nifty-default-styles.xml");
         nifty.loadControlFile("nifty-default-controls.xml");
+
+        nifty.addScreen("game", new ScreenBuilder("Game Screen") {
+            {
+                controller(app);
+
+                layer(new LayerBuilder("Layer_ID") {
+                    {
+                        childLayoutOverlay();
+                    }
+                });
+            }
+        }.build(nifty));
+
+        nifty.addScreen("console", new ScreenBuilder("Console") {
+            {
+                controller(app);
+
+                layer(new LayerBuilder("Layer_ID") {
+                    {
+                        childLayoutHorizontal();
+
+                        control(new ConsoleBuilder("console") {
+                            {
+                                width("30%");
+                                lines(10);
+                                alignLeft();
+                                valignBottom();
+                                onStartScreenEffect(new EffectBuilder("move") {
+                                    {
+                                        length(75);
+                                        inherit();
+                                        neverStopRendering(true);
+                                        effectParameter("mode", "in");
+                                        effectParameter("direction", "top");
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }.build(nifty));
 
         nifty.addScreen("start", new ScreenBuilder("Start Screen") {
             {
@@ -823,9 +898,10 @@ public class Main extends SimpleApplication implements ScreenController {
             stateManager.detach(gameRunningState);
             stateManager.attach(startScreenState);
 
-            if (!guiViewPort.getProcessors().contains(niftyDisplay)) {
-                guiViewPort.addProcessor(niftyDisplay);
-            }
+            /*            if (!guiViewPort.getProcessors().contains(niftyDisplay)) {
+            guiViewPort.addProcessor(niftyDisplay);
+            }*/
+            nifty.gotoScreen("start");
             System.out.println("switching to startscreen...");
         } else {
             if (gameRunningState == null) {
@@ -833,7 +909,9 @@ public class Main extends SimpleApplication implements ScreenController {
                 inputManager.setCursorVisible(false);
 
                 if (guiViewPort.getProcessors().contains(niftyDisplay)) {
-                    guiViewPort.removeProcessor(niftyDisplay);
+                    nifty.gotoScreen("game");
+                    showConsole = false;
+                    //guiViewPort.removeProcessor(niftyDisplay);
                 }
 
                 loadFuture = exec.submit(loadingCallable);
@@ -844,7 +922,9 @@ public class Main extends SimpleApplication implements ScreenController {
                     stateManager.attach(gameRunningState);
 
                     if (guiViewPort.getProcessors().contains(niftyDisplay)) {
-                        guiViewPort.removeProcessor(niftyDisplay);
+                        nifty.gotoScreen("game");
+                        showConsole = false;
+                        //guiViewPort.removeProcessor(niftyDisplay);
                     }
                     System.out.println("switching to game...");
 
@@ -876,18 +956,20 @@ public class Main extends SimpleApplication implements ScreenController {
 
         if (gameRunningState != null) {
             if (gameRunningState.getHealth() <= 0) {
-                dead = true;
                 deathCounter += tpf;
                 deathText.setCullHint(Spatial.CullHint.Never);
                 int dt = (int) (9 - deathCounter);
                 deathText.setText(" you Died - restart in " + dt);
+                nifty.gotoScreen("game");
+                showConsole = false;
                 if (deathCounter >= 9 && deathCounter < 10) {
                     deathText.setCullHint(Spatial.CullHint.Always);
                     deathText.setText("");
                     deathCounter = 11;
+                    inputEnabled = false;
+                    showConsole = false;
                     addListener();
                     add_mapping();
-                    
                     doRestart();
                 }
             }
@@ -1008,7 +1090,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
                 Platform platform = platforms.get(0);
                 availableDevices = platform.getDevices();
-                selectedPlatform = platform;
+                setSelectedPlatform(platform);
 
                 Device device = platform.getDevices().get(currentDeviceIndex);
                 currentDeviceIndex++;
