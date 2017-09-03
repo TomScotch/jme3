@@ -38,6 +38,14 @@ import com.jme3.system.JmeContext;
 
 public class PlayerControl extends AbstractControl {
 
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
+
     private final SkeletonControl skelCon;
     private final AudioNode footsteps;
     // private final AudioNode hit;

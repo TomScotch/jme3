@@ -37,6 +37,14 @@ import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
 
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
+
     private final Camera cam2;
     private final AudioNode amb;
     private final AudioNode amb1;
@@ -88,6 +96,7 @@ public class GameRunningState extends AbstractAppState {
     private Vector2f minMaxFps;
     private final AppStateManager stateManager;
     private final EnemyControl enemyControl;
+    private float health = 100;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -537,6 +546,10 @@ public class GameRunningState extends AbstractAppState {
     public void update(float tpf) {
 
         if (isRunning) {
+
+            if (playerControl != null) {
+                health = playerControl.getHealth();
+            }
 
             super.update(tpf);
 

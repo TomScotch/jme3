@@ -99,6 +99,9 @@ public class Main extends SimpleApplication implements ScreenController {
     private static List<? extends Device> availableDevices;
     private static int currentDeviceIndex;
     private BitmapText helloText;
+    private float deathCounter = 0;
+    private BitmapText deathText;
+    private boolean dead;
 
     public void switchShadows() {
         shadows = !shadows;
@@ -382,6 +385,14 @@ public class Main extends SimpleApplication implements ScreenController {
         helloText.setLocalTranslation(75, (cam.getHeight()) - (cam.getHeight() / 6), 0);
         guiNode.attachChild(helloText);
         helloText.setCullHint(Spatial.CullHint.Always);
+
+        deathText = new BitmapText(guiFont, false);
+        deathText.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+        deathText.setColor(ColorRGBA.Red);
+        deathText.setText("");
+        deathText.setLocalTranslation((cam.getWidth()) - (cam.getWidth() / 2), (cam.getHeight()) - (cam.getHeight() / 2), 0);
+        guiNode.attachChild(deathText);
+        deathText.setCullHint(Spatial.CullHint.Always);
     }
 
     private void addListener() {
@@ -435,6 +446,8 @@ public class Main extends SimpleApplication implements ScreenController {
                 stateManager.detach(gameRunningState);
                 viewPort.clearProcessors();
                 gameRunningState = null;
+                deathCounter = 0;
+                dead = false;
                 app.restart();
                 switchGameState();
             }
@@ -861,8 +874,25 @@ public class Main extends SimpleApplication implements ScreenController {
     @SuppressWarnings("Convert2Lambda")
     public void simpleUpdate(final float tpf) {
 
+        if (gameRunningState != null) {
+            if (gameRunningState.getHealth() <= 0) {
+                dead = true;
+                deathCounter += tpf;
+                deathText.setCullHint(Spatial.CullHint.Never);
+                int dt = (int) (9 - deathCounter);
+                deathText.setText(" you Died - restart in " + dt);
+                if (deathCounter >= 9 && deathCounter < 10) {
+                    deathText.setCullHint(Spatial.CullHint.Always);
+                    deathText.setText("");
+                    deathCounter = 11;
+                    addListener();
+                    add_mapping();
+                    
+                    doRestart();
+                }
+            }
+        }
 
-        
         if (isRecording) {
             helloText.setColor(ColorRGBA.Red);
             helloText.setSize(guiFont.getCharSet().getRenderedSize() * 2);
