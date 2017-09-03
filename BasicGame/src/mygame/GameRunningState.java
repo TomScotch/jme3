@@ -29,6 +29,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
 import com.jme3.water.SimpleWaterProcessor;
+import de.lessvoid.nifty.controls.Console;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
+
+    private final Console console;
 
     public float getHealth() {
         return health;
@@ -101,7 +104,7 @@ public class GameRunningState extends AbstractAppState {
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
         System.out.println("Game State is being constructed");
-
+        this.console = mygame.Main.getConsole();
         this.fogEnabled = fogEnabled;
         this.bloomEnabled = bloomEnabled;
         this.lightScatterEnabled = lightScatterEnabled;
@@ -641,7 +644,6 @@ public class GameRunningState extends AbstractAppState {
     public void stateAttached(AppStateManager stateManager) {
 
         System.out.println("Game State is being attached");
-
         stateAttach();
         setIsRunning(true);
 

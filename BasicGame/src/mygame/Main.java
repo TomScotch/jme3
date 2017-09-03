@@ -49,6 +49,7 @@ import java.util.prefs.BackingStoreException;
 import com.jme3.opencl.*;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.builder.EffectBuilder;
+import de.lessvoid.nifty.controls.Console;
 import de.lessvoid.nifty.controls.console.builder.ConsoleBuilder;
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +57,10 @@ import java.util.Scanner;
 
 @SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
+
+    public static Console getConsole() {
+        return console;
+    }
 
     public static Platform getSelectedPlatform() {
         return selectedPlatform;
@@ -113,6 +118,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private float deathCounter = 0;
     private BitmapText deathText;
     private boolean showConsole = false;
+    private static Console console;
 
     public void switchShadows() {
         shadows = !shadows;
@@ -386,6 +392,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 + "mouse wheel - zoom in or out";
         System.out.println(s);
         initStartGui();
+        console = nifty.getScreen("console").findNiftyControl("console", Console.class);
         addListener();
         add_mapping();
 
@@ -483,7 +490,8 @@ public class Main extends SimpleApplication implements ScreenController {
                         nifty.gotoScreen("game");
                         showConsole = false;
                     }
-                } /*else if (stateManager.hasState(startScreenState) && gameRunningState != null) {
+                }
+                /*else if (stateManager.hasState(startScreenState) && gameRunningState != null) {
                     nifty.gotoScreen("start");
                     showConsole = false;
                 } else if (stateManager.hasState(settingsScreenState) && gameRunningState != null) {
