@@ -38,6 +38,7 @@ import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.control.LightControl;
 import com.jme3.scene.shape.Quad;
 import com.jme3.system.JmeContext;
+import com.jme3.util.TangentBinormalGenerator;
 
 public class PlayerControl extends AbstractControl {
 
@@ -99,6 +100,8 @@ public class PlayerControl extends AbstractControl {
     private boolean dead = false;
     private final float armor = 10;
     private float deadDelay = 3f;
+    private final Geometry healthbar;
+    private boolean showHealthBar = false;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -166,7 +169,7 @@ public class PlayerControl extends AbstractControl {
         this.localRootNode.attachChild(characterNode);
         doAnim("player", "Idle", LoopMode.Loop);
         characterNode.setQueueBucket(RenderQueue.Bucket.Opaque);
-        characterNode.getLocalTranslation().addLocal(10, 0, 20);
+
         if (aniCon.getClass() == null) {
             aniCon.createChannel();
             aniCon.getChannel(0).setAnim("idle");
@@ -185,16 +188,19 @@ public class PlayerControl extends AbstractControl {
         hit.setPositional(false);
         hit.setVolume(4);
         localRootNode.attachChild(hit);*/
-        // TangentBinormalGenerator.generate(this.model);
-        /*        BillboardControl billboard = new BillboardControl();
-        Geometry healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
+        TangentBinormalGenerator.generate(this.model);
+        BillboardControl billboard = new BillboardControl();
+        healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
         Material mathb = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mathb.setColor("Color", ColorRGBA.Red);
         healthbar.setMaterial(mathb);
         characterNode.attachChild(healthbar);
+        healthbar.setCullHint(Spatial.CullHint.Always);
+        healthbar.getLocalScale().setX((health + 1) / 75);
         healthbar.center();
-        healthbar.move(4.3f, 9, 0);
-        healthbar.addControl(billboard);*/
+        healthbar.move(5, 9, 0);
+        healthbar.addControl(billboard);
+        characterNode.getLocalTranslation().addLocal(55, 3, -20);
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -203,11 +209,15 @@ public class PlayerControl extends AbstractControl {
         public void onAction(String binding, boolean value, float tpf) {
             idleCounter = 0;
             switch (binding) {
+                case "showHealthBar":
+                    if (value && isEnabled()) {
+                        showHealthBar = !showHealthBar;
+                    }
+                    break;
                 case "flashlight":
                     if (value && isEnabled()) {
                         getLamp().setEnabled(!lamp.isEnabled());
                     }
-
                     break;
                 case "rightRotate":
                     rightRotate = value;
@@ -326,6 +336,8 @@ public class PlayerControl extends AbstractControl {
     }
 
     public void setupListener() {
+
+        inputManager.addListener(actionListener, "showHealthBar");
         inputManager.addListener(actionListener, "leftRotate", "rightRotate");
         inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
         inputManager.addListener(actionListener, "Rotate Left", "Rotate Right");
@@ -353,9 +365,13 @@ public class PlayerControl extends AbstractControl {
         inputManager.deleteMapping("Shoot");
         inputManager.deleteMapping("changeFOV");
         inputManager.deleteMapping("changeFPS");
+        inputManager.deleteMapping("showHealthBar");
     }
 
     public void setupMappings() {
+
+        inputManager.addMapping("showHealthBar",
+                new KeyTrigger(KeyInput.KEY_B));
         inputManager.addMapping("flashlight",
                 new KeyTrigger(KeyInput.KEY_F));
         inputManager.addMapping("leftRotate",
@@ -408,6 +424,13 @@ public class PlayerControl extends AbstractControl {
         if (isEnabled()) {
 
             if (!dead) {
+
+                if (showHealthBar) {
+                    healthbar.setCullHint(Spatial.CullHint.Never);
+                } else {
+                    healthbar.setCullHint(Spatial.CullHint.Always);
+                }
+
                 checkIdleforPlayer();
 
                 if (attackTimer <= 0) {
@@ -415,7 +438,7 @@ public class PlayerControl extends AbstractControl {
                         attack();
                     }
                 }
-                if (health < 0) {
+                if (health <= 0) {
 
                     dead = true;
                     // doAnim("player", "Idle", LoopMode.DontLoop);
@@ -513,6 +536,7 @@ public class PlayerControl extends AbstractControl {
             }
 
             if (dead) {
+                healthbar.getLocalScale().setX(0);
                 if (deadDelay >= 3f) {
                     System.out.println("YOU ARE DEAD");
                     inputManager.clearMappings();
@@ -647,6 +671,9 @@ public class PlayerControl extends AbstractControl {
         if (!dead) {
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
+                healthbar.getLocalScale().setX((health + 1) / 75);
+                healthbar.center();
+                healthbar.move((health / 200)+1, 9, 0);
                 hitAnimationDelay = 1.5f;
                 // doAnim("player", "Hit", LoopMode.Loop);
                 System.out.println("ouch" + dmg + " damage " + " from " + name + "");

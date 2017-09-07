@@ -60,7 +60,7 @@ public class EntityControl extends AbstractControl {
         hostile.addControl(bcc);
         bulletState.getPhysicsSpace().add(bcc);s
         bcc.warp(new Vector3f(pos));*/
-        setAnim("walk", LoopMode.Loop);
+        setAnim("Walk", LoopMode.Loop);
         getSkeletonControl().setHardwareSkinningPreferred(false);
         this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
 
@@ -86,6 +86,10 @@ public class EntityControl extends AbstractControl {
         healthbar.center();
         healthbar.move(5, 9, 0);
         healthbar.addControl(billboard);
+
+        if (name.equals("demon")) {
+            this.spatial.scale(1.2f);
+        }
 
     }
     private float attackTimer = 0f;
@@ -113,17 +117,21 @@ public class EntityControl extends AbstractControl {
                 Vector3f b = this.spatial.getWorldTranslation();
 
                 float distance = a.distance(b);
-                if (distance > fleeDistance) {
-                    fighting = false;
+                if (distance > fleeDistance / 2) {
                     targetName = "";
+                    fighting = false;
                 } else {
                     //  spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
                     //   spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_Z);
                     spatial.lookAt(targetSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
                 }
+            } else {
+                fighting = false;
             }
             if (fighting) {
                 attacking = true;
+            } else {
+                attacking = false;
             }
 
             if (health < 0) {

@@ -283,7 +283,6 @@ public class GameRunningState extends AbstractAppState {
         inputManager.addListener(actionListener, "delayUp");
         inputManager.addListener(actionListener, "delayDown");
         inputManager.addListener(actionListener, "timeDemo");
-        inputManager.addListener(actionListener, "switchPath");
     }
 
     public void removeListener() {
@@ -385,8 +384,6 @@ public class GameRunningState extends AbstractAppState {
 
         inputManager.addMapping("timeDemo",
                 new KeyTrigger(KeyInput.KEY_F10));
-        inputManager.addMapping("switchPath",
-                new KeyTrigger(KeyInput.KEY_I));
     }
 
     private void treeoutroot(Node node) {
@@ -471,12 +468,6 @@ public class GameRunningState extends AbstractAppState {
                 case "treeoutroot":
                     if (value && isRunning) {
                         treeoutroot(localRootNode);
-                    }
-                    break;
-
-                case "switchPath":
-                    if (value && isRunning) {
-                        enemyControl.setPlaying(!enemyControl.isPlaying());
                     }
                     break;
 
