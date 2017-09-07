@@ -19,6 +19,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
@@ -32,8 +33,10 @@ import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.control.LightControl;
+import com.jme3.scene.shape.Quad;
 import com.jme3.system.JmeContext;
 
 public class PlayerControl extends AbstractControl {
@@ -183,6 +186,15 @@ public class PlayerControl extends AbstractControl {
         hit.setVolume(4);
         localRootNode.attachChild(hit);*/
         // TangentBinormalGenerator.generate(this.model);
+        /*        BillboardControl billboard = new BillboardControl();
+        Geometry healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
+        Material mathb = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mathb.setColor("Color", ColorRGBA.Red);
+        healthbar.setMaterial(mathb);
+        characterNode.attachChild(healthbar);
+        healthbar.center();
+        healthbar.move(4.3f, 9, 0);
+        healthbar.addControl(billboard);*/
     }
 
     private final ActionListener actionListener = new ActionListener() {

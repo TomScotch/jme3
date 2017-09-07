@@ -14,13 +14,18 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.light.PointLight;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.control.BillboardControl;
+import com.jme3.scene.shape.Quad;
 
 public class EntityControl extends AbstractControl {
 
     private final float damage = 20;
     private final PlayerControl pc;
+    private final Geometry healthbar;
 
     public boolean isFighting() {
         return fighting;
@@ -69,6 +74,19 @@ public class EntityControl extends AbstractControl {
         localRootNode.attachChild(hit);*/
         this.spatial.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         // this.spatial.lookAt(new Vector3f(1, 0, 0), Vector3f.UNIT_X);
+
+        BillboardControl billboard = new BillboardControl();
+        healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
+        Material mathb = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mathb.setColor("Color", ColorRGBA.Red);
+        healthbar.setMaterial(mathb);
+        Node n = (Node) this.spatial;
+        n.attachChild(healthbar);
+        healthbar.getLocalScale().setX((health + 1) / 75);
+        healthbar.center();
+        healthbar.move(5, 9, 0);
+        healthbar.addControl(billboard);
+
     }
     private float attackTimer = 0f;
     private final float attackTime = 1.5f;
@@ -78,6 +96,7 @@ public class EntityControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
 
         if (!dead) {
+
             if (attackTimer <= 0) {
                 if (attacking) {
                     attack();
@@ -98,8 +117,8 @@ public class EntityControl extends AbstractControl {
                     fighting = false;
                     targetName = "";
                 } else {
-                    spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
-                    spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_Z);
+                    //  spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
+                    //   spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_Z);
                     spatial.lookAt(targetSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
                 }
             }
@@ -132,6 +151,7 @@ public class EntityControl extends AbstractControl {
         }
 
         if (dead) {
+            healthbar.getLocalScale().setX(0);
             if (deadDelay >= 3f) {
                 deadParticles(20);
                 setAnim("Dying", LoopMode.DontLoop);
@@ -172,6 +192,9 @@ public class EntityControl extends AbstractControl {
             targetName = name;
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
+                healthbar.getLocalScale().setX((health + 1) / 75);
+                healthbar.center();
+                healthbar.move(-(((health + 1) / 75) * 2), 9, 0);
                 hitAnimationDelay = 1.5f;
                 setAnim("Hit", LoopMode.Loop);
 

@@ -9,6 +9,7 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
+import com.jme3.scene.control.BillboardControl;
 
 public class ShowDamage extends AbstractControl {
 
@@ -25,6 +26,9 @@ public class ShowDamage extends AbstractControl {
         txt.setColor(ColorRGBA.Red);
         n.attachChild(txt);
         txt.getLocalTranslation().addLocal(0, n.getWorldTransform().getScale().getY() * 7.5f, 0);
+        BillboardControl billboard = new BillboardControl();
+        Node node = (Node) txt;
+        node.addControl(billboard);
     }
 
     @Override
