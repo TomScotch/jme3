@@ -163,7 +163,7 @@ public class PlayerControl extends AbstractControl {
         this.localRootNode.attachChild(characterNode);
         doAnim("player", "Idle", LoopMode.Loop);
         characterNode.setQueueBucket(RenderQueue.Bucket.Opaque);
-
+        characterNode.getLocalTranslation().addLocal(10, 0, 20);
         if (aniCon.getClass() == null) {
             aniCon.createChannel();
             aniCon.getChannel(0).setAnim("idle");
