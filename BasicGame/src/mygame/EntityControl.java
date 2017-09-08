@@ -128,11 +128,7 @@ public class EntityControl extends AbstractControl {
             } else {
                 fighting = false;
             }
-            if (fighting) {
-                attacking = true;
-            } else {
-                attacking = false;
-            }
+            attacking = fighting;
 
             if (health < 0) {
 
