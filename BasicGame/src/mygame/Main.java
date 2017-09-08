@@ -389,7 +389,8 @@ public class Main extends SimpleApplication implements ScreenController {
                 + "back        - open menu\n"
                 + "leftmouse   - attack\n"
                 + "rightmouse  - rotate view ( rotation mode only  ) \n"
-                + "mouse wheel - zoom in or out";
+                + "mouse wheel - zoom in or out \n"
+                + "b           - show health bar";
         System.out.println(s);
         initStartGui();
         console = nifty.getScreen("console").findNiftyControl("console", Console.class);
@@ -411,6 +412,7 @@ public class Main extends SimpleApplication implements ScreenController {
         deathText.setLocalTranslation((cam.getWidth()) - (cam.getWidth() / 2), (cam.getHeight()) - (cam.getHeight() / 2), 0);
         guiNode.attachChild(deathText);
         deathText.setCullHint(Spatial.CullHint.Always);
+        app.getRenderManager().setAlphaToCoverage(true);
     }
 
     private void addListener() {
@@ -952,6 +954,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 if (!guiViewPort.getProcessors().contains(niftyDisplay)) {
                     guiViewPort.addProcessor(niftyDisplay);
                 }
+                nifty.gotoScreen("start");
                 //switchGameState();
             }
         }
@@ -967,7 +970,7 @@ public class Main extends SimpleApplication implements ScreenController {
                 deathCounter += tpf;
                 deathText.setCullHint(Spatial.CullHint.Never);
                 int dt = (int) (9 - deathCounter);
-                deathText.setText(" you Died - restart in " + dt);
+                deathText.setText("restart in " + dt);
                 nifty.gotoScreen("game");
                 showConsole = false;
                 if (deathCounter >= 9 && deathCounter < 10) {

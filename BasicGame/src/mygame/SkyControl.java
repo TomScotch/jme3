@@ -99,7 +99,6 @@ public class SkyControl extends AbstractControl {
         evening.setCullHint(Spatial.CullHint.Always);
         morning.setCullHint(Spatial.CullHint.Always);
         night.setCullHint(Spatial.CullHint.Always);
-
     }
 
     @Override
@@ -142,7 +141,7 @@ public class SkyControl extends AbstractControl {
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations
-        rm.setAlphaToCoverage(enabled);
+        //rm.setAlphaToCoverage(enabled);
     }
 
 }

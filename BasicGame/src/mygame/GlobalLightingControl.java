@@ -240,18 +240,17 @@ public class GlobalLightingControl extends AbstractControl {
                         }
                     }
                 }
-
-                if (!isNight() && !isMorning()) {
-                    vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 3);
-                }
-                if (isMorning()) {
-                    vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), (tpf / getTimeDelay()) * 3);
-                }
             } else {
                 sun.setDirection(new Vector3f(-5, -5, -5));
                 sun.setColor(ColorRGBA.White);
                 fire.removeFromParent();
                 sphereGeo.removeFromParent();
+            }
+            if (!isNight() && !isMorning()) {
+                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 3);
+            }
+            if (isMorning()) {
+                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), (tpf / getTimeDelay()) * 3);
             }
         } else {
             System.out.println("glc stopped");

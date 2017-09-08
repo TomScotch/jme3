@@ -42,6 +42,14 @@ import com.jme3.util.TangentBinormalGenerator;
 
 public class PlayerControl extends AbstractControl {
 
+    public boolean isDead() {
+        return dead;
+    }
+
+    public void setDead(boolean dead) {
+        this.dead = dead;
+    }
+
     public float getHealth() {
         return health;
     }

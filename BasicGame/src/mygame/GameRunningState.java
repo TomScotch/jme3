@@ -12,6 +12,7 @@ import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
+import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -37,6 +38,9 @@ import java.util.List;
 import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
+
+    private BitmapText healthText;
+    private BitmapFont guiFont;
 
     public void setConsole(Console console) {
         this.console = console;
@@ -262,10 +266,11 @@ public class GameRunningState extends AbstractAppState {
         enemyControl = new EnemyControl(assetManager, localRootNode, bulletAppState, playerControl);
 
         limit = getRandomNumberInRange(15, 45);
-        
     }
 
     private void setupHudText() {
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+
         hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
         hudText.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 1.75f);      // font size
         hudText.setColor(ColorRGBA.Blue);
@@ -282,6 +287,14 @@ public class GameRunningState extends AbstractAppState {
         // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
 
+        healthText = new BitmapText(guiFont, false);
+        healthText.setSize(guiFont.getCharSet().getRenderedSize() * 3.2f);
+        healthText.setColor(ColorRGBA.Green);
+        Integer i = (int) playerControl.getHealth();
+        healthText.setText(i.toString());
+        healthText.setLocalTranslation(healthText.getSize(), viewPort.getCamera().getHeight() - healthText.getHeight(), 0);
+        guiNode.attachChild(healthText);
+        healthText.setCullHint(Spatial.CullHint.Never);
     }
 
     public void addListener() {
@@ -551,7 +564,31 @@ public class GameRunningState extends AbstractAppState {
         if (isRunning) {
 
             if (playerControl != null) {
-                health = playerControl.getHealth();
+                if (!playerControl.isDead()) {
+                    health = playerControl.getHealth();
+                    Integer i = (int) playerControl.getHealth();
+
+                    if (health <= 100 && health >= 75) {
+                        healthText.setColor(ColorRGBA.Green);
+                    }
+                    if (health < 75 && health >= 50) {
+                        healthText.setColor(ColorRGBA.Yellow);
+                    }
+
+                    if (health < 50 && health >= 25) {
+                        healthText.setColor(ColorRGBA.Orange);
+                    }
+
+                    if (health < 25) {
+                        healthText.setColor(ColorRGBA.Red);
+                        localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
+                        localRootNode.getControl(PosterizationFilterControl.class).setStrength(1.25f);
+                    }
+
+                    healthText.setText(i.toString());
+                } else {
+                    healthText.setText("dead");
+                }
             }
 
             super.update(tpf);
@@ -698,7 +735,7 @@ public class GameRunningState extends AbstractAppState {
     public void stateDetach() {
         hudText.removeFromParent();
         hudText2.removeFromParent();
-
+        healthText.removeFromParent();
         hudText2.setText("... : ...         ");
 
         amb.stop();
