@@ -33,6 +33,7 @@ public class GlobalLightingControl extends AbstractControl {
     private final SpotLight dummySpotLight;
 
     private final Node localRootNode;
+    private final ViewPort vp;
 
     public DirectionalLight getSun() {
         return sun;
@@ -62,6 +63,7 @@ public class GlobalLightingControl extends AbstractControl {
         this.sl = sl;
         this.localRootNode = localRootNode;
         dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
+        this.vp = vp;
 
         //PointLightSunPivotNode
         pivot.getWorldTranslation().set(0, 0, 0);
@@ -138,6 +140,7 @@ public class GlobalLightingControl extends AbstractControl {
 
         sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
+
     }
 
     @Override
@@ -200,6 +203,7 @@ public class GlobalLightingControl extends AbstractControl {
                     day = true;
                     evening = false;
                     night = false;
+
                     if (sl != null) {
                         slsr.setShadowIntensity(0.35f);
                     }
@@ -237,6 +241,12 @@ public class GlobalLightingControl extends AbstractControl {
                     }
                 }
 
+                if (!isNight() && !isMorning()) {
+                    vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 3);
+                }
+                if (isMorning()) {
+                    vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), (tpf / getTimeDelay()) * 3);
+                }
             } else {
                 sun.setDirection(new Vector3f(-5, -5, -5));
                 sun.setColor(ColorRGBA.White);

@@ -38,7 +38,15 @@ import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
 
-    private final Console console;
+    public void setConsole(Console console) {
+        this.console = console;
+    }
+
+    public Console getConsole() {
+        return console;
+    }
+
+    private Console console;
 
     public float getHealth() {
         return health;
@@ -254,6 +262,7 @@ public class GameRunningState extends AbstractAppState {
         enemyControl = new EnemyControl(assetManager, localRootNode, bulletAppState, playerControl);
 
         limit = getRandomNumberInRange(15, 45);
+        
     }
 
     private void setupHudText() {

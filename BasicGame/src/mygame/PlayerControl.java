@@ -200,7 +200,7 @@ public class PlayerControl extends AbstractControl {
         healthbar.center();
         healthbar.move(5, 9, 0);
         healthbar.addControl(billboard);
-        characterNode.getLocalTranslation().addLocal(55, 3, -20);
+        characterNode.getLocalTranslation().addLocal(60, 3, -10);
     }
 
     private final ActionListener actionListener = new ActionListener() {
