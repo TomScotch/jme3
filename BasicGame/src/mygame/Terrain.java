@@ -59,9 +59,11 @@ public class Terrain extends AbstractControl {
         }
 
         // TangentBinormalGenerator.generate(terrain);
-        terrain.addControl(new RigidBodyControl(0));
+        RigidBodyControl rb = new RigidBodyControl(0);
+        terrain.addControl(rb);
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);
+        rb.setFriction(1);
     }
 
     @Override

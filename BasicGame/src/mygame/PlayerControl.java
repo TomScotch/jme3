@@ -67,10 +67,11 @@ public class PlayerControl extends AbstractControl {
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     private boolean chaseEnabled = true;
-    private final float jump_Speed = 750;
+
     private final CameraNode camNode;
-    private final float gravity = 0;
-    private final float playerMass = 175;
+    private final float gravity = -9.81f;
+    private final float playerMass = 75f;
+    private final float jump_Speed = 500f;
     private final float chaseCamRotationSpeed = 0.375f;
     private final SpotLight lamp;
 
@@ -172,6 +173,7 @@ public class PlayerControl extends AbstractControl {
         physicsCharacter.warp(new Vector3f(5, 2, -10));
         physicsCharacter.setJumpForce(new Vector3f(0, jump_Speed, 0));
         physicsCharacter.setGravity(new Vector3f(0, gravity, 0));
+        physicsCharacter.setPhysicsDamping(1);
         characterNode.addControl(physicsCharacter);
         bulletAppState.getPhysicsSpace().add(physicsCharacter);
         this.localRootNode.attachChild(characterNode);
@@ -681,7 +683,7 @@ public class PlayerControl extends AbstractControl {
                 health -= (dmg - armor);
                 healthbar.getLocalScale().setX((health + 1) / 75);
                 healthbar.center();
-                healthbar.move((health / 200)+1, 9, 0);
+                healthbar.move((health / 200) + 1, 9, 0);
                 hitAnimationDelay = 1.5f;
                 // doAnim("player", "Hit", LoopMode.Loop);
                 System.out.println("ouch" + dmg + " damage " + " from " + name + "");
