@@ -441,6 +441,18 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addMapping("console", consoleTrigger);
     }
 
+    public void remove_trigger() {
+        inputManager.deleteTrigger("rain_trigger", rain_trigger);
+        inputManager.deleteTrigger("fpsSwitch_trigger", fpsSwitch_trigger);
+        inputManager.deleteTrigger("superDebug", superDebug_trigger);
+        inputManager.deleteTrigger("Game Pause Unpause", pause_trigger);
+        inputManager.deleteTrigger("record", record_trigger);
+        inputManager.deleteTrigger("restart", restart_trigger);
+        inputManager.deleteTrigger("exit", exit_trigger);
+        inputManager.deleteTrigger("switchStats", statsViewTrigger);
+        inputManager.deleteTrigger("help", helpTrigger);
+    }
+
     public int getDisplayMode() {
         int c = 0;
         for (DisplayMode dm : modes) {
@@ -487,8 +499,10 @@ public class Main extends SimpleApplication implements ScreenController {
 
                 if (stateManager.hasState(gameRunningState) && gameRunningState != null) {
                     if (showConsole) {
+                        remove_trigger();
                         nifty.gotoScreen("console");
                     } else {
+                        add_mapping();
                         nifty.gotoScreen("game");
                         showConsole = false;
                     }
