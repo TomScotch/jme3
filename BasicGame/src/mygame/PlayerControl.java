@@ -621,7 +621,7 @@ public class PlayerControl extends AbstractControl {
             doAnim("player", "Attack", LoopMode.DontLoop);
             attackTimer = attackTime;
 
-            Ray ray1 = new Ray(model.getWorldTranslation(), viewPort.getCamera().getDirection());
+            Ray ray1 = new Ray(model.getWorldTranslation(), viewPort.getCamera().getDirection()); //model.getWorldTranslation()
             CollisionResults results1 = new CollisionResults();
             localRootNode.collideWith(ray1, results1);
 
@@ -639,7 +639,7 @@ public class PlayerControl extends AbstractControl {
                         if (target != null) {
                             if (!target.equals("")) {
                                 if (!target.equals("terrain")) {
-                                    if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 10) {
+                                    if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 25) {
                                         attack(target);
                                     }
                                 }
