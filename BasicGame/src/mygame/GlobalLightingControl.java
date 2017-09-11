@@ -159,10 +159,8 @@ public class GlobalLightingControl extends AbstractControl {
             if (globalLightning) {
 
                 fire.setLocalTranslation(sphereGeo.getWorldTranslation());
-                fire.rotate(0, tpf, 0);
-
                 rotation = tpf / timeDelay;
-
+                fire.rotate(0, 0, rotation);
                 pivot.rotate(rotation, 0, 0);
                 float z = sphereGeo.getWorldTranslation().getZ();
                 float y = sphereGeo.getWorldTranslation().getY();
