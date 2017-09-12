@@ -55,23 +55,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * @version 0.21
+ * @author tomscotch
+ */
 @SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
 
+    /**
+     * get the nifty gui console
+     *
+     * @return console
+     */
     public static Console getConsole() {
         return console;
     }
 
-    public static Platform getSelectedPlatform() {
-        return selectedPlatform;
-    }
-
-    public static void setSelectedPlatform(Platform aSelectedPlatform) {
-        selectedPlatform = aSelectedPlatform;
-    }
-
     private static AppSettings cfg;
     private static Main app;
+
     private static final boolean opencl = false;
     private static final boolean openAl = true;
 
@@ -120,20 +122,28 @@ public class Main extends SimpleApplication implements ScreenController {
     private boolean showConsole = false;
     private static Console console;
 
-    //https://github.com/QuietOne/MonkeyBrains.git
-    
+    /**
+     * nifty gui switch procedure to turn shadows on/off
+     */
     public void switchShadows() {
         shadows = !shadows;
         settingsNode.setUserData("shadows", shadows);
         nifty.getScreen("settings").findNiftyControl("shadowsButton", Button.class).setText("Shadows : " + shadows);
     }
 
+    /**
+     * nifty gui switch procedure nifty gui switch procedure to turn bloom
+     * on/off
+     */
     public void switchBloom() {
         bloomEnabled = !bloomEnabled;
         settingsNode.setUserData("bloomEnabled", bloomEnabled);
         nifty.getScreen("settings").findNiftyControl("BloomButton", Button.class).setText("Bloom : " + bloomEnabled);
     }
 
+    /**
+     * nifty gui switch procedure to turn OpenGl on/off
+     */
     public void switchOpenGl() {
 
         isGl3 = !isGl3;
@@ -148,18 +158,30 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.getScreen("settings").findNiftyControl("openglButton", Button.class).setText("OpenGL = " + isGl3);
     }
 
+    /**
+     * nifty gui switch procedure nifty gui switch procedure to turn water post
+     * processing on/off
+     */
     public void switchPostProcessWater() {
         waterPostProcessing = !waterPostProcessing;
         settingsNode.setUserData("waterPostProcessing", waterPostProcessing);
         nifty.getScreen("settings").findNiftyControl("waterButton", Button.class).setText("WaterPP = " + waterPostProcessing);
     }
 
+    /**
+     * nifty gui switch procedure nifty gui switch procedure to turn anisotropy
+     * on/off
+     */
     public void switchAnisotropy() {
         anisotropyEnabled = !anisotropyEnabled;
         settingsNode.setUserData("anisotropyEnabled", anisotropyEnabled);
         nifty.getScreen("settings").findNiftyControl("anisotropyButton", Button.class).setText("anisotropy = " + anisotropyEnabled);
     }
 
+    /**
+     * nifty gui switch procedure nifty gui switch procedure to turn
+     * LightScatter on/off
+     */
     public void switchLightScatter() {
 
         lightScatterEnabled = !lightScatterEnabled;
@@ -167,18 +189,28 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.getScreen("settings").findNiftyControl("lightScatterButton", Button.class).setText("lightScatter = " + lightScatterEnabled);
     }
 
+    /**
+     * nifty gui switch procedure nifty gui switch procedure to turn fog on/off
+     */
     public void switchFog() {
         fogEnabled = !fogEnabled;
         settingsNode.setUserData("fogEnabled", fogEnabled);
         nifty.getScreen("settings").findNiftyControl("fogButton", Button.class).setText("fog = " + fogEnabled);
     }
 
+    /**
+     * nifty gui switch procedure nifty gui switch procedure to turn global
+     * lighting on/off
+     */
     public void switchGlobalLightning() {
         globalLightningEnabled = !globalLightningEnabled;
         settingsNode.setUserData("globalLightningEnabled", globalLightningEnabled);
         nifty.getScreen("settings").findNiftyControl("globalLightningButton", Button.class).setText("globalLightning = " + globalLightningEnabled);
     }
 
+    /**
+     * build new game state multithreading
+     */
     @SuppressWarnings("Convert2Lambda")
     Callable<Void> loadingCallable = new Callable<Void>() {
         @Override
@@ -188,6 +220,12 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     };
 
+    /**
+     * save a node as j3o
+     *
+     * @param node the node to write to disk
+     * @return true if file could be saved / false if not
+     */
     public boolean saveNode(Node node) {
         String userHome = System.getProperty("user.home");
         BinaryExporter exporter = BinaryExporter.getInstance();
@@ -203,6 +241,12 @@ public class Main extends SimpleApplication implements ScreenController {
         return x;
     }
 
+    /**
+     * load a j3o from disk
+     *
+     * @param fileName the name of the j3o to load
+     * @return node
+     */
     public Node loadNode(String fileName) {
 
         Node loadedNode = null;
@@ -222,6 +266,12 @@ public class Main extends SimpleApplication implements ScreenController {
         return loadedNode;
     }
 
+    /**
+     * sort a list with display modes
+     *
+     * @param modes display modes list to be sorted
+     * @return modes2 the sorted list with modes
+     */
     private static DisplayMode[] sortModes(DisplayMode[] modes) {
         DisplayMode[] modes2;
         for (int i = 1; i < modes.length; i++) {
@@ -291,15 +341,17 @@ public class Main extends SimpleApplication implements ScreenController {
             cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
         }
 
-        //
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
 
         app.setSettings(cfg);
-        //
+
         app.start();
     }
 
+    /**
+     * tries to save the cfg to disk ( Logs error) and to stop zombie tasks
+     */
     @Override
     public void stop() {
 
@@ -417,6 +469,9 @@ public class Main extends SimpleApplication implements ScreenController {
         app.getRenderManager().setAlphaToCoverage(true);
     }
 
+    /**
+     * add all action listener at once
+     */
     private void addListener() {
         inputManager.addListener(actionListener, new String[]{"record"});
         inputManager.addListener(actionListener, new String[]{"restart"});
@@ -430,6 +485,9 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addListener(actionListener, new String[]{"console"});
     }
 
+    /**
+     * add all keyboard mappings at once
+     */
     public void add_mapping() {
         inputManager.addMapping("rain_trigger", rain_trigger);
         inputManager.addMapping("fpsSwitch_trigger", fpsSwitch_trigger);
@@ -443,6 +501,9 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.addMapping("console", consoleTrigger);
     }
 
+    /**
+     * remove local keyboard trigger
+     */
     public void remove_trigger() {
         inputManager.deleteTrigger("rain_trigger", rain_trigger);
         inputManager.deleteTrigger("fpsSwitch_trigger", fpsSwitch_trigger);
@@ -455,6 +516,11 @@ public class Main extends SimpleApplication implements ScreenController {
         inputManager.deleteTrigger("help", helpTrigger);
     }
 
+    /**
+     * number of available Display Modes
+     *
+     * @return
+     */
     public int getDisplayMode() {
         int c = 0;
         for (DisplayMode dm : modes) {
@@ -468,6 +534,9 @@ public class Main extends SimpleApplication implements ScreenController {
         return c;
     }
 
+    /**
+     * full deconstruction of the game state and fresh start of the game
+     */
     public void doRestart() {
 
         System.out.println("restart");
@@ -488,13 +557,18 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
     }
+
     protected boolean isRecording;
+
     private final ActionListener actionListener = new ActionListener() {
 
         @Override
         @SuppressWarnings("Convert2Lambda")
         public void onAction(String name, boolean isPressed, float tpf) {
 
+            /**
+             * display or hide the onscreem console
+             */
             if (name.equals("console") && !isPressed) {
 
                 showConsole = !showConsole;
@@ -519,6 +593,9 @@ public class Main extends SimpleApplication implements ScreenController {
 
             }
 
+            /**
+             * display keyboard mapping
+             */
             if (name.equals("help") && !isPressed) {
 
                 if (!isRecording) {
@@ -531,22 +608,35 @@ public class Main extends SimpleApplication implements ScreenController {
 
             }
 
+            /**
+             * change to random weather settings
+             */
             if (name.equals("rain_trigger") && !isPressed) {
                 if (stateManager.hasState(gameRunningState)) {
                     gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
                 }
             }
+
+            /**
+             * show or hide statistics in lower left gui
+             */
             if (name.equals("switchStats") && !isPressed) {
                 displayStatView = !displayStatView;
                 app.setDisplayStatView(displayStatView);
                 app.getContext().restart();
             }
 
+            /**
+             * show or hide framesPerSecond in lower left gui
+             */
             if (name.equals("fpsSwitch_trigger") && !isPressed) {
 
                 switchFps();
             }
 
+            /**
+             * switch between wireframe view
+             */
             if (name.equals("superDebug") && !isPressed) {
                 wireframe = !wireframe;
                 rootNode.depthFirstTraversal(new SceneGraphVisitor() {
@@ -559,6 +649,10 @@ public class Main extends SimpleApplication implements ScreenController {
                 });
             }
 
+            /**
+             * pause the game and jump to startscreen , return to the game on
+             * continue
+             */
             if (name.equals("Game Pause Unpause") && !isPressed) {
                 if (gameRunningState != null) {
                     switchGameState();
@@ -569,10 +663,16 @@ public class Main extends SimpleApplication implements ScreenController {
                 doRestart();
             }
 
+            /**
+             * full shutdown of the application
+             */
             if (name.equals("exit") && !isPressed) {
                 app.stop();
             }
 
+            /**
+             * create video recording of your game
+             */
             if (name.equals("record") && !isPressed) {
 
                 if (stateManager.hasState(gameRunningState)) {
@@ -598,11 +698,17 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     };
 
+    /**
+     * show or hide framesPerSecond in lower left gui
+     */
     private void switchFps() {
         showFps = !showFps;
         app.setDisplayFps(showFps);
     }
 
+    /**
+     * open settings screen
+     */
     public void switchOptionsState() {
         if (stateManager.hasState(startScreenState)) {
             stateManager.detach(startScreenState);
@@ -617,6 +723,9 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     }
 
+    /**
+     * create nifty gui screens and controls
+     */
     public void initStartGui() {
 
         nifty.loadStyleFile("nifty-default-styles.xml");
@@ -859,15 +968,16 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.gotoScreen("start");
     }
 
+    /**
+     * applies a new video resolution , in case of multisamples the application
+     * will exit
+     */
     public void applyResolution() {
         int value = (int) nifty.getScreen("settings").findNiftyControl("sliderA", Slider.class).getValue();
         int samples = (int) nifty.getScreen("settings").findNiftyControl("sliderB", Slider.class).getValue();
 
         nifty.getScreen("settings").findNiftyControl("resolutionLabel", Label.class).setText(modes[value].getWidth() + " x " + modes[value].getHeight());
         cfg.setResolution(modes[value].getWidth(), modes[value].getHeight());
-
-        nifty.resolutionChanged();
-        //nifty.update();
 
         if (cfg.getSamples() != samples) {
             System.out.println("will Stop because samples");
@@ -878,7 +988,7 @@ public class Main extends SimpleApplication implements ScreenController {
             app.setSettings(cfg);
             doRestart();
         }
-
+        nifty.resolutionChanged();
     }
 
     @NiftyEventSubscriber(pattern = "slider*.")
@@ -894,6 +1004,9 @@ public class Main extends SimpleApplication implements ScreenController {
         }
     }
 
+    /**
+     * apply nifty control changes , update vsync app settings and restart game
+     */
     public void switchVsync() {
         nifty.getScreen("settings").findNiftyControl("vSyncCheckbox", CheckBox.class).setChecked(!nifty.getScreen("settings").findNiftyControl("vSyncCheckbox", CheckBox.class).isChecked());
         cfg.setVSync(nifty.getScreen("settings").findNiftyControl("vSyncCheckbox", CheckBox.class).isChecked());
@@ -901,6 +1014,9 @@ public class Main extends SimpleApplication implements ScreenController {
         doRestart();
     }
 
+    /**
+     * apply nifty control changes , apply fullscreen settings and restart
+     */
     public void switchFullScreen() {
 
         nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).setChecked(!nifty.getScreen("settings").findNiftyControl("fullscreenCheckbox", CheckBox.class).isChecked());
@@ -913,23 +1029,26 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
         nifty.resolutionChanged();
-        // nifty.update();
+        nifty.update();
         app.setSettings(cfg);
         doRestart();
     }
 
+    /**
+     * switch between game and startscreen or start game if none existing
+     */
     public void switchGameState() {
+
         System.out.println("switchting Game State");
+
         if (stateManager.hasState(gameRunningState)) {
             stateManager.detach(gameRunningState);
             stateManager.attach(startScreenState);
-
-            /*            if (!guiViewPort.getProcessors().contains(niftyDisplay)) {
-            guiViewPort.addProcessor(niftyDisplay);
-            }*/
             nifty.gotoScreen("start");
             System.out.println("switching to startscreen...");
+
         } else {
+
             if (gameRunningState == null) {
 
                 inputManager.setCursorVisible(false);
@@ -937,11 +1056,12 @@ public class Main extends SimpleApplication implements ScreenController {
                 if (guiViewPort.getProcessors().contains(niftyDisplay)) {
                     nifty.gotoScreen("game");
                     showConsole = false;
-                    //guiViewPort.removeProcessor(niftyDisplay);
                 }
 
                 loadFuture = exec.submit(loadingCallable);
+
             } else {
+
                 if (stateManager.hasState(startScreenState)) {
 
                     stateManager.detach(startScreenState);
@@ -950,16 +1070,16 @@ public class Main extends SimpleApplication implements ScreenController {
                     if (guiViewPort.getProcessors().contains(niftyDisplay)) {
                         nifty.gotoScreen("game");
                         showConsole = false;
-                        //guiViewPort.removeProcessor(niftyDisplay);
                     }
                     System.out.println("switching to game...");
-
-//                    app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                 }
             }
         }
     }
 
+    /**
+     * in case game lose focus pause to avoid uncontrolled game progress
+     */
     @Override
     public void loseFocus() {
         System.out.println("lostFocus");
@@ -971,16 +1091,23 @@ public class Main extends SimpleApplication implements ScreenController {
                     guiViewPort.addProcessor(niftyDisplay);
                 }
                 nifty.gotoScreen("start");
-                //switchGameState();
             }
         }
         super.loseFocus();
     }
 
+    /**
+     * Main Game Loop
+     *
+     * @param tpf times per frame
+     */
     @Override
     @SuppressWarnings("Convert2Lambda")
     public void simpleUpdate(final float tpf) {
 
+        /**
+         * if player dies display message count down and restart applicatiom
+         */
         if (gameRunningState != null) {
             if (gameRunningState.getHealth() <= 0) {
                 deathCounter += tpf;
@@ -1002,6 +1129,10 @@ public class Main extends SimpleApplication implements ScreenController {
             }
         }
 
+        /**
+         * in case the game screen is being recorded, blinking REC message is
+         * being displayed
+         */
         if (isRecording) {
             helloText.setColor(ColorRGBA.Red);
             helloText.setSize(guiFont.getCharSet().getRenderedSize() * 2);
@@ -1028,6 +1159,9 @@ public class Main extends SimpleApplication implements ScreenController {
             helloText.setText(s);
         }
 
+        /**
+         * rotate Box while Game is being loaded
+         */
         if (loadFuture != null) {
 
             if (stateManager.hasState(startScreenState)) {
@@ -1043,8 +1177,11 @@ public class Main extends SimpleApplication implements ScreenController {
                 });
             }
 
+            /**
+             * remove Rotating Box detach StartScreen State attach Game State
+             * set multithreading to null enable user input
+             */
             if (gameRunningState != null) {
-                //  app.getRenderManager().preloadScene(gameRunningState.getLocalRoot());
                 startScreenState.detachBox();
                 stateManager.detach(startScreenState);
                 stateManager.attach(gameRunningState);
@@ -1074,33 +1211,30 @@ public class Main extends SimpleApplication implements ScreenController {
         nifty.gotoScreen("end");
     }
 
+    /**
+     * stop application
+     */
     public void doShutdown() {
         app.stop();
     }
 
+    /**
+     * true if fps is shown in gui
+     *
+     * @return isShowFps
+     */
     public static boolean isShowFps() {
         return showFps;
     }
 
+    /**
+     * set boolean to handle if FramesPerSecond is shown ,true will show fps in
+     * gui
+     *
+     * @param aShowFps
+     */
     public static void setShowFps(boolean aShowFps) {
         showFps = aShowFps;
-    }
-
-    public class TextLoader implements AssetLoader {
-
-        @Override
-        public String load(AssetInfo assetInfo) throws IOException {
-            Scanner scan = new Scanner(assetInfo.openStream());
-            StringBuilder sb = new StringBuilder();
-            try {
-                while (scan.hasNextLine()) {
-                    sb.append(scan.nextLine()).append('\n');
-                }
-            } finally {
-                scan.close();
-            }
-            return sb.toString();
-        }
     }
 
     public static class CustomPlatformChooser implements PlatformChooser {
@@ -1117,7 +1251,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
                 Platform platform = platforms.get(0);
                 availableDevices = platform.getDevices();
-                setSelectedPlatform(platform);
+                selectedPlatform = platform;
 
                 Device device = platform.getDevices().get(currentDeviceIndex);
                 currentDeviceIndex++;
