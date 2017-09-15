@@ -20,9 +20,9 @@ public class DepthOfField extends AbstractControl {
     private final JmeContext context;
     private final Camera cam;
 
-    private float focusDistance = 10; // 10f
-    private final float range = 50; // 50f
-    private final float scale = 1; // 1.4f
+    private float focusDistance = 7.5f; // 10f
+    private final float range = 45; // 50f
+    private final float scale = 0.9f; // 1f
 
     public DepthOfField(FilterPostProcessor fpp, JmeContext context, ViewPort vp, AssetManager assetManager) {
 

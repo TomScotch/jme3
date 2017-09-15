@@ -10,20 +10,20 @@ public class BloomPostFilter extends AbstractControl {
 
     private final BloomFilter bloom;
 
-    private float density = 2.3f;//2
-    private float sampling = 1;//1
+    private float density = 2f;//2
+    private float sampling = 2;//1
     private float blurScale = 1.5f;//1.5f
-    private float exposurePower = 3.5f;//5
-    private float cutOff = 0.2f; // 0.1 - 1.0
+    private float exposurePower = 5f;//5
+    private float cutOff = 0f; // 0.1 - 1.0
 
     public BloomPostFilter(FilterPostProcessor fpp) {
 
         bloom = new BloomFilter(BloomFilter.GlowMode.SceneAndObjects);
-        bloom.setExposureCutOff(cutOff - 0.1f);
-        bloom.setBloomIntensity(density / 1.5f);
+        bloom.setExposureCutOff(cutOff);
+        bloom.setBloomIntensity(density);
         bloom.setDownSamplingFactor(sampling);
-        bloom.setBlurScale(blurScale * 1.5f);
-        bloom.setExposurePower(exposurePower / 1.25f);
+        bloom.setBlurScale(blurScale);
+        bloom.setExposurePower(exposurePower);
         fpp.addFilter(bloom);
     }
 

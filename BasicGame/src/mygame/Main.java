@@ -3,8 +3,6 @@ package mygame;
 import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.VideoRecorderAppState;
-import com.jme3.asset.AssetInfo;
-import com.jme3.asset.AssetLoader;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.export.binary.BinaryImporter;
 import com.jme3.font.BitmapText;
@@ -53,9 +51,10 @@ import de.lessvoid.nifty.controls.Console;
 import de.lessvoid.nifty.controls.console.builder.ConsoleBuilder;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 /**
+ * Application Main Method
+ *
  * @version 0.21
  * @author tomscotch
  */
@@ -517,9 +516,7 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     /**
-     * number of available Display Modes
-     *
-     * @return
+     * @return number of available Display Modes
      */
     public int getDisplayMode() {
         int c = 0;
@@ -1219,19 +1216,15 @@ public class Main extends SimpleApplication implements ScreenController {
     }
 
     /**
-     * true if fps is shown in gui
-     *
-     * @return isShowFps
+     * @return true if fps is shown in gui
      */
     public static boolean isShowFps() {
         return showFps;
     }
 
     /**
-     * set boolean to handle if FramesPerSecond is shown ,true will show fps in
-     * gui
      *
-     * @param aShowFps
+     * @param aShowFps true to show fps
      */
     public static void setShowFps(boolean aShowFps) {
         showFps = aShowFps;

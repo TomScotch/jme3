@@ -47,8 +47,8 @@ public class simpleWaterControl extends AbstractControl {
     private int waterDepth = 75;
 
     /**
-     * @param app
-     * @param localRootNode
+     * @param app the main app to retrieve interfaces
+     * @param localRootNode the games local root node
      */
     public simpleWaterControl(SimpleApplication app, Node localRootNode) {
 
@@ -77,9 +77,6 @@ public class simpleWaterControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        /**
-         *
-         */
         waterProcessor.setWaterDepth(waterDepth);
         waterProcessor.setDistortionScale(waterStrength);
         waterProcessor.setWaveSpeed(waterSpeed);
@@ -92,49 +89,49 @@ public class simpleWaterControl extends AbstractControl {
     }
 
     /**
-     * @return waterSpeed
+     * @return waterSpeed get how fast the water animation goes
      */
     public float getWaterSpeed() {
         return waterSpeed;
     }
 
     /**
-     * @param waterSpeed
+     * @param waterSpeed set how fast the water animation goes
      */
     public void setWaterSpeed(float waterSpeed) {
         this.waterSpeed = waterSpeed;
     }
 
     /**
-     * @return waterStrength
+     * @return waterStrength get how strong is the fraction from normal map
      */
     public float getWaterStrength() {
         return waterStrength;
     }
 
     /**
-     * @param waterStrength
+     * @param waterStrength set the strength of the fraction from normal map
      */
     public void setWaterStrength(float waterStrength) {
         this.waterStrength = waterStrength;
     }
 
     /**
-     * @return waterDepth
+     * @return waterDepth get depth of the water
      */
     public int getWaterDepth() {
         return waterDepth;
     }
 
     /**
-     * @param waterDepth
+     * @param waterDepth set depth of the water
      */
     public void setWaterDepth(int waterDepth) {
         this.waterDepth = waterDepth;
     }
 
     /**
-     * @return waterProcessor
+     * @return waterProcessor get the Water Post Processor
      */
     public SimpleWaterProcessor getWaterProcessor() {
         return waterProcessor;

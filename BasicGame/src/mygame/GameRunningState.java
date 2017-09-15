@@ -103,7 +103,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-    //private final SSAO ssao;
+//    private final SSAO ssao;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
     private List<Float> fps;
@@ -216,8 +216,11 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.addControl(dof);
 
         //Screen Space Ambient Occlusion
-        //ssao = new SSAO(assetManager, fpp);
-        //localRootNode.addControl(ssao);
+        /*
+        ssao = new SSAO(assetManager, fpp);
+        localRootNode.addControl(ssao);
+         */
+
         /*//      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
