@@ -325,6 +325,10 @@ public class GlobalLightingControl extends AbstractControl {
         return rotation;
     }
 
+    public ColorRGBA getBackgroundColor() {
+        return vp.getBackgroundColor();
+    }
+
     public DirectionalLightShadowRenderer getDlsr() {
         return dlsr;
     }

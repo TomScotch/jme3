@@ -1,5 +1,6 @@
 package mygame;
 
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -24,16 +25,20 @@ public class WaterPostFilter extends AbstractControl {
         this.glc = glc;
         water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
         water.setWaterHeight(initialWaterHeight);
+        this.dynamicLighting = dynamicLight;
+        this.dynamicWater = dynamicWater;
         initWater(specular, hqshore, caustics, foam, refraction, ripples, dynamicLight, dynamicWater);
         fpp.addFilter(water);
     }
 
-    public WaterPostFilter(FilterPostProcessor fpp, boolean specular, boolean hqshore, boolean caustics, boolean foam, boolean refraction, boolean ripples, boolean dynamicWater) {
+    public WaterPostFilter(FilterPostProcessor fpp, boolean specular, boolean hqshore, boolean caustics, boolean foam, boolean refraction, boolean ripples, boolean dynamicLight, boolean dynamicWater) {
 
         water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
         water.setWaterHeight(initialWaterHeight);
         initWater(specular, hqshore, caustics, foam, refraction, ripples, false, dynamicWater);
         fpp.addFilter(water);
+        this.dynamicLighting = dynamicLight;
+        this.dynamicWater = dynamicWater;
     }
 
     private void initWater(boolean specular, boolean hqShore, boolean caustic, boolean foam, boolean refraction, boolean ripples, boolean dynamicLight, boolean dynamicWater) {
@@ -43,12 +48,15 @@ public class WaterPostFilter extends AbstractControl {
         water.setUseFoam(foam);
         water.setUseRefraction(refraction);
         water.setUseRipples(ripples);
-        dynamicLighting = dynamicLight;
+        this.dynamicLighting = dynamicLight;
         this.dynamicWater = dynamicWater;
+        water.setWaterTransparency(1f);
+        water.setColorExtinction(new Vector3f(30f, 20f, 10f));
     }
 
     @Override
     protected void controlUpdate(float tpf) {
+
         if (isEnabled()) {
 
             time += tpf;
@@ -59,7 +67,16 @@ public class WaterPostFilter extends AbstractControl {
             }
 
             if (dynamicLighting) {
-                water.getLightDirection().set(glc.getSunDirection());
+                if (!glc.isNight()) {
+                    water.setDeepWaterColor(glc.getBackgroundColor().mult(glc.getSun().getColor()));
+                    water.setWaterColor(ColorRGBA.Blue);
+                    water.setLightColor(glc.getSun().getColor());
+                    water.getLightDirection().set(glc.getSunDirection());
+                } else {
+                    water.setDeepWaterColor(ColorRGBA.Black);
+                    water.setLightColor(ColorRGBA.Black);
+                    water.setLightDirection(new Vector3f(0, 1, 0));
+                }
             }
 
         }

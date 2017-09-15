@@ -102,7 +102,7 @@ public class Main extends SimpleApplication implements ScreenController {
     private boolean fogEnabled = false;
     private boolean lightScatterEnabled = false;
     private boolean anisotropyEnabled = false;
-    private boolean waterPostProcessing = false;
+    private boolean waterPostProcessing = true;
     private boolean globalLightningEnabled = false;
     private boolean isGl3 = false;
     private boolean shadows = false;

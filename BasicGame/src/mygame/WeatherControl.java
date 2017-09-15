@@ -517,14 +517,14 @@ public class WeatherControl extends AbstractControl {
                 misty_low = false;
                 misty_med = false;
                 misty_high = false;
-
+                if(spatial.getControl(FogPostFilter.class) != null){
                 if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() > 0) {
                     spatial.getControl(FogPostFilter.class).getFog().setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() - (tpf * fogDistance));
                 }
 
                 if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() > 0) {
                     spatial.getControl(FogPostFilter.class).getFog().setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() - (tpf * fogDensity));
-                }
+                }}
             }
         }
     }

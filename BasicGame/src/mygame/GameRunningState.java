@@ -367,7 +367,7 @@ public class GameRunningState extends AbstractAppState {
         //      WATER
         if (waterPostProcessing) {
             if (localRootNode.getControl(WaterPostFilter.class) == null) {
-                localRootNode.addControl(new WaterPostFilter(fpp, true, true, true, true, true, true, true));
+                localRootNode.addControl(new WaterPostFilter(fpp,glc, true, true, true, true, true, true,true, true));                
             }
         } else {
             if (localRootNode.getControl(simpleWaterControl.class) == null) {
