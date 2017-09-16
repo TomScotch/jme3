@@ -330,6 +330,7 @@ public class WeatherControl extends AbstractControl {
 
             counter += tpf;
 
+            //clouds.setGravity(((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.15f, 0, 0);
             if (counter >= limit) {
                 counter = 0;
                 startRandomWeather();
@@ -337,25 +338,6 @@ public class WeatherControl extends AbstractControl {
             }
 
             if (clouded) {
-                clouds.setGravity(((tpf / (glc.getTimeDelay() / 4)) * 200) + 1, 0, 0);
-                /*                int x = getRandomNumberInRange(1, 4);
-                switch (x) {
-                case 1:
-                clouds.setGravity(-(tpf / glc.getTimeDelay()), 0, tpf / glc.getTimeDelay());
-                break;
-                case 2:
-                clouds.setGravity(tpf / glc.getTimeDelay(), 0, -(tpf / glc.getTimeDelay()));
-                break;
-                case 3:
-                clouds.setGravity(tpf / glc.getTimeDelay(), 0, 0);
-                break;
-                case 4:
-                clouds.setGravity(0, 0, tpf / glc.getTimeDelay());
-                break;
-                default:
-                break;
-                }*/
-
                 if (clouded_high) {
                     if (clouds.getNumVisibleParticles() < cloudThickness * 2) {
                         clouds.emitParticles(cloudThickness / 5);

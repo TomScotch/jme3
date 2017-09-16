@@ -329,12 +329,14 @@ public class Main extends SimpleApplication implements ScreenController {
         app.setDisplayStatView(false);
 
         cfg.load(cfg.getTitle());
-        
-        if(cfg.getRenderer().equals(AppSettings.LWJGL_OPENGL3)){
-        cfg.setGammaCorrection(true);
-        }else{
-             cfg.setGammaCorrection(false);
+
+        if (cfg.getRenderer().equals(AppSettings.LWJGL_OPENGL3)) {
+            cfg.setGammaCorrection(true);
+        } else {
+            cfg.setGammaCorrection(false);
         }
+
+        System.out.println("isGamaCorrection : " + cfg.isGammaCorrection());
 
         if (openAl) {
             cfg.setAudioRenderer(AppSettings.LWJGL_OPENAL);
