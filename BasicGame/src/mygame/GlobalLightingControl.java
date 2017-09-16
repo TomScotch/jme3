@@ -143,7 +143,7 @@ public class GlobalLightingControl extends AbstractControl {
         sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
 
-        al = new AmbientLight(ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray));
+        al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.DarkGray).mult(ColorRGBA.Gray));
         localRootNode.addLight(al);
     }
 
@@ -187,7 +187,7 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = false;
                     night = false;
                     if (isSun == false) {
-                    //    localRootNode.removeLight(al);
+                        //    localRootNode.removeLight(al);
                         if (sl != null) {
                             slsr.setShadowIntensity(0.25f);
                         }
@@ -233,7 +233,7 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = false;
                     night = true;
                     if (isSun == true) {
-                     //   localRootNode.addLight(al);
+                        //   localRootNode.addLight(al);
                         sun.setEnabled(false);
                         fire.setEnabled(false);
                         fire.killAllParticles();
