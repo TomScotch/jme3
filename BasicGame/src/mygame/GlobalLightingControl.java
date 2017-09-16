@@ -4,6 +4,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.shapes.EmitterSphereShape;
+import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
 import com.jme3.light.LightList;
@@ -34,6 +35,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     private final Node localRootNode;
     private final ViewPort vp;
+    private final AmbientLight al;
 
     public DirectionalLight getSun() {
         return sun;
@@ -141,6 +143,8 @@ public class GlobalLightingControl extends AbstractControl {
         sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
 
+        al = new AmbientLight(ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray));
+        localRootNode.addLight(al);
     }
 
     @Override
@@ -183,6 +187,7 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = false;
                     night = false;
                     if (isSun == false) {
+                    //    localRootNode.removeLight(al);
                         if (sl != null) {
                             slsr.setShadowIntensity(0.25f);
                         }
@@ -228,6 +233,7 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = false;
                     night = true;
                     if (isSun == true) {
+                     //   localRootNode.addLight(al);
                         sun.setEnabled(false);
                         fire.setEnabled(false);
                         fire.killAllParticles();
