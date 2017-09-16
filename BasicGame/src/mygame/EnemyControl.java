@@ -33,6 +33,7 @@ public class EnemyControl extends AbstractControl {
     private EntityControl ec2;
     private EntityControl ec3;
     private final GlobalLightingControl glc;
+    private float emptyNodeTimer = 0;
 
     public int countEnemys() {
         int c = 0;
@@ -83,7 +84,27 @@ public class EnemyControl extends AbstractControl {
         path3.addWayPoint(new Vector3f(0, 1, 30));
 
         // path3.enableDebugShape(assetManager, localRoot);
-        addHostille();
+        Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
+        ec1 = new EntityControl(assetManager, demon, "demon", new Vector3f(-10, 0, -10), pc);
+        demon.setLocalTranslation(new Vector3f(10, 1.75f, 10));
+        demon.addControl(ec1);
+        localRoot.attachChild(demon);
+        setMotionPath("demon", path1, demon);
+        playing1 = true;
+
+        Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
+        ec2 = new EntityControl(assetManager, forestmonster, "forestmonster", new Vector3f(-10, 0, 10), pc);
+        forestmonster.addControl(ec2);
+        localRoot.attachChild(forestmonster);
+        setMotionPath("forestmonster", path2, forestmonster);
+        playing2 = true;
+
+        Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
+        ec3 = new EntityControl(assetManager, spider, "spider", new Vector3f(-10, 0, -10), pc);
+        spider.addControl(ec3);
+        localRoot.attachChild(spider);
+        setMotionPath("spider", path3, spider);
+        playing3 = true;
     }
 
     private void setMotionPath(String name, MotionPath path, Spatial spa) {
@@ -118,8 +139,13 @@ public class EnemyControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (countEnemys() <= 0) {
-            addHostille();
+        if (countEnemys() < 3) {
+            emptyNodeTimer += tpf;
+
+            if (emptyNodeTimer >= 20) {
+                emptyNodeTimer = 0;
+                addHostille();
+            }
         }
 
         if (ec1 != null) {
@@ -138,9 +164,18 @@ public class EnemyControl extends AbstractControl {
                 motionControl1.pause();
             }
         }
-        motionControl2.setSpeed(((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.15f);
-        motionControl1.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.25f);
-        motionControl3.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.35f);
+
+        if (motionControl1 != null) {
+            motionControl1.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.25f);
+        }
+
+        if (motionControl2 != null) {
+            motionControl2.setSpeed(((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.15f);
+        }
+
+        if (motionControl3 != null) {
+            motionControl3.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.35f);
+        }
 
         if (ec2 != null) {
             playing2 = !ec2.isFighting();
@@ -179,27 +214,75 @@ public class EnemyControl extends AbstractControl {
     }
 
     private void addHostille() {
-        Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
-        ec1 = new EntityControl(assetManager, demon, "demon", new Vector3f(-10, 0, -10), pc);
-        demon.setLocalTranslation(new Vector3f(10, 1.75f, 10));
-        demon.addControl(ec1);
-        localRoot.attachChild(demon);
-        setMotionPath("demon", path1, demon);
-        playing1 = true;
 
-        Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
-        ec2 = new EntityControl(assetManager, forestmonster, "forestmonster", new Vector3f(-10, 0, 10), pc);
-        forestmonster.addControl(ec2);
-        localRoot.attachChild(forestmonster);
-        setMotionPath("forestmonster", path2, forestmonster);
-        playing2 = true;
+        boolean hasSpider = false;
+        boolean hasDemon = false;
+        boolean hasForestmonster = false;
 
-        Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
-        ec3 = new EntityControl(assetManager, spider, "spider", new Vector3f(-10, 0, -10), pc);
-        spider.addControl(ec3);
-        localRoot.attachChild(spider);
-        playing3 = true;
-        setMotionPath("spider", path3, spider);
+        for (Spatial child : localRoot.getChildren()) {
+            if (localRoot.getChildren() != null) {
+                if (child.getName() != null) {
+                    if (child.getName().equals("spider")) {
+                        hasSpider = true;
+
+                    }
+                    if (child.getName().equals("forestmonster")) {
+                        hasForestmonster = true;
+
+                    }
+                    if (child.getName().equals("demon")) {
+                        hasDemon = true;
+
+                    }
+                }
+            }
+        }
+
+        if (!hasDemon) {
+            TimedActionControl timedActionControl1 = new TimedActionControl(9) {
+                @Override
+                void action() {
+                    Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
+                    ec1 = new EntityControl(assetManager, demon, "demon", new Vector3f(-10, 0, -10), pc);
+                    demon.setLocalTranslation(new Vector3f(10, 1.75f, 10));
+                    demon.addControl(ec1);
+                    localRoot.attachChild(demon);
+                    setMotionPath("demon", path1, demon);
+                    playing1 = true;
+                }
+            };
+            localRoot.addControl(timedActionControl1);
+        }
+
+        if (!hasForestmonster) {
+            TimedActionControl timedActionControl2 = new TimedActionControl(6) {
+                @Override
+                void action() {
+                    Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
+                    ec2 = new EntityControl(assetManager, forestmonster, "forestmonster", new Vector3f(-10, 0, 10), pc);
+                    forestmonster.addControl(ec2);
+                    localRoot.attachChild(forestmonster);
+                    setMotionPath("forestmonster", path2, forestmonster);
+                    playing2 = true;
+                }
+            };
+            localRoot.addControl(timedActionControl2);
+        }
+
+        if (!hasSpider) {
+            TimedActionControl timedActionControl3 = new TimedActionControl(3) {
+                @Override
+                void action() {
+                    Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
+                    ec3 = new EntityControl(assetManager, spider, "spider", new Vector3f(-10, 0, -10), pc);
+                    spider.addControl(ec3);
+                    localRoot.attachChild(spider);
+                    setMotionPath("spider", path3, spider);
+                    playing3 = true;
+                }
+            };
+            localRoot.addControl(timedActionControl3);
+        }
     }
 
     @Override
