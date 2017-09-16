@@ -32,6 +32,7 @@ public class EnemyControl extends AbstractControl {
     private EntityControl ec1;
     private EntityControl ec2;
     private EntityControl ec3;
+    private final GlobalLightingControl glc;
 
     public int countEnemys() {
         int c = 0;
@@ -53,11 +54,13 @@ public class EnemyControl extends AbstractControl {
         return c;
     }
 
-    public EnemyControl(AssetManager assetManager, Node localRoot, BulletAppState bulletAppState, PlayerControl pc) {
+    public EnemyControl(GlobalLightingControl glc, AssetManager assetManager, Node localRoot, BulletAppState bulletAppState, PlayerControl pc) {
 
         this.localRoot = localRoot;
         this.assetManager = assetManager;
         this.pc = pc;
+        this.glc = glc;
+
         path1 = new MotionPath();
         path2 = new MotionPath();
         path3 = new MotionPath();
@@ -92,21 +95,21 @@ public class EnemyControl extends AbstractControl {
                 motionControl1.setDirectionType(MotionEvent.Direction.PathAndRotation);
                 motionControl1.setRotation(new Quaternion().fromAngleNormalAxis(-FastMath.TWO_PI, Vector3f.UNIT_Y));
                 motionControl1.setInitialDuration(10);
-                motionControl1.setSpeed(0.5f);
+                //motionControl1.setSpeed(0.5f);
                 break;
             case "forestmonster":
                 motionControl2 = new MotionEvent(spa, path);
                 motionControl2.setDirectionType(MotionEvent.Direction.PathAndRotation);
                 motionControl2.setRotation(new Quaternion().fromAngleNormalAxis(-FastMath.TWO_PI, Vector3f.UNIT_Y));
                 motionControl2.setInitialDuration(10);
-                motionControl2.setSpeed(0.25f);
+                // motionControl2.setSpeed(0.25f);
                 break;
             case "spider":
                 motionControl3 = new MotionEvent(spa, path);
                 motionControl3.setDirectionType(MotionEvent.Direction.PathAndRotation);
                 motionControl3.setRotation(new Quaternion().fromAngleNormalAxis(-FastMath.TWO_PI, Vector3f.UNIT_Y));
                 motionControl3.setInitialDuration(10);
-                motionControl3.setSpeed(0.75f);
+                //motionControl3.setSpeed(0.75f);
                 break;
         }
 
@@ -127,6 +130,7 @@ public class EnemyControl extends AbstractControl {
                     if (ec1.getAnimControl().getChannel(0) != null) {
                         if (!ec1.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
                             ec1.setAnim("Walk", LoopMode.Loop);
+
                         }
                     }
                 }
@@ -134,6 +138,9 @@ public class EnemyControl extends AbstractControl {
                 motionControl1.pause();
             }
         }
+        motionControl2.setSpeed(((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.15f);
+        motionControl1.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.25f);
+        motionControl3.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.35f);
 
         if (ec2 != null) {
             playing2 = !ec2.isFighting();
@@ -143,6 +150,7 @@ public class EnemyControl extends AbstractControl {
                     if (ec2.getAnimControl().getChannel(0) != null) {
                         if (!ec2.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
                             ec2.setAnim("Walk", LoopMode.Loop);
+
                         }
                     }
                 }
@@ -154,11 +162,13 @@ public class EnemyControl extends AbstractControl {
         if (ec3 != null) {
             playing3 = !ec3.isFighting();
             if (playing3) {
+
                 motionControl3.play();
                 if (ec3.getAnimControl() != null) {
                     if (ec3.getAnimControl().getChannel(0) != null) {
                         if (!ec3.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
                             ec3.setAnim("Walk", LoopMode.Loop);
+
                         }
                     }
                 }

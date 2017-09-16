@@ -11,10 +11,16 @@ import java.util.Random;
 
 public class WildLifeControl extends AbstractControl {
 
+    private final GlobalLightingControl glc;
+
+    public WildLifeControl(GlobalLightingControl glc) {
+        this.glc = glc;
+    }
+
     @Override
     protected void controlUpdate(float tpf) {
 
-        spatial.move(0, 0, 15 * tpf);
+        spatial.move(0, 0, ((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.1f);
 
         float x = spatial.getWorldTranslation().getX();
         float y = spatial.getWorldTranslation().getZ();

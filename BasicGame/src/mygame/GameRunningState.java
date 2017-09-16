@@ -197,7 +197,7 @@ public class GameRunningState extends AbstractAppState {
         //      Weather
         if (weatherEnabled) {
             if (localRootNode.getControl(WeatherControl.class) == null) {
-                weatherControl = new WeatherControl(assetManager, localRootNode, terrainControl.getHeightmap());
+                weatherControl = new WeatherControl(glc,assetManager, localRootNode, terrainControl.getHeightmap());
                 weatherControl.setEnabled(false);
                 localRootNode.addControl(weatherControl);
             }
@@ -266,7 +266,7 @@ public class GameRunningState extends AbstractAppState {
         amb2.setVolume(ambienceVolume + 1.5f);
         localRootNode.attachChild(amb2);
 
-        enemyControl = new EnemyControl(assetManager, localRootNode, bulletAppState, playerControl);
+        enemyControl = new EnemyControl(glc,assetManager, localRootNode, bulletAppState, playerControl);
 
         limit = getRandomNumberInRange(15, 45);
     }
@@ -324,7 +324,7 @@ public class GameRunningState extends AbstractAppState {
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
             //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
-            WildLifeControl wildlifeControl = new WildLifeControl();
+            WildLifeControl wildlifeControl = new WildLifeControl(glc);
 
             bird.addControl(wildlifeControl);
             wildlifeControl.getSkeletonControl().setHardwareSkinningPreferred(false);
