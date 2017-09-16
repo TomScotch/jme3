@@ -323,13 +323,18 @@ public class Main extends SimpleApplication implements ScreenController {
         cfg.setVSync(false);
         cfg.setSamples(0);
         cfg.setDepthBits(-1);
-        cfg.setGammaCorrection(true);
         cfg.setFrameRate(60);
         cfg.setFrequency(cfg.getFrameRate());
         app.setDisplayFps(showFps);
         app.setDisplayStatView(false);
 
         cfg.load(cfg.getTitle());
+        
+        if(cfg.getRenderer().equals(AppSettings.LWJGL_OPENGL3)){
+        cfg.setGammaCorrection(true);
+        }else{
+             cfg.setGammaCorrection(false);
+        }
 
         if (openAl) {
             cfg.setAudioRenderer(AppSettings.LWJGL_OPENAL);

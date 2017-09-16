@@ -1,6 +1,7 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Plane;
 import com.jme3.math.Quaternion;
@@ -55,6 +56,7 @@ public class simpleWaterControl extends AbstractControl {
         waterProcessor = new SimpleWaterProcessor(app.getAssetManager());
         waterProcessor.setReflectionScene(localRootNode);
         waterProcessor.setWaterDepth(waterDepth);
+        waterProcessor.setWaterColor(ColorRGBA.Blue);
         waterProcessor.setDistortionScale(waterStrength);
         waterProcessor.setWaveSpeed(waterSpeed);
         waterProcessor.setRenderSize(256, 256);
@@ -69,8 +71,8 @@ public class simpleWaterControl extends AbstractControl {
         water.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
         water.setLocalTranslation(-1024, -4f, 1024);
         water.setShadowMode(ShadowMode.Off);
-        water.setMaterial(waterProcessor.getMaterial());
         app.getViewPort().addProcessor(waterProcessor);
+        water.setMaterial(waterProcessor.getMaterial());
         localRootNode.attachChild(water);
     }
 
