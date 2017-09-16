@@ -255,21 +255,24 @@ public class PlayerControl extends AbstractControl {
                     break;
                 case "Strafe Left":
                     leftStrafe = value;
-                    if (value) {
-                        doAnim("player", "Walk", LoopMode.Loop);
-                    } else {
-                        doAnim("player", "Idle", LoopMode.Loop);
+                    if (attackTimer <= 0) {
+                        if (value) {
+                            doAnim("player", "Walk", LoopMode.Loop);
+                        } else {
+                            doAnim("player", "Idle", LoopMode.Loop);
+                        }
                     }
 
                     break;
                 case "Strafe Right":
                     rightStrafe = value;
-                    if (value) {
-                        doAnim("player", "Walk", LoopMode.Loop);
-                    } else {
-                        doAnim("player", "Idle", LoopMode.Loop);
+                    if (attackTimer <= 0) {
+                        if (value) {
+                            doAnim("player", "Walk", LoopMode.Loop);
+                        } else {
+                            doAnim("player", "Idle", LoopMode.Loop);
+                        }
                     }
-
                     break;
                 case "chase":
                     if (value && isEnabled()) {
@@ -288,19 +291,23 @@ public class PlayerControl extends AbstractControl {
                     }
                     break;
                 case "Walk Forward":
-                    if (value && isEnabled()) {
-                        doAnim("player", "Walk", LoopMode.Loop);
-                    } else {
-                        doAnim("player", "Idle", LoopMode.Loop);
+                    if (attackTimer <= 0) {
+                        if (value && isEnabled()) {
+                            doAnim("player", "Walk", LoopMode.Loop);
+                        } else {
+                            doAnim("player", "Idle", LoopMode.Loop);
+                        }
                     }
                     forward = value;
 
                     break;
                 case "Walk Backward":
-                    if (value && isEnabled()) {
-                        doAnim("player", "Walk", LoopMode.Loop);
-                    } else {
-                        doAnim("player", "Idle", LoopMode.Loop);
+                    if (attackTimer <= 0) {
+                        if (value && isEnabled()) {
+                            doAnim("player", "Walk", LoopMode.Loop);
+                        } else {
+                            doAnim("player", "Idle", LoopMode.Loop);
+                        }
                     }
                     backward = value;
 
