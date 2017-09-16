@@ -42,6 +42,14 @@ import com.jme3.util.TangentBinormalGenerator;
 
 public class PlayerControl extends AbstractControl {
 
+    public float getRotationModifier() {
+        return rotationModifier;
+    }
+
+    public void setRotationModifier(float rotationModifier) {
+        this.rotationModifier = rotationModifier;
+    }
+
     public boolean isDead() {
         return dead;
     }
@@ -113,7 +121,8 @@ public class PlayerControl extends AbstractControl {
     private boolean showHealthBar = false;
     private float underAttackTimer = 0f;
     private boolean underAttack = false;
-    private float underAttackTimerVal = 9f;
+    private final float underAttackTimerVal = 9f;
+    private float rotationModifier = 0;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -513,7 +522,7 @@ public class PlayerControl extends AbstractControl {
                 }
 
                 if (rotateAround) {
-                    viewDirection.addLocal(camLeft.mult((rotationSpeed * 1.5f) * tpf));
+                    viewDirection.addLocal(camLeft.mult((rotationSpeed * (1.5f + rotationModifier)) * tpf));
                 }
 
                 walkDirection.set(0, 0, 0);
@@ -779,5 +788,9 @@ public class PlayerControl extends AbstractControl {
             }
         }
         return dead;
+    }
+
+    public void setIdleCounter(float value) {
+        this.idleCounter = value;
     }
 }

@@ -563,6 +563,10 @@ public class Main extends SimpleApplication implements ScreenController {
         @SuppressWarnings("Convert2Lambda")
         public void onAction(String name, boolean isPressed, float tpf) {
 
+            if (stateManager.hasState(gameRunningState)) {
+                gameRunningState.getPlayerCOntrol().setIdleCounter(0);
+            }
+
             /**
              * display or hide the onscreem console
              */

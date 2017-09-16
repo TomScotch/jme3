@@ -197,7 +197,7 @@ public class GameRunningState extends AbstractAppState {
         //      Weather
         if (weatherEnabled) {
             if (localRootNode.getControl(WeatherControl.class) == null) {
-                weatherControl = new WeatherControl(glc,assetManager, localRootNode, terrainControl.getHeightmap());
+                weatherControl = new WeatherControl(glc, assetManager, localRootNode, terrainControl.getHeightmap());
                 weatherControl.setEnabled(false);
                 localRootNode.addControl(weatherControl);
             }
@@ -221,7 +221,7 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.addControl(ssao);
          */
 
-        /*//      HOSTILE
+ /*//      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
         demon.addControl(ec1);
@@ -266,7 +266,7 @@ public class GameRunningState extends AbstractAppState {
         amb2.setVolume(ambienceVolume + 1.5f);
         localRootNode.attachChild(amb2);
 
-        enemyControl = new EnemyControl(glc,assetManager, localRootNode, bulletAppState, playerControl);
+        enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
 
         limit = getRandomNumberInRange(15, 45);
     }
@@ -367,7 +367,7 @@ public class GameRunningState extends AbstractAppState {
         //      WATER
         if (waterPostProcessing) {
             if (localRootNode.getControl(WaterPostFilter.class) == null) {
-                localRootNode.addControl(new WaterPostFilter(fpp,glc, true, true, true, true, true, true,true, true));                
+                localRootNode.addControl(new WaterPostFilter(fpp, glc, true, true, true, true, true, true, true, true));
             }
         } else {
             if (localRootNode.getControl(simpleWaterControl.class) == null) {
@@ -462,7 +462,7 @@ public class GameRunningState extends AbstractAppState {
 
         @Override
         public void onAction(String binding, boolean value, float tpf) {
-
+            playerControl.setIdleCounter(0);
             switch (binding) {
 
                 case "timeDemo":
@@ -597,11 +597,15 @@ public class GameRunningState extends AbstractAppState {
             super.update(tpf);
 
             if (isTimeDemo) {
+                playerControl.setRotationModifier(12.f);
+                playerControl.setIdleCounter(90);
                 if (fps.size() < 500) {
                     hudText2.setText(" collecting data : tablesize = " + fps.size() + " of 500");
                     fps.add(1 / tpf);
                 } else {
                     isTimeDemo = false;
+                    playerControl.setRotationModifier(0);
+                    playerControl.setIdleCounter(0);
                     for (int i = 1; i < fps.size(); i++) {
                         for (int j = 0; j < fps.size(); j++) {
                             if (fps.get(j) < fps.get(i)) {
@@ -882,6 +886,10 @@ public class GameRunningState extends AbstractAppState {
 
     public void setWeatherEnabled(boolean weatherEnabled) {
         this.weatherEnabled = weatherEnabled;
+    }
+
+    public PlayerControl getPlayerCOntrol() {
+        return playerControl;
     }
 
     private int getRandomNumberInRange(int min, int max) {
