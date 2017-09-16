@@ -111,6 +111,9 @@ public class PlayerControl extends AbstractControl {
     private float deadDelay = 3f;
     private final Geometry healthbar;
     private boolean showHealthBar = false;
+    private float underAttackTimer = 0f;
+    private boolean underAttack = false;
+    private float underAttackTimerVal = 9f;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
 
@@ -435,6 +438,21 @@ public class PlayerControl extends AbstractControl {
 
             if (!dead) {
 
+                underAttackTimer -= tpf;
+
+                underAttack = underAttackTimer > 0;
+
+                if (!underAttack) {
+                    if (getHealth() < 100) {
+                        if ((getHealth() + 10) < 100) {
+                            underAttackTimer = underAttackTimerVal / 2;
+                            setHealth(getHealth() + 10);
+                        } else {
+                            setHealth(100);
+                        }
+                    }
+                }
+
                 if (showHealthBar) {
                     healthbar.setCullHint(Spatial.CullHint.Never);
                 } else {
@@ -735,6 +753,7 @@ public class PlayerControl extends AbstractControl {
         if (!dead) {
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
+                underAttackTimer = underAttackTimerVal;
                 healthbar.getLocalScale().setX((health + 1) / 75);
                 healthbar.center();
                 healthbar.move((health / 200) + 1, 9, 0);
