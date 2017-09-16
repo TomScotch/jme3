@@ -60,7 +60,7 @@ public class GlobalLightingControl extends AbstractControl {
     private boolean evening = false;
     private boolean night = false;
 
-    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
+    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode, Boolean colorCorrect) {
 
         this.sl = sl;
         this.localRootNode = localRootNode;
@@ -142,8 +142,13 @@ public class GlobalLightingControl extends AbstractControl {
 
         sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
-
-        al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.DarkGray).mult(ColorRGBA.Gray));
+        ColorRGBA cr;
+        if (colorCorrect) {
+            cr = ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.DarkGray).mult(ColorRGBA.Gray);
+        } else {
+            cr = ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray).mult(ColorRGBA.Gray);
+        }
+        al = new AmbientLight(cr);
         localRootNode.addLight(al);
     }
 

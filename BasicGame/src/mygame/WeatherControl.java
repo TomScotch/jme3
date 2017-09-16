@@ -489,23 +489,23 @@ public class WeatherControl extends AbstractControl {
                         }
 
                         if (misty_high) {
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.25f) {
                                 spatial.getControl(FogPostFilter.class).setFogDistance(fogDistance);
                             }
 
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.25f) {
                                 spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + (tpf * 6));
                             }
                         } else if (misty_med) {
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.5) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.5f) {
                                 spatial.getControl(FogPostFilter.class).setFogDistance(fogDistance);
                             }
 
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5f) {
                                 spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + (tpf * 4));
                             }
                         } else if (misty_low) {
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.75) {
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.75f) {
                                 spatial.getControl(FogPostFilter.class).setFogDistance(fogDistance / 1.75f);
                             }
 

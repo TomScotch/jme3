@@ -163,7 +163,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      SUN
         Node sunNode = new Node("sunNode");
-        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
+        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode,app.getContext().getSettings().isGammaCorrection());
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
@@ -654,6 +654,7 @@ public class GameRunningState extends AbstractAppState {
             if (counter >= limit) {
                 counter = 0;
                 int nl = getRandomNumberInRange(15, 45);
+                nl = nl + (glc.getTimeDelay() / 500);
                 limit = nl;
                 attachBird();
             }
