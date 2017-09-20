@@ -112,6 +112,7 @@ public class GameRunningState extends AbstractAppState {
     private final AppStateManager stateManager;
     private final EnemyControl enemyControl;
     private float health = 100;
+    private final int birdLimit = 29;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -163,7 +164,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      SUN
         Node sunNode = new Node("sunNode");
-        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode,app.getContext().getSettings().isGammaCorrection());
+        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode, app.getContext().getSettings().isGammaCorrection());
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
@@ -175,7 +176,7 @@ public class GameRunningState extends AbstractAppState {
 //      Bloom
         if (bloomEnabled) {
             if (localRootNode.getControl(BloomPostFilter.class) == null) {
-                localRootNode.addControl(new BloomPostFilter(fpp));
+                localRootNode.addControl(new BloomPostFilter(fpp, app.getContext().getSettings().isGammaCorrection()));
             }
         }
 
@@ -314,9 +315,7 @@ public class GameRunningState extends AbstractAppState {
         inputManager.removeListener(actionListener);
     }
 
-    public final void attachBird() {
-
-        int cl = getRandomNumberInRange(6, 24);
+    public final void attachBird(int cl) {
 
         for (int i = 1; i < cl; i++) {
             Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
@@ -328,6 +327,7 @@ public class GameRunningState extends AbstractAppState {
 
             bird.addControl(wildlifeControl);
             wildlifeControl.getSkeletonControl().setHardwareSkinningPreferred(false);
+            bird.setName("bird");
             localRootNode.attachChild(bird);
             wildlifeControl.setAnim("fly", LoopMode.Loop);
             // bird.scale(getRandomNumberInRange(0, 1) - 0.5f);
@@ -656,7 +656,20 @@ public class GameRunningState extends AbstractAppState {
                 int nl = getRandomNumberInRange(15, 45);
                 nl = nl + (glc.getTimeDelay() / 500);
                 limit = nl;
-                attachBird();
+                int bc = 0;
+                for (Spatial child : localRootNode.getChildren()) {
+                    if (localRootNode.getChildren() != null) {
+                        if (child.getName() != null) {
+                            if (child.getName().equals("bird")) {
+                                bc += 1;
+                            }
+                        }
+                    }
+                }
+
+                if (bc <= birdLimit) {
+                    attachBird(getRandomNumberInRange(1, ((birdLimit) - bc) + 1));
+                }
             }
         }
     }

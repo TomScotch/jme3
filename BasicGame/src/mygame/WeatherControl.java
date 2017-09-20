@@ -46,8 +46,8 @@ public class WeatherControl extends AbstractControl {
     private boolean lightnungStrikes_med = false;
     private boolean lightnungStrikes_high = false;
 
-    private final float fogDensity = 0.40f; // 1.3f
-    private final int fogDistance = 30; // 50
+    private final float fogDensity = 0.35f; // 1.3f
+    private final int fogDistance = 35; // 50
 
     private final int cloudThickness = 350; // 400
 
@@ -65,8 +65,8 @@ public class WeatherControl extends AbstractControl {
     private ColorRGBA rainColorStart = new ColorRGBA(ColorRGBA.Blue);
     private ColorRGBA rainColorEnd = new ColorRGBA(ColorRGBA.DarkGray);
 
-    private final int maximumWeatherLength = 38;
-    private final int minimumWeatherLength = 8;
+    private final int maximumWeatherLength = 30;
+    private final int minimumWeatherLength = 4;
 
     private final AbstractHeightMap hm;
     private final AssetManager am;
@@ -82,7 +82,7 @@ public class WeatherControl extends AbstractControl {
         this.am = am;
         this.localRoot = localRoot;
 
-        limit = (float) getRandomNumberInRange(minimumWeatherLength, maximumWeatherLength);
+        limit = limit = getLimit();
 
         flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 8);
         Material flash_mat = new Material(
@@ -334,7 +334,8 @@ public class WeatherControl extends AbstractControl {
             if (counter >= limit) {
                 counter = 0;
                 startRandomWeather();
-                limit = (float) getRandomNumberInRange(minimumWeatherLength, maximumWeatherLength);
+
+                limit = getLimit();
             }
 
             if (clouded) {
@@ -551,6 +552,62 @@ public class WeatherControl extends AbstractControl {
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //
+    }
+
+    private float getLimit() {
+        int delayValue = 0;
+        switch (glc.getTimeDelay()) {
+            case 4:
+                delayValue = 2;
+                break;
+            case 8:
+                delayValue = 4;
+                break;
+            case 16:
+                delayValue = 6;
+                break;
+            case 32:
+                delayValue = 8;
+                break;
+            case 64:
+                delayValue = 10;
+                break;
+            case 128:
+                delayValue = 12;
+                break;
+            case 256:
+                delayValue = 14;
+                break;
+            case 512:
+                delayValue = 16;
+                break;
+            case 1024:
+                delayValue = 18;
+                break;
+            case 2048:
+                delayValue = 20;
+                break;
+            case 4096:
+                delayValue = 22;
+                break;
+            case 8192:
+                delayValue = 24;
+                break;
+            case 16384:
+                delayValue = 26;
+                break;
+            case 32768:
+                delayValue = 28;
+                break;
+            case 65536:
+                delayValue = 30;
+                break;
+            case 131072:
+                delayValue = 32;
+                break;
+        }
+
+        return (float) getRandomNumberInRange(minimumWeatherLength + delayValue, maximumWeatherLength);
     }
 
     public boolean isClouded() {
