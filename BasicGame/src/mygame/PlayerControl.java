@@ -789,10 +789,10 @@ public class PlayerControl extends AbstractControl {
                     }
                 });
 
-                 hit.play();
-                if (health >= 0) {
-                    characterNode.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) characterNode));
-                }
+                hit.play();
+                /*                if (health >= 0) {
+                 characterNode.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) characterNode));
+                 }*/
             }
         }
         return dead;

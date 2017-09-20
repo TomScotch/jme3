@@ -61,6 +61,10 @@ import java.util.List;
 @SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
 
+    public static GameRunningState getGameRunningState() {
+        return gameRunningState;
+    }
+
     /**
      * get the nifty gui console
      *
@@ -570,8 +574,8 @@ public class Main extends SimpleApplication implements ScreenController {
         @SuppressWarnings("Convert2Lambda")
         public void onAction(String name, boolean isPressed, float tpf) {
 
-            if (stateManager.hasState(gameRunningState)) {
-                gameRunningState.getPlayerCOntrol().setIdleCounter(0);
+            if (stateManager.hasState(getGameRunningState())) {
+                getGameRunningState().getPlayerCOntrol().setIdleCounter(0);
             }
 
             /**
@@ -581,7 +585,7 @@ public class Main extends SimpleApplication implements ScreenController {
 
                 showConsole = !showConsole;
 
-                if (stateManager.hasState(gameRunningState) && gameRunningState != null) {
+                if (stateManager.hasState(getGameRunningState()) && getGameRunningState() != null) {
                     if (showConsole) {
                         remove_trigger();
                         nifty.gotoScreen("console");
@@ -620,8 +624,8 @@ public class Main extends SimpleApplication implements ScreenController {
              * change to random weather settings
              */
             if (name.equals("rain_trigger") && !isPressed) {
-                if (stateManager.hasState(gameRunningState)) {
-                    gameRunningState.getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
+                if (stateManager.hasState(getGameRunningState())) {
+                    getGameRunningState().getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
                 }
             }
 
@@ -662,7 +666,7 @@ public class Main extends SimpleApplication implements ScreenController {
              * continue
              */
             if (name.equals("Game Pause Unpause") && !isPressed) {
-                if (gameRunningState != null) {
+                if (getGameRunningState() != null) {
                     switchGameState();
                 }
             }
@@ -683,7 +687,7 @@ public class Main extends SimpleApplication implements ScreenController {
              */
             if (name.equals("record") && !isPressed) {
 
-                if (stateManager.hasState(gameRunningState)) {
+                if (stateManager.hasState(getGameRunningState())) {
                     if (stateManager.hasState(videoRecorderAppState)) {
                         stateManager.detach(videoRecorderAppState);
                         isRecording = false;

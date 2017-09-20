@@ -10,10 +10,10 @@ public class BloomPostFilter extends AbstractControl {
 
     private final BloomFilter bloom;
 
-    private float density = 6f;//2
+    private float density = 2f;//2
     private float sampling = 1f;//1
     private float blurScale = 1.5f;//1.5f
-    private float exposurePower = 2.5f;//5
+    private float exposurePower = 5f;//5
     private float cutOff = 0f; // 0.1 - 1.0
 
     public BloomPostFilter(FilterPostProcessor fpp, Boolean openGL3) {
@@ -22,15 +22,15 @@ public class BloomPostFilter extends AbstractControl {
         if (openGL3) {
             modifier = 1;
         } else {
-            modifier = 1.5f;
+            modifier = 1.25f;
         }
 
         bloom = new BloomFilter(BloomFilter.GlowMode.SceneAndObjects);
-        bloom.setExposureCutOff(cutOff / modifier);
-        bloom.setBloomIntensity(density / modifier);
-        bloom.setDownSamplingFactor(sampling / modifier);
-        bloom.setBlurScale(blurScale / modifier);
-        bloom.setExposurePower(exposurePower * modifier);
+        bloom.setExposureCutOff(cutOff);
+        bloom.setBloomIntensity(density);
+        bloom.setDownSamplingFactor(sampling);
+        bloom.setBlurScale(blurScale);
+        bloom.setExposurePower(exposurePower);
         fpp.addFilter(bloom);
     }
 

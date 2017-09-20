@@ -206,8 +206,8 @@ public class EntityControl extends AbstractControl {
                 lamp.setPosition(Vector3f.ZERO);
                 lamp.setColor(ColorRGBA.Red);
                 this.spatial.addLight(lamp);
-                lamp.setRadius(42);
-                this.spatial.addControl(new TimedActionControl(0.30f) {
+                lamp.setRadius(38);
+                this.spatial.addControl(new TimedActionControl(0.20f) {
                     @Override
                     void action() {
                         this.spatial.removeLight(lamp);

@@ -169,7 +169,7 @@ public class GlobalLightingControl extends AbstractControl {
 
                 fire.setLocalTranslation(sphereGeo.getWorldTranslation());
                 rotation = tpf / timeDelay;
-                fire.rotate(0, 0, rotation);
+                //               fire.rotate(0, 0, 0);
                 pivot.rotate(rotation, 0, 0);
                 float z = sphereGeo.getWorldTranslation().getZ();
                 float y = sphereGeo.getWorldTranslation().getY();
@@ -256,10 +256,10 @@ public class GlobalLightingControl extends AbstractControl {
                 sphereGeo.removeFromParent();
             }
             if (!isNight() && !isMorning()) {
-                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 3);
+                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 2);
             }
             if (isMorning()) {
-                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), (tpf / getTimeDelay()) * 3);
+                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), (tpf / getTimeDelay()) * 2);
             }
         } else {
             System.out.println("glc stopped");

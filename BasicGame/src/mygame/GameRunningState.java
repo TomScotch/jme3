@@ -7,6 +7,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.app.state.VideoRecorderAppState;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
@@ -385,6 +386,10 @@ public class GameRunningState extends AbstractAppState {
         amb.play();
         amb1.play();
         amb2.play();
+        if (viewPort.getCamera().getWidth() / 4 == viewPort.getCamera().getHeight() / 3) {
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth() * 2, viewPort.getCamera().getHeight(), true);
+            System.out.println("DOUBLED X FOV ON CAM");
+        }
     }
 
     private void setupKeys() {
@@ -909,5 +914,9 @@ public class GameRunningState extends AbstractAppState {
     private int getRandomNumberInRange(int min, int max) {
         Random r = new Random();
         return r.ints(min, (max + 1)).findFirst().getAsInt();
+    }
+
+    public AudioNode getAudioNode(String path) {
+        return (AudioNode) new AudioNode(assetManager, path, AudioData.DataType.Buffer);
     }
 };
