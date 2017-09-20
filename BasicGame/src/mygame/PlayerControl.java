@@ -68,7 +68,7 @@ public class PlayerControl extends AbstractControl {
 
     private final SkeletonControl skelCon;
     private final AudioNode footsteps;
-    // private final AudioNode hit;
+    private final AudioNode hit;
 
     private final ViewPort viewPort;
     private final AssetManager assetManager;
@@ -205,11 +205,12 @@ public class PlayerControl extends AbstractControl {
         footsteps.setVolume(3f);
         localRootNode.attachChild(footsteps);
 
-        /*        hit = new AudioNode(assetManager, "Sound/Effects/Bang.wav", AudioData.DataType.Buffer);
+        hit = new AudioNode(assetManager, "Sound/Effects/Bang.wav", AudioData.DataType.Buffer);
         hit.setLooping(false);
         hit.setPositional(false);
         hit.setVolume(4);
-        localRootNode.attachChild(hit);*/
+        localRootNode.attachChild(hit);
+
         TangentBinormalGenerator.generate(this.model);
         BillboardControl billboard = new BillboardControl();
         healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
@@ -788,7 +789,7 @@ public class PlayerControl extends AbstractControl {
                     }
                 });
 
-                // hit.play();
+                 hit.play();
                 if (health >= 0) {
                     characterNode.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) characterNode));
                 }
