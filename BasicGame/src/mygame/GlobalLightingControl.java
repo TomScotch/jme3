@@ -144,9 +144,9 @@ public class GlobalLightingControl extends AbstractControl {
         sun.setColor(ColorRGBA.Orange);
         ColorRGBA cr;
         if (colorCorrect) {
-            cr = ColorRGBA.DarkGray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray).mult(ColorRGBA.Gray);
-        } else {
             cr = ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray).mult(ColorRGBA.Gray);
+        } else {
+            cr = ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray);
         }
         al = new AmbientLight(cr);
         localRootNode.addLight(al);
