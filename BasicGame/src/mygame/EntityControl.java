@@ -20,6 +20,7 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.shape.Quad;
+import com.jme3.util.TangentBinormalGenerator;
 
 public class EntityControl extends AbstractControl {
 
@@ -64,7 +65,7 @@ public class EntityControl extends AbstractControl {
         getSkeletonControl().setHardwareSkinningPreferred(false);
         this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
 
-        // TangentBinormalGenerator.generate(this.spatial);
+        TangentBinormalGenerator.generate(this.spatial);
 
         /*        hit = new AudioNode(assetManager, "audio/creature-growl01.wav", AudioData.DataType.Buffer);
         hit.setLooping(false);

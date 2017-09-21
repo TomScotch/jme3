@@ -30,6 +30,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
+import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 import de.lessvoid.nifty.controls.Console;
 import java.io.File;
@@ -320,7 +321,7 @@ public class GameRunningState extends AbstractAppState {
 
         for (int i = 1; i < cl; i++) {
             Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
-
+           TangentBinormalGenerator.generate(bird);
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
             //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
