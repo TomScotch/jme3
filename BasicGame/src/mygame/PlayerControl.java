@@ -42,6 +42,8 @@ import com.jme3.util.TangentBinormalGenerator;
 
 public class PlayerControl extends AbstractControl {
 
+    private boolean noWide;
+
     public float getRotationModifier() {
         return rotationModifier;
     }
@@ -123,13 +125,15 @@ public class PlayerControl extends AbstractControl {
     private boolean underAttack = false;
     private final float underAttackTimerVal = 9f;
     private float rotationModifier = 0;
+    private boolean wideFov;
 
-    public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode) {
+    public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode, boolean noWide) {
 
         this.context = app.getContext();
         this.viewPort = app.getViewPort();
         this.assetManager = app.getAssetManager();
         this.inputManager = app.getInputManager();
+        this.noWide = noWide;
         this.bulletAppState = bulletState;
         this.localRootNode = localRootNode;
         characterNode = new Node("player");
@@ -313,13 +317,12 @@ public class PlayerControl extends AbstractControl {
 
                 case "changeFOV":
                     if (value) {
-                        x = context.getSettings().getWidth();
-                        if (x == viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3)) {
-                            x = viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4);
-                        } else if (x == viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4)) {
-                            x = viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3);
+                        noWide = !noWide;
+                        if (noWide) {
+                            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
+                        } else {
+                            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4), viewPort.getCamera().getHeight(), true);
                         }
-                        viewPort.getCamera().resize(x, viewPort.getCamera().getHeight(), true);
                     }
 
                     break;

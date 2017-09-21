@@ -155,9 +155,52 @@ public class GameRunningState extends AbstractAppState {
         Node terrainNode = new Node("terrainNode");
         terrainNode.addControl(terrainControl);
         localRootNode.attachChild(terrainNode);
+//      FOV
+
+        String xy = String.valueOf(viewPort.getCamera().getWidth()) + "×" + String.valueOf(viewPort.getCamera().getHeight());
+        System.out.println(xy);
+        Boolean noWide = false;
+
+        switch (xy) {
+            case "320×240":
+                noWide = true;
+                break;
+            case "640x480":
+                noWide = true;
+                break;
+            case "800x600":
+                noWide = true;
+                break;
+            case "1024x768":
+                noWide = true;
+                break;
+            case "1152x864":
+                noWide = true;
+                break;
+            case "1280x1024":
+                noWide = true;
+                break;
+            case "1360x1024":
+                noWide = true;
+                break;
+            case "1400x1050":
+                noWide = true;
+                break;
+            case "1600x1200":
+                noWide = true;
+                break;
+            default:
+                break;
+        }
+
+        if (noWide) {
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
+        } else {
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4), viewPort.getCamera().getHeight(), true);
+        }
 
 //      PLAYER
-        playerControl = new PlayerControl(app, bulletAppState, localRootNode);
+        playerControl = new PlayerControl(app, bulletAppState, localRootNode,noWide);
         playerControl.getPhysicsCharacter().setEnabled(false);
         Node player = new Node("playerNode");
         player.addControl(playerControl);
@@ -384,48 +427,6 @@ public class GameRunningState extends AbstractAppState {
         amb.play();
         amb1.play();
         amb2.play();
-
-        String xy = String.valueOf(viewPort.getCamera().getWidth()) + "×" + String.valueOf(viewPort.getCamera().getHeight());
-
-        Boolean noWide = false;
-
-        switch (xy) {
-            case "320×240":
-                noWide = true;
-                break;
-            case "640x480":
-                noWide = true;
-                break;
-            case "800x600":
-                noWide = true;
-                break;
-            case "1024x768":
-                noWide = true;
-                break;
-            case "1152x864":
-                noWide = true;
-                break;
-            case "1280x1024":
-                noWide = true;
-                break;
-            case "1360x1024":
-                noWide = true;
-                break;
-            case "1400x1050":
-                noWide = true;
-                break;
-            case "1600x1200":
-                noWide = true;
-                break;
-            default:
-                break;
-        }
-
-        if (noWide) {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
-        } else {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4), viewPort.getCamera().getHeight(), true);
-        }
 
         /*        if (viewPort.getCamera().getWidth() / 4 == viewPort.getCamera().getHeight() / 3) {
         viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
