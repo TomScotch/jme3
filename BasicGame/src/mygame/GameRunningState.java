@@ -175,13 +175,6 @@ public class GameRunningState extends AbstractAppState {
         sc = new SkyControl(assetManager, glc, localRootNode);
         localRootNode.addControl(sc);
 
-//      Bloom
-        if (bloomEnabled) {
-            if (localRootNode.getControl(BloomPostFilter.class) == null) {
-                localRootNode.addControl(new BloomPostFilter(fpp, app.getContext().getSettings().isGammaCorrection()));
-            }
-        }
-
 //      LightScatter
         if (lightScatterEnabled) {
 
@@ -217,6 +210,13 @@ public class GameRunningState extends AbstractAppState {
         //Depth of Field
         dof = new DepthOfField(fpp, app.getContext(), viewPort, assetManager);
         localRootNode.addControl(dof);
+
+//      Bloom
+        if (bloomEnabled) {
+            if (localRootNode.getControl(BloomPostFilter.class) == null) {
+                localRootNode.addControl(new BloomPostFilter(fpp));
+            }
+        }
 
         //Screen Space Ambient Occlusion
         /*
@@ -321,7 +321,7 @@ public class GameRunningState extends AbstractAppState {
 
         for (int i = 1; i < cl; i++) {
             Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
-           TangentBinormalGenerator.generate(bird);
+            TangentBinormalGenerator.generate(bird);
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
             //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
