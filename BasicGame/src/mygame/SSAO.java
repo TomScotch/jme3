@@ -11,10 +11,10 @@ public class SSAO extends AbstractControl {
 
     private final SSAOFilter ssaoFilter;
 
-    private float sampleRadius = 0.01f; // 5.1f
-    private float intensity = 0.01f; // 1.2f
-    private float scale = 0.01f; // 0.2f
-    private float bias = 0.01f; // 0.1f 
+    private float sampleRadius = 12.94f; // 5.1f 12.94f, 
+    private float intensity = 43.92f; // 1.2f 43.92f, 
+    private float scale = 0.33f;// 0.2f 0.33f, 
+    private float bias = 0.61f; // 0.1f 0.61f
     private boolean approximateNormals = false;
 
     public SSAO(AssetManager assetManager, FilterPostProcessor fpp) {

@@ -105,7 +105,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-//    private final SSAO ssao;
+   // private final SSAO ssao;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
     private List<Float> fps;
@@ -219,12 +219,11 @@ public class GameRunningState extends AbstractAppState {
         }
 
         //Screen Space Ambient Occlusion
-        /*
-        ssao = new SSAO(assetManager, fpp);
-        localRootNode.addControl(ssao);
-         */
+       // ssao = new SSAO(assetManager, fpp);
+     //   localRootNode.addControl(ssao);
 
- /*//      HOSTILE
+
+        /*//      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
         demon.addControl(ec1);
@@ -369,7 +368,7 @@ public class GameRunningState extends AbstractAppState {
         //      WATER
         if (waterPostProcessing) {
             if (localRootNode.getControl(WaterPostFilter.class) == null) {
-                localRootNode.addControl(new WaterPostFilter(fpp, glc, true, true, true, true, true, true, true, true));
+                localRootNode.addControl(new WaterPostFilter(fpp, glc, true, false, false, false, false, false, true, true));
             }
         } else {
             if (localRootNode.getControl(simpleWaterControl.class) == null) {
@@ -388,7 +387,7 @@ public class GameRunningState extends AbstractAppState {
         amb1.play();
         amb2.play();
         if (viewPort.getCamera().getWidth() / 4 == viewPort.getCamera().getHeight() / 3) {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth() * 2, viewPort.getCamera().getHeight(), true);
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
             System.out.println("DOUBLED X FOV ON CAM");
         }
     }

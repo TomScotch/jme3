@@ -50,8 +50,8 @@ public class WaterPostFilter extends AbstractControl {
         water.setUseRipples(ripples);
         this.dynamicLighting = dynamicLight;
         this.dynamicWater = dynamicWater;
-        water.setWaterTransparency(1f);
-        water.setColorExtinction(new Vector3f(30f, 20f, 10f));
+        // water.setWaterTransparency(1f);
+        //water.setColorExtinction(new Vector3f(30f, 20f, 10f));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class WaterPostFilter extends AbstractControl {
 
             if (dynamicLighting) {
                 if (!glc.isNight()) {
-                    water.setDeepWaterColor(glc.getBackgroundColor().mult(glc.getSun().getColor()));
+                    water.setDeepWaterColor(glc.getBackgroundColor());
                     water.setWaterColor(ColorRGBA.Blue);
                     water.setLightColor(glc.getSun().getColor());
                     water.getLightDirection().set(glc.getSunDirection());

@@ -132,7 +132,7 @@ public class WeatherControl extends AbstractControl {
 
         clouds = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, cloudThickness);
         Material cloudMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        cloudMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/clouds/SmallCloud.png"));
+        cloudMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/clouds/smoketex.jpg"));
         clouds.setMaterial(cloudMat);
         clouds.setStartSize(25);
         clouds.setEndSize(25);
