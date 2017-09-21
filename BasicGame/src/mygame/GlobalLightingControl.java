@@ -60,7 +60,7 @@ public class GlobalLightingControl extends AbstractControl {
     private boolean evening = false;
     private boolean night = false;
 
-    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode, Boolean colorCorrect) {
+    public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
         this.sl = sl;
         this.localRootNode = localRootNode;
@@ -142,13 +142,7 @@ public class GlobalLightingControl extends AbstractControl {
 
         sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
-        ColorRGBA cr;
-        if (colorCorrect) {
-            cr = ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray).mult(ColorRGBA.Gray);
-        } else {
-            cr = ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray);
-        }
-        al = new AmbientLight(cr);
+        al = new AmbientLight(ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray).mult(ColorRGBA.Gray));
         localRootNode.addLight(al);
     }
 
@@ -227,7 +221,7 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = true;
                     night = false;
                     if (isSun) {
-                        // sun.getColor().interpolateLocal(ColorRGBA.Blue, (tpf / timeDelay) / 2.5f);/// 0.0005f
+                        // sun.getColor().interpolateLocal(ColorRGBA.Orange, (tpf / timeDelay) / 2.5f);/// 0.0005f
                     }
                 }
 
@@ -255,6 +249,11 @@ public class GlobalLightingControl extends AbstractControl {
                 fire.removeFromParent();
                 sphereGeo.removeFromParent();
             }
+
+            if (isEvening()) {
+                sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) / 3);
+            }
+
             if (!isNight() && !isEvening()) {
                 sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));
             }
