@@ -10,11 +10,11 @@ public class BloomPostFilter extends AbstractControl {
 
     private final BloomFilter bloom;
 
-    private float density = 2f;//2
-    private float sampling = 1f;//1
-    private float blurScale = 1.5f;//1.5f
-    private float exposurePower = 5f;//5
-    private float cutOff = 0f; // 0.1 - 1.0
+    private float density = 1.5f;//2
+    private float sampling = 2f;//1
+    private float blurScale = 1.75f;//1.5f
+    private float exposurePower = 7.5f;//5
+    private float cutOff = 0.1f; // 0.1 - 1.0
 
     public BloomPostFilter(FilterPostProcessor fpp, Boolean openGL3) {
 
