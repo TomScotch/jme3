@@ -132,9 +132,6 @@ public class PlayerControl extends AbstractControl {
         this.inputManager = app.getInputManager();
         this.bulletAppState = bulletState;
         this.localRootNode = localRootNode;
-
-        this.x = viewPort.getCamera().getWidth();
-
         characterNode = new Node("player");
         chaseCam = new ChaseCamera(app.getCamera(), characterNode, inputManager);
         chaseCam.setChasingSensitivity(1);
@@ -316,10 +313,11 @@ public class PlayerControl extends AbstractControl {
 
                 case "changeFOV":
                     if (value) {
-                        if (x == viewPort.getCamera().getWidth()) {
+                        x = context.getSettings().getWidth();
+                        if (x == viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3)) {
+                            x = viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4);
+                        } else if (x == viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4)) {
                             x = viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3);
-                        } else {
-                            x = viewPort.getCamera().getWidth();
                         }
                         viewPort.getCamera().resize(x, viewPort.getCamera().getHeight(), true);
                     }

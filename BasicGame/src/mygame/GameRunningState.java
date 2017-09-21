@@ -105,7 +105,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-   // private final SSAO ssao;
+    // private final SSAO ssao;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
     private List<Float> fps;
@@ -166,7 +166,7 @@ public class GameRunningState extends AbstractAppState {
 
 //      SUN
         Node sunNode = new Node("sunNode");
-        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode, app.getContext().getSettings().isGammaCorrection());
+        glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
@@ -219,10 +219,8 @@ public class GameRunningState extends AbstractAppState {
         }
 
         //Screen Space Ambient Occlusion
-       // ssao = new SSAO(assetManager, fpp);
-     //   localRootNode.addControl(ssao);
-
-
+        // ssao = new SSAO(assetManager, fpp);
+        //   localRootNode.addControl(ssao);
         /*//      HOSTILE
         Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
         EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
@@ -386,10 +384,52 @@ public class GameRunningState extends AbstractAppState {
         amb.play();
         amb1.play();
         amb2.play();
-        if (viewPort.getCamera().getWidth() / 4 == viewPort.getCamera().getHeight() / 3) {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
-            System.out.println("DOUBLED X FOV ON CAM");
+
+        String xy = String.valueOf(viewPort.getCamera().getWidth()) + "×" + String.valueOf(viewPort.getCamera().getHeight());
+
+        Boolean noWide = false;
+
+        switch (xy) {
+            case "320×240":
+                noWide = true;
+                break;
+            case "640x480":
+                noWide = true;
+                break;
+            case "800x600":
+                noWide = true;
+                break;
+            case "1024x768":
+                noWide = true;
+                break;
+            case "1152x864":
+                noWide = true;
+                break;
+            case "1280x1024":
+                noWide = true;
+                break;
+            case "1360x1024":
+                noWide = true;
+                break;
+            case "1400x1050":
+                noWide = true;
+                break;
+            case "1600x1200":
+                noWide = true;
+                break;
+            default:
+                break;
         }
+
+        if (noWide) {
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
+        } else {
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4), viewPort.getCamera().getHeight(), true);
+        }
+
+        /*        if (viewPort.getCamera().getWidth() / 4 == viewPort.getCamera().getHeight() / 3) {
+        viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
+        }*/
     }
 
     private void setupKeys() {
