@@ -671,10 +671,15 @@ public class GameRunningState extends AbstractAppState {
                     hudText2.setText("min : " + (int) minMaxFps.getX() + " max : " + (int) minMaxFps.getY() + " avg : " + (int) (t / fps.size()));
                     System.out.println("finished Timedemo");
                     System.out.println(hudText2.getText());
+
+                    if (hudText2.getControl(TimedActionControl.class) != null) {
+                        hudText2.removeControl(TimedActionControl.class);
+                    }
+
                     hudText2.addControl(new TimedActionControl(15) {
                         @Override
                         void action() {
-                            if (isTimeDemo == false) {
+                            if (!isTimeDemo) {
                                 if (fps.size() >= 500) {
                                     hudText2.setText("... : ...");
                                 }
