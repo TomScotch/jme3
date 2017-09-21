@@ -65,11 +65,10 @@ public class WeatherControl extends AbstractControl {
     private ColorRGBA rainColorStart = new ColorRGBA(ColorRGBA.Blue);
     private ColorRGBA rainColorEnd = new ColorRGBA(ColorRGBA.DarkGray);
 
-    private final int maximumWeatherLength = 30;
+    private final int maximumWeatherLength = 8;
     private final int minimumWeatherLength = 4;
 
     private final AbstractHeightMap hm;
-    private final AssetManager am;
     private final ParticleEmitter debrisEffect;
     private final Node localRoot;
     private final DirectionalLight sun;
@@ -79,10 +78,10 @@ public class WeatherControl extends AbstractControl {
 
         this.glc = glc;
         this.hm = hm;
-        this.am = am;
+
         this.localRoot = localRoot;
 
-        limit = limit = getLimit();
+        limit = getLimit();
 
         flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 8);
         Material flash_mat = new Material(
@@ -204,6 +203,7 @@ public class WeatherControl extends AbstractControl {
                 makeSuny();
                 break;
         }
+        limit = getLimit();
     }
 
     private void makeMisty() {
@@ -607,7 +607,7 @@ public class WeatherControl extends AbstractControl {
                 break;
         }
 
-        return (float) getRandomNumberInRange(minimumWeatherLength + delayValue, maximumWeatherLength);
+        return (float) getRandomNumberInRange(minimumWeatherLength + delayValue, maximumWeatherLength + delayValue);
     }
 
     public boolean isClouded() {
