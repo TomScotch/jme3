@@ -319,9 +319,9 @@ public class PlayerControl extends AbstractControl {
                     if (value) {
                         noWide = !noWide;
                         if (noWide) {
-                            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
+                            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 2), viewPort.getCamera().getHeight(), true);
                         } else {
-                            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4), viewPort.getCamera().getHeight(), true);
+                            viewPort.getCamera().resize(viewPort.getCamera().getWidth(), viewPort.getCamera().getHeight(), true);
                         }
                     }
 

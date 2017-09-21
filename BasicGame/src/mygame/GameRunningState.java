@@ -43,6 +43,7 @@ public class GameRunningState extends AbstractAppState {
 
     private BitmapText healthText;
     private BitmapFont guiFont;
+    private boolean noWide;
 
     public void setConsole(Console console) {
         this.console = console;
@@ -157,12 +158,12 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(terrainNode);
 //      FOV
 
-        String xy = String.valueOf(viewPort.getCamera().getWidth()) + "×" + String.valueOf(viewPort.getCamera().getHeight());
-        System.out.println(xy);
-        Boolean noWide = false;
+        String xy = String.valueOf(viewPort.getCamera().getWidth()) + "x" + String.valueOf(viewPort.getCamera().getHeight());
+
+        noWide = false;
 
         switch (xy) {
-            case "320×240":
+            case "320x240":
                 noWide = true;
                 break;
             case "640x480":
@@ -193,14 +194,8 @@ public class GameRunningState extends AbstractAppState {
                 break;
         }
 
-        if (noWide) {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
-        } else {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 4), viewPort.getCamera().getHeight(), true);
-        }
-
 //      PLAYER
-        playerControl = new PlayerControl(app, bulletAppState, localRootNode,noWide);
+        playerControl = new PlayerControl(app, bulletAppState, localRootNode, noWide);
         playerControl.getPhysicsCharacter().setEnabled(false);
         Node player = new Node("playerNode");
         player.addControl(playerControl);
@@ -328,8 +323,8 @@ public class GameRunningState extends AbstractAppState {
         hudText2 = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
         hudText2.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 2.25f);      // font size
         hudText2.setColor(ColorRGBA.Red);
-        hudText2.setText("... : ...         ");
-        hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - hudText.getLineWidth(), hudText.getLineHeight() * 3, 0); // position
+        hudText2.setText("... : ...");
+        hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - (hudText2.getLineWidth() / 2), hudText2.getLineHeight() * 3, 0); // position
         // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
 
@@ -428,6 +423,12 @@ public class GameRunningState extends AbstractAppState {
         amb1.play();
         amb2.play();
 
+        if (noWide) {
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 2), viewPort.getCamera().getHeight(), true);
+        } else {
+            viewPort.getCamera().resize(viewPort.getCamera().getWidth(), viewPort.getCamera().getHeight(), true);
+        }
+
         /*        if (viewPort.getCamera().getWidth() / 4 == viewPort.getCamera().getHeight() / 3) {
         viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
         }*/
@@ -518,7 +519,6 @@ public class GameRunningState extends AbstractAppState {
                                 isTimeDemo = true;
                                 System.out.println("Running Timedemo");
                                 fps = new ArrayList<>();
-                                hudText2.setText("... : ...         ");
                             }
                         }
                     }
@@ -646,7 +646,7 @@ public class GameRunningState extends AbstractAppState {
                 playerControl.setRotationModifier(12.f);
                 playerControl.setIdleCounter(90);
                 if (fps.size() < 500) {
-                    hudText2.setText(" collecting data : tablesize = " + fps.size() + " of 500");
+                    hudText2.setText(" timedemo : " + fps.size() + " - 500");
                     fps.add(1 / tpf);
                 } else {
                     isTimeDemo = false;
@@ -667,7 +667,8 @@ public class GameRunningState extends AbstractAppState {
                     }
 
                     minMaxFps = new Vector2f(fps.get(fps.size() - 1), fps.get(0));
-                    hudText2.setText("min :   " + minMaxFps.getX() + " max : " + minMaxFps.getY() + " avg : " + (t / fps.size()));
+
+                    hudText2.setText("min : " + (int) minMaxFps.getX() + " max : " + (int) minMaxFps.getY() + " avg : " + (int) (t / fps.size()));
                     System.out.println("finished Timedemo");
                     System.out.println(hudText2.getText());
                     hudText2.addControl(new TimedActionControl(15) {
@@ -675,7 +676,7 @@ public class GameRunningState extends AbstractAppState {
                         void action() {
                             if (isTimeDemo == false) {
                                 if (fps.size() >= 500) {
-                                    hudText2.setText("... : ...         ");
+                                    hudText2.setText("... : ...");
                                 }
                             }
                         }
@@ -755,7 +756,7 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateAttach() {
         setupHudText();
-        hudText2.setText("... : ...         ");
+        hudText2.setText("... : ...");
         glc.setEnabled(true);
         playerControl.setEnabled(true);
         sc.setEnabled(true);
@@ -803,7 +804,7 @@ public class GameRunningState extends AbstractAppState {
         hudText.removeFromParent();
         hudText2.removeFromParent();
         healthText.removeFromParent();
-        hudText2.setText("... : ...         ");
+        hudText2.setText("... : ...");
 
         amb.stop();
         amb1.stop();
