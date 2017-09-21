@@ -185,7 +185,7 @@ public class GlobalLightingControl extends AbstractControl {
                 if (y > -(sunSize / 1.1f) && z < -222) {
                     //morning
                     if (isSun) {
-                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
+                        //  sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
                     }
                     morning = true;
                     day = false;
@@ -216,7 +216,7 @@ public class GlobalLightingControl extends AbstractControl {
                         slsr.setShadowIntensity(0.35f);
                     }
                     if (isSun) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) / 2);/// 0.0005f
+                        //     sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
                     }
                 }
 
@@ -227,7 +227,7 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = true;
                     night = false;
                     if (isSun) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Blue, (tpf / timeDelay) / 3);/// 0.0005f
+                        sun.getColor().interpolateLocal(ColorRGBA.Blue, (tpf / timeDelay));/// 0.0005f
                     }
                 }
 
@@ -254,6 +254,9 @@ public class GlobalLightingControl extends AbstractControl {
                 sun.setColor(ColorRGBA.White);
                 fire.removeFromParent();
                 sphereGeo.removeFromParent();
+            }
+            if (!isNight() && !isEvening()) {
+                sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));
             }
             if (!isNight() && !isMorning()) {
                 vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 2);
