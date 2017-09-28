@@ -67,6 +67,10 @@ public class GameRunningState extends AbstractAppState {
     private final AudioNode amb;
     private final AudioNode amb1;
     private final AudioNode amb2;
+    private  AudioNode lightRain;
+    private  AudioNode normalRain;
+    private  AudioNode heavyRain;
+
     private final int ambienceVolume = 3;
 
     private WeatherControl weatherControl;
@@ -284,6 +288,10 @@ public class GameRunningState extends AbstractAppState {
         view2.setEnabled(false);
 
         //Audio
+        lightRain = new AudioNode(assetManager, "audio/rain/light_rain.ogg", DataType.Stream);
+        normalRain = new AudioNode(assetManager, "audio/rain/moderate_rain.ogg", DataType.Stream);
+        heavyRain = new AudioNode(assetManager, "audio/rain/heavy_rain.ogg", DataType.Stream);
+
         amb = new AudioNode(assetManager, "audio/ambience-creepyatmosfear.wav", DataType.Stream);
         amb.setLooping(true);
         amb.setPositional(false);
@@ -355,7 +363,7 @@ public class GameRunningState extends AbstractAppState {
 
         for (int i = 1; i < cl; i++) {
             Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
-            TangentBinormalGenerator.generate(bird);
+          //  TangentBinormalGenerator.generate(bird);
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
             //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
@@ -809,7 +817,7 @@ public class GameRunningState extends AbstractAppState {
 
         removeMappings();
         removeListener();
-        
+
         playerControl.removeMappings();
         playerControl.removeListeners();
 

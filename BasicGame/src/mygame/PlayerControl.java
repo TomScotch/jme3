@@ -211,7 +211,7 @@ public class PlayerControl extends AbstractControl {
         hit.setVolume(4);
         localRootNode.attachChild(hit);
 
-        TangentBinormalGenerator.generate(this.model);
+       // TangentBinormalGenerator.generate(this.model);
         BillboardControl billboard = new BillboardControl();
         healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
         Material mathb = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
