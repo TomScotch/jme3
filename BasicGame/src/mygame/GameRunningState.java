@@ -190,8 +190,6 @@ public class GameRunningState extends AbstractAppState {
             case "1600x1200":
                 noWide = true;
                 break;
-            default:
-                break;
         }
 
 //      PLAYER
@@ -307,6 +305,7 @@ public class GameRunningState extends AbstractAppState {
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
 
         limit = getRandomNumberInRange(15, 45);
+
     }
 
     private void setupHudText() {
@@ -423,15 +422,6 @@ public class GameRunningState extends AbstractAppState {
         amb1.play();
         amb2.play();
 
-        if (noWide) {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 2), viewPort.getCamera().getHeight(), true);
-        } else {
-            viewPort.getCamera().resize(viewPort.getCamera().getWidth(), viewPort.getCamera().getHeight(), true);
-        }
-
-        /*        if (viewPort.getCamera().getWidth() / 4 == viewPort.getCamera().getHeight() / 3) {
-        viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
-        }*/
     }
 
     private void setupKeys() {
@@ -760,6 +750,7 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateAttach() {
+
         setupHudText();
         hudText2.setText("... : ...");
         glc.setEnabled(true);
@@ -806,6 +797,7 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
+
         hudText.removeFromParent();
         hudText2.removeFromParent();
         healthText.removeFromParent();
@@ -817,6 +809,7 @@ public class GameRunningState extends AbstractAppState {
 
         removeMappings();
         removeListener();
+        
         playerControl.removeMappings();
         playerControl.removeListeners();
 

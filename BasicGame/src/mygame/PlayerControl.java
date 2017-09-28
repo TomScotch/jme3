@@ -114,7 +114,7 @@ public class PlayerControl extends AbstractControl {
     private float idleCounter = 0;
     private final JmeContext context;
     private final float idleTimeOutValue = 90f;
-    private int x;
+
     private float health = 100;
     private boolean dead = false;
     private final float armor = 10;
@@ -125,7 +125,6 @@ public class PlayerControl extends AbstractControl {
     private boolean underAttack = false;
     private final float underAttackTimerVal = 9f;
     private float rotationModifier = 0;
-    private boolean wideFov;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode, boolean noWide) {
 
@@ -317,14 +316,14 @@ public class PlayerControl extends AbstractControl {
 
                 case "changeFOV":
                     if (value) {
-                        noWide = !noWide;
+
                         if (noWide) {
-                            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 2), viewPort.getCamera().getHeight(), true);
+                            viewPort.getCamera().resize(viewPort.getCamera().getWidth() + (viewPort.getCamera().getWidth() / 3), viewPort.getCamera().getHeight(), true);
                         } else {
                             viewPort.getCamera().resize(viewPort.getCamera().getWidth(), viewPort.getCamera().getHeight(), true);
                         }
+                        noWide = !noWide;
                     }
-
                     break;
 
                 case "Jump":
