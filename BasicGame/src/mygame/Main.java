@@ -460,8 +460,6 @@ public class Main extends SimpleApplication implements ScreenController {
         console = nifty.getScreen("console").findNiftyControl("console", Console.class);
         addListener();
         add_mapping();
-
-        GuiGlobals.initialize(app);
         
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         helloText = new BitmapText(guiFont, false);
