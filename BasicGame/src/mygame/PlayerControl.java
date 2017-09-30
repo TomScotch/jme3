@@ -38,7 +38,6 @@ import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.control.LightControl;
 import com.jme3.scene.shape.Quad;
 import com.jme3.system.JmeContext;
-import com.jme3.util.TangentBinormalGenerator;
 
 public class PlayerControl extends AbstractControl {
 
@@ -211,7 +210,6 @@ public class PlayerControl extends AbstractControl {
         hit.setVolume(4);
         localRootNode.attachChild(hit);
 
-       // TangentBinormalGenerator.generate(this.model);
         BillboardControl billboard = new BillboardControl();
         healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
         Material mathb = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

@@ -1,4 +1,4 @@
-package mygame;
+    package mygame;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
@@ -58,8 +58,7 @@ public class Terrain extends AbstractControl {
             terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
         }
 
-        // TangentBinormalGenerator.generate(terrain);
-        RigidBodyControl rb = new RigidBodyControl(0);
+                RigidBodyControl rb = new RigidBodyControl(0);
         terrain.addControl(rb);
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);

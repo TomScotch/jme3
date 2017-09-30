@@ -30,7 +30,6 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
-import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.SimpleWaterProcessor;
 import de.lessvoid.nifty.controls.Console;
 import java.io.File;
@@ -40,6 +39,18 @@ import java.util.List;
 import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
+
+    public AudioNode getLightRain() {
+        return lightRain;
+    }
+
+    public AudioNode getNormalRain() {
+        return normalRain;
+    }
+
+    public AudioNode getHeavyRain() {
+        return heavyRain;
+    }
 
     private BitmapText healthText;
     private BitmapFont guiFont;
@@ -67,9 +78,10 @@ public class GameRunningState extends AbstractAppState {
     private final AudioNode amb;
     private final AudioNode amb1;
     private final AudioNode amb2;
-    private  AudioNode lightRain;
-    private  AudioNode normalRain;
-    private  AudioNode heavyRain;
+    
+    private final AudioNode lightRain;
+    private final AudioNode normalRain;
+    private final AudioNode heavyRain;
 
     private final int ambienceVolume = 3;
 
@@ -363,7 +375,7 @@ public class GameRunningState extends AbstractAppState {
 
         for (int i = 1; i < cl; i++) {
             Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
-          //  TangentBinormalGenerator.generate(bird);
+    
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
             //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
