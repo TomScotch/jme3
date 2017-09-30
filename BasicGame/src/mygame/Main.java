@@ -461,6 +461,8 @@ public class Main extends SimpleApplication implements ScreenController {
         addListener();
         add_mapping();
 
+        GuiGlobals.initialize(app);
+        
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         helloText = new BitmapText(guiFont, false);
         helloText.setSize(guiFont.getCharSet().getRenderedSize());

@@ -20,11 +20,10 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.shape.Quad;
-import com.jme3.util.TangentBinormalGenerator;
 
 public class EntityControl extends AbstractControl {
 
-    private final float damage = 20;
+    private float damage = 20;
     private final PlayerControl pc;
     private final Geometry healthbar;
 
@@ -56,6 +55,18 @@ public class EntityControl extends AbstractControl {
         this.pc = pc;
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
 
+        switch (spatial.getName()) {
+            case "bear":
+                damage = 0;
+                break;
+            case "spider":
+                damage = 15;
+                break;
+            default:
+                damage = 20;
+                break;
+        }
+
         /*        bcc = new BetterCharacterControl(3, 7, mass);
         bcc.setSpatial(hostile);
         hostile.addControl(bcc);
@@ -65,7 +76,7 @@ public class EntityControl extends AbstractControl {
         getSkeletonControl().setHardwareSkinningPreferred(false);
         this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
 
-       // TangentBinormalGenerator.generate(this.spatial);
+        // TangentBinormalGenerator.generate(this.spatial);
 
         /*        hit = new AudioNode(assetManager, "audio/creature-growl01.wav", AudioData.DataType.Buffer);
         hit.setLooping(false);
@@ -90,6 +101,10 @@ public class EntityControl extends AbstractControl {
 
         if (name.equals("demon")) {
             this.spatial.scale(1.2f);
+        }
+        if (name.equals("bear")) {
+            this.spatial.getWorldScale().addLocal(2, 2, 2);
+            this.spatial.getWorldTranslation().addLocal(0, 4, 0);
         }
 
     }
@@ -134,13 +149,22 @@ public class EntityControl extends AbstractControl {
             if (health < 0) {
 
                 dead = true;
-                setAnim("Idle", LoopMode.DontLoop);
+
+                if (!spatial.getName().equals("bear")) {
+                    setAnim("Idle", LoopMode.DontLoop);
+                } else {
+                    setAnim("Attack", LoopMode.DontLoop);
+                }
             }
 
             if (hitAnimationDelay > 0) {
                 hitAnimationDelay -= tpf;
                 if (hitAnimationDelay <= 0) {
-                    setAnim("Idle", LoopMode.Loop);
+                    if (!spatial.getName().equals("bear")) {
+                        setAnim("Idle", LoopMode.DontLoop);
+                    } else {
+                        setAnim("Attack", LoopMode.DontLoop);
+                    }
                 }
             }
         }
@@ -159,6 +183,9 @@ public class EntityControl extends AbstractControl {
             healthbar.getLocalScale().setX(0);
             if (deadDelay >= 3f) {
                 deadParticles(20);
+                if (this.spatial.getName().equals("spider")) {
+                    this.spatial.rotate(-90, 0, 0);
+                }
                 setAnim("Dying", LoopMode.DontLoop);
             }
             deadDelay -= tpf;
@@ -201,7 +228,11 @@ public class EntityControl extends AbstractControl {
                 healthbar.center();
                 healthbar.move(-(((health + 1) / 75) * 2), 9, 0);
                 hitAnimationDelay = 1.5f;
-                setAnim("Hit", LoopMode.Loop);
+                if (spatial.getName().equals("bear")) {
+                    setAnim("Walk", LoopMode.Loop);
+                } else {
+                    setAnim("Hit", LoopMode.Loop);
+                }
 
                 PointLight lamp = new PointLight();
                 lamp.setPosition(Vector3f.ZERO);
