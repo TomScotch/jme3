@@ -34,6 +34,8 @@ public class EnemyControl extends AbstractControl {
     private EntityControl ec3;
     private final GlobalLightingControl glc;
     private float emptyNodeTimer = 0;
+    private Spatial spider;
+    private Spatial forestmonster;
 
     public int countEnemys() {
         int c = 0;
@@ -91,15 +93,14 @@ public class EnemyControl extends AbstractControl {
         localRoot.attachChild(demon);
         setMotionPath("demon", path1, demon);
         playing1 = true;*/
-
-        Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
+        forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
         ec2 = new EntityControl(assetManager, forestmonster, "forestmonster", new Vector3f(-10, 0, 10), pc);
         forestmonster.addControl(ec2);
         localRoot.attachChild(forestmonster);
         setMotionPath("forestmonster", path2, forestmonster);
         playing2 = true;
 
-        Spatial spider = assetManager.loadModel("Models/spider/spider.j3o");
+        spider = assetManager.loadModel("Models/spider/spider.j3o");
         ec3 = new EntityControl(assetManager, spider, "spider", new Vector3f(-10, 0, -10), pc);
         spider.addControl(ec3);
         localRoot.attachChild(spider);
@@ -139,76 +140,78 @@ public class EnemyControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (countEnemys() < 3) {
-            emptyNodeTimer += tpf;
+        if (isEnabled()) {
+            if (countEnemys() < 3) {
+                emptyNodeTimer += tpf;
 
-            if (emptyNodeTimer >= 20) {
-                emptyNodeTimer = 0;
-                addHostille();
+                if (emptyNodeTimer >= 20) {
+                    emptyNodeTimer = 0;
+                    addHostille();
+                }
             }
-        }
 
-        if (ec1 != null) {
-            playing1 = !ec1.isFighting();
-            if (playing1) {
-                motionControl1.play();
-                if (ec1.getAnimControl() != null) {
-                    if (ec1.getAnimControl().getChannel(0) != null) {
-                        if (!ec1.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
-                            ec1.setAnim("Walk", LoopMode.Loop);
+            if (ec1 != null) {
+                playing1 = !ec1.isFighting();
+                if (playing1) {
+                    motionControl1.play();
+                    if (ec1.getAnimControl() != null) {
+                        if (ec1.getAnimControl().getChannel(0) != null) {
+                            if (!ec1.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
+                                ec1.setAnim("Walk", LoopMode.Loop);
 
+                            }
                         }
                     }
+                } else {
+                    motionControl1.pause();
                 }
-            } else {
-                motionControl1.pause();
             }
-        }
 
-        if (motionControl1 != null) {
-            motionControl1.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.25f);
-        }
+            if (motionControl1 != null) {
+                motionControl1.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.25f);
+            }
 
-        if (motionControl2 != null) {
-            motionControl2.setSpeed(((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.15f);
-        }
+            if (motionControl2 != null) {
+                motionControl2.setSpeed(((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.15f);
+            }
 
-        if (motionControl3 != null) {
-            motionControl3.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.35f);
-        }
+            if (motionControl3 != null) {
+                motionControl3.setSpeed(((tpf / (glc.getTimeDelay()) / 4) * 200) + 0.35f);
+            }
 
-        if (ec2 != null) {
-            playing2 = !ec2.isFighting();
-            if (playing2) {
-                motionControl2.play();
-                if (ec2.getAnimControl() != null) {
-                    if (ec2.getAnimControl().getChannel(0) != null) {
-                        if (!ec2.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
-                            ec2.setAnim("Walk", LoopMode.Loop);
+            if (ec2 != null) {
+                playing2 = !ec2.isFighting();
+                if (playing2) {
+                    motionControl2.play();
+                    if (ec2.getAnimControl() != null) {
+                        if (ec2.getAnimControl().getChannel(0) != null) {
+                            if (!ec2.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
+                                ec2.setAnim("Walk", LoopMode.Loop);
 
+                            }
                         }
                     }
+                } else {
+                    motionControl2.pause();
                 }
-            } else {
-                motionControl2.pause();
             }
-        }
 
-        if (ec3 != null) {
-            playing3 = !ec3.isFighting();
-            if (playing3) {
+            if (ec3 != null) {
+                playing3 = !ec3.isFighting();
+                if (playing3) {
 
-                motionControl3.play();
-                if (ec3.getAnimControl() != null) {
-                    if (ec3.getAnimControl().getChannel(0) != null) {
-                        if (!ec3.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
-                            ec3.setAnim("Walk", LoopMode.Loop);
+                    motionControl3.play();
+                    if (ec3.getAnimControl() != null) {
+                        if (ec3.getAnimControl().getChannel(0) != null) {
+                            if (!ec3.getAnimControl().getChannel(0).getAnimationName().equals("Walk")) {
+                                ec3.setAnim("Walk", LoopMode.Loop);
 
+                            }
                         }
                     }
+                } else {
+                    motionControl3.pause();
                 }
-            } else {
-                motionControl3.pause();
             }
         }
     }
@@ -253,7 +256,6 @@ public class EnemyControl extends AbstractControl {
         };
         localRoot.addControl(timedActionControl1);
         }*/
-
         if (!hasForestmonster) {
             TimedActionControl timedActionControl2 = new TimedActionControl(6) {
                 @Override
@@ -283,6 +285,27 @@ public class EnemyControl extends AbstractControl {
             };
             localRoot.addControl(timedActionControl3);
         }
+    }
+
+    public void remAllEnemys() {
+        // spider.removeFromParent();
+        // forestmonster.removeFromParent();
+        
+        localRoot.detachChild(spider);
+        localRoot.detachChild(forestmonster);
+        spider = (Spatial) new Node();
+        forestmonster = (Spatial) new Node();
+        
+       // spider.removeControl(EntityControl.class);
+       // forestmonster.removeControl(EntityControl.class);
+        playing2 = false;
+        playing3 = false;
+/*        motionControl2.stop();
+        motionControl3.stop();
+        ec2 = null;
+        ec3 = null;
+        motionControl2 = null;
+        motionControl3 = null;*/
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.font.BitmapFont;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
+
+    private final Spatial teapot;
 
     public AudioNode getLightRain() {
         return lightRain;
@@ -78,7 +81,7 @@ public class GameRunningState extends AbstractAppState {
     private final AudioNode amb;
     private final AudioNode amb1;
     private final AudioNode amb2;
-    
+
     private final AudioNode lightRain;
     private final AudioNode normalRain;
     private final AudioNode heavyRain;
@@ -129,7 +132,7 @@ public class GameRunningState extends AbstractAppState {
     private BitmapText hudText2;
     private Vector2f minMaxFps;
     private final AppStateManager stateManager;
-    private final EnemyControl enemyControl;
+    private EnemyControl enemyControl;
     private float health = 100;
     private final int birdLimit = 29;
 
@@ -323,9 +326,18 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(amb2);
 
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
-
         limit = getRandomNumberInRange(15, 45);
 
+        teapot = assetManager.loadModel("Models/alternativeScene.j3o");
+        teapot.setName("scene");
+        teapot.scale(20);
+        teapot.setLocalTranslation(0, 5, 0);
+        RigidBodyControl rb1 = new RigidBodyControl(0);
+        teapot.addControl(rb1);
+        //localRootNode.attachChild(teapot);
+
+        rb1.setFriction(0.9f);
+        //teapot.setCullHint(Spatial.CullHint.Always);
     }
 
     private void setupHudText() {
@@ -358,6 +370,7 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void addListener() {
+        inputManager.addListener(actionListener, "changeLevel");
         inputManager.addListener(actionListener, "write");
         inputManager.addListener(actionListener, "treeoutroot");
         inputManager.addListener(actionListener, "debug");
@@ -375,7 +388,7 @@ public class GameRunningState extends AbstractAppState {
 
         for (int i = 1; i < cl; i++) {
             Spatial bird = assetManager.loadModel("Models/wildlife/Bird.j3o");
-    
+
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
             //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
@@ -445,6 +458,9 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void setupKeys() {
+
+        inputManager.addMapping("changeLevel",
+                new KeyTrigger(KeyInput.KEY_NUMPAD5));
 
         inputManager.addMapping("switchCam",
                 new KeyTrigger(KeyInput.KEY_P));
@@ -521,6 +537,34 @@ public class GameRunningState extends AbstractAppState {
         public void onAction(String binding, boolean value, float tpf) {
             playerControl.setIdleCounter(0);
             switch (binding) {
+
+                case "changeLevel":
+                    if (value && isRunning) {
+                        if (!isTimeDemo) {
+                            if (localRootNode.getChild("scene") != null) {
+                                teapot.removeFromParent();
+                                bulletAppState.getPhysicsSpace().addAll(terrainControl.getTerrain());
+                                bulletAppState.getPhysicsSpace().removeAll(teapot);
+                                playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
+                                localRootNode.attachChild(terrainControl.getTerrain());
+                                enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
+                                localRootNode.addControl(enemyControl);
+                                enemyControl.setEnabled(true);
+                             //   enemyControl.remAllEnemys();
+                            }else if (localRootNode.hasChild(terrainControl.getTerrain())) {
+                                terrainControl.getTerrain().removeFromParent();
+                                localRootNode.attachChild(teapot);
+                                playerControl.getPhysicsCharacter().warp(new Vector3f(0, 6, 0));
+                                bulletAppState.getPhysicsSpace().addAll(teapot);
+                                bulletAppState.getPhysicsSpace().removeAll(terrainControl.getTerrain());
+                                enemyControl.remAllEnemys();
+                                enemyControl.setEnabled(false);
+                                localRootNode.removeControl(enemyControl);
+                                //enemyControl = null;
+                            }
+                        }
+                    }
+                    break;
 
                 case "timeDemo":
                     if (value && isRunning) {
@@ -807,6 +851,7 @@ public class GameRunningState extends AbstractAppState {
         playerControl.setupMappings();
         view2.attachScene(localRootNode);
         localRootNode.addControl(enemyControl);
+        enemyControl.setEnabled(true);
     }
 
     @Override
@@ -867,6 +912,7 @@ public class GameRunningState extends AbstractAppState {
                 }
             }
         }
+        enemyControl.setEnabled(false);
         localRootNode.removeControl(enemyControl);
         dettachLocalRootNode();
         detachLocalGuiNode();

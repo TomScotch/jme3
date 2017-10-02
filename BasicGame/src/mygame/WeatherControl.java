@@ -46,8 +46,8 @@ public class WeatherControl extends AbstractControl {
     private boolean lightnungStrikes_med = false;
     private boolean lightnungStrikes_high = false;
 
-    private final float fogDensity = 0.35f; // 1.3f
-    private final int fogDistance = 35; // 50
+    private final float fogDensity = 0.25f; // 1.3f
+    private final int fogDistance = 50; // 50
 
     private final int cloudThickness = 350; // 400
 
@@ -484,9 +484,9 @@ public class WeatherControl extends AbstractControl {
                     if (spatial.getControl(FogPostFilter.class) != null) {
                         Node n = (Node) spatial;
                         if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-                            spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.DarkGray);
-                        } else {
                             spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.Gray);
+                        } else {
+                            spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.LightGray);
                         }
 
                         if (misty_high) {

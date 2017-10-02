@@ -200,9 +200,15 @@ public class EntityControl extends AbstractControl {
     }
 
     public AnimControl getAnimControl() {
-        Node n = (Node) this.spatial;
-        Node e = (Node) n.getChild("anim");
-        return e.getControl(AnimControl.class);
+
+        if (this.spatial != null) {
+            Node n = (Node) this.spatial;
+            if (n.getChild("anim") != null) {
+                Node e = (Node) n.getChild("anim");
+                return e.getControl(AnimControl.class);
+            }
+        }
+        return null;
     }
 
     public final void setAnim(String name, LoopMode mode) {
