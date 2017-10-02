@@ -386,6 +386,8 @@ public class Main extends SimpleApplication implements ScreenController {
     @Override
     public void simpleInitApp() {
 
+
+
         settingsNode = loadNode("settings");
 
         if (settingsNode != null) {
@@ -460,7 +462,7 @@ public class Main extends SimpleApplication implements ScreenController {
         console = nifty.getScreen("console").findNiftyControl("console", Console.class);
         addListener();
         add_mapping();
-        
+
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         helloText = new BitmapText(guiFont, false);
         helloText.setSize(guiFont.getCharSet().getRenderedSize());

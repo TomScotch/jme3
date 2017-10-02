@@ -338,6 +338,9 @@ public class GameRunningState extends AbstractAppState {
 
         rb1.setFriction(0.9f);
         //teapot.setCullHint(Spatial.CullHint.Always);
+
+        app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
+        app.getCamera().update();
     }
 
     private void setupHudText() {
@@ -550,8 +553,8 @@ public class GameRunningState extends AbstractAppState {
                                 enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
                                 localRootNode.addControl(enemyControl);
                                 enemyControl.setEnabled(true);
-                             //   enemyControl.remAllEnemys();
-                            }else if (localRootNode.hasChild(terrainControl.getTerrain())) {
+                                //   enemyControl.remAllEnemys();
+                            } else if (localRootNode.hasChild(terrainControl.getTerrain())) {
                                 terrainControl.getTerrain().removeFromParent();
                                 localRootNode.attachChild(teapot);
                                 playerControl.getPhysicsCharacter().warp(new Vector3f(0, 6, 0));
