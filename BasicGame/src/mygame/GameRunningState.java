@@ -340,14 +340,14 @@ public class GameRunningState extends AbstractAppState {
         //teapot.setCullHint(Spatial.CullHint.Always);
         app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
         app.getCamera().update();
-        
-    guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-    ch = new BitmapText(guiFont, false);
-    ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
-    ch.setText("+"); // crosshairs
-    ch.setLocalTranslation( // center
-      app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth()/2, app.getContext().getSettings().getHeight() / 2 + ch.getLineHeight()/2, 0);
-    guiNode.attachChild(ch);
+
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        ch = new BitmapText(guiFont, false);
+        ch.setName("crosshair");
+        ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+        ch.setText("+"); // crosshairs
+        ch.setLocalTranslation( // center
+                app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getContext().getSettings().getHeight() / 2 + ch.getLineHeight() / 2, 0);
     }
 
     private void setupHudText() {
@@ -678,6 +678,13 @@ public class GameRunningState extends AbstractAppState {
 
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
+                    
+                    if(playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()){
+                        localGuiNode.attachChild(ch);
+                    }else{
+                        ch.removeFromParent();
+                    }
+                    
                     health = playerControl.getHealth();
                     Integer i = (int) playerControl.getHealth();
 
