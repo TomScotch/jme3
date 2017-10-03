@@ -42,6 +42,7 @@ import java.util.Random;
 public class GameRunningState extends AbstractAppState {
 
     private final Spatial teapot;
+    private final BitmapText ch;
 
     public AudioNode getLightRain() {
         return lightRain;
@@ -328,19 +329,25 @@ public class GameRunningState extends AbstractAppState {
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
         limit = getRandomNumberInRange(15, 45);
 
-        teapot = assetManager.loadModel("Models/alternativeScene.j3o");
+        teapot = assetManager.loadModel("Models/Apocalyptic City/Apocalyptic City.j3o");
         teapot.setName("scene");
         teapot.scale(20);
         teapot.setLocalTranslation(0, 5, 0);
         RigidBodyControl rb1 = new RigidBodyControl(0);
         teapot.addControl(rb1);
         //localRootNode.attachChild(teapot);
-
         rb1.setFriction(0.9f);
         //teapot.setCullHint(Spatial.CullHint.Always);
-
         app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
         app.getCamera().update();
+        
+    guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+    ch = new BitmapText(guiFont, false);
+    ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+    ch.setText("+"); // crosshairs
+    ch.setLocalTranslation( // center
+      app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth()/2, app.getContext().getSettings().getHeight() / 2 + ch.getLineHeight()/2, 0);
+    guiNode.attachChild(ch);
     }
 
     private void setupHudText() {
