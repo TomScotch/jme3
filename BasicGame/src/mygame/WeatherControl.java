@@ -383,15 +383,11 @@ public class WeatherControl extends AbstractControl {
                             Vector3f position = rain.getParticles()[c].position;
                             float trueHeightAtPoint = hm.getTrueHeightAtPoint((int) position.getX(), (int) position.getZ());
 
-                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint, position.getZ()); //
-                            debrisEffect.emitParticles(1);
-                            rain.killParticle(c);
-                            /*
-                            float distance = cam.getLocation().distance(position);
-                            if (distance < 0.05f) {
-                            debrisEffect.setStartSize(0f);
-                            debrisEffect.setEndSize(0.0f);
-                            }*/
+                            if (position.y <= trueHeightAtPoint) {
+                                debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint, position.getZ()); //
+                                debrisEffect.emitParticles(1);
+                                rain.killParticle(c);
+                            }
                         } catch (Exception e) {
                         }
                     }

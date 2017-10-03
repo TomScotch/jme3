@@ -331,8 +331,8 @@ public class GameRunningState extends AbstractAppState {
 
         teapot = assetManager.loadModel("Models/Apocalyptic City/Apocalyptic City.j3o");
         teapot.setName("scene");
-        teapot.scale(20);
-        teapot.setLocalTranslation(0, 5, 0);
+        teapot.scale(0.25f);
+        teapot.setLocalTranslation(0, 2, 0);
         RigidBodyControl rb1 = new RigidBodyControl(0);
         teapot.addControl(rb1);
         //localRootNode.attachChild(teapot);
@@ -678,13 +678,13 @@ public class GameRunningState extends AbstractAppState {
 
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
-                    
-                    if(playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()){
+
+                    if (playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()) {
                         localGuiNode.attachChild(ch);
-                    }else{
+                    } else {
                         ch.removeFromParent();
                     }
-                    
+
                     health = playerControl.getHealth();
                     Integer i = (int) playerControl.getHealth();
 
