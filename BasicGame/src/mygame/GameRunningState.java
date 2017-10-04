@@ -277,21 +277,6 @@ public class GameRunningState extends AbstractAppState {
         //Screen Space Ambient Occlusion
         // ssao = new SSAO(assetManager, fpp);
         //   localRootNode.addControl(ssao);
-        /*//      HOSTILE
-        Spatial demon = assetManager.loadModel("Models/hostile/demon/demon.j3o");
-        EntityControl ec1 = new EntityControl(assetManager, demon, bulletAppState, "demon", new Vector3f(10, 0, -10));
-        demon.addControl(ec1);
-        localRootNode.attachChild(demon);
-        
-        Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
-        EntityControl ec2 = new EntityControl(assetManager, forestmonster, bulletAppState, "forestmonster", new Vector3f(-10, 0, 10));
-        forestmonster.addControl(ec2);
-        localRootNode.attachChild(forestmonster);
-        
-        Spatial spider = assetManager.loadModel("Models/hostile/spider/spider.j3o");
-        EntityControl ec3 = new EntityControl(assetManager, spider, bulletAppState, "spider", new Vector3f(-10, 0, -10));
-        spider.addControl(ec3);
-        localRootNode.attachChild(spider);*/
         //Second Camera View
         cam2 = app.getCamera().clone();
         cam2.setViewPort(0f, 0.5f, 0f, 0.5f);
@@ -335,9 +320,8 @@ public class GameRunningState extends AbstractAppState {
         teapot.setLocalTranslation(0, 2, 0);
         RigidBodyControl rb1 = new RigidBodyControl(0);
         teapot.addControl(rb1);
-        //localRootNode.attachChild(teapot);
         rb1.setFriction(0.9f);
-        //teapot.setCullHint(Spatial.CullHint.Always);
+
         app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
         app.getCamera().update();
 
@@ -676,11 +660,30 @@ public class GameRunningState extends AbstractAppState {
 
         if (isRunning) {
 
+            super.update(tpf);
+
+            if (glc.isNight()) {
+
+                if (viewPort.getProcessors().contains(glc.getDlsr())) {
+                    viewPort.removeProcessor(glc.getDlsr());
+                }
+
+            } else {
+
+                if (!viewPort.getProcessors().contains(glc.getDlsr())) {
+                    viewPort.addProcessor(glc.getDlsr());
+                }
+            }
+
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
 
                     if (playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()) {
-                        localGuiNode.attachChild(ch);
+
+                        if (stateManager.getState(VideoRecorderAppState.class) == null) {
+                            localGuiNode.attachChild(ch);
+                        }
+
                     } else {
                         ch.removeFromParent();
                     }
@@ -710,8 +713,6 @@ public class GameRunningState extends AbstractAppState {
                     healthText.setText("dead");
                 }
             }
-
-            super.update(tpf);
 
             if (isTimeDemo) {
                 playerControl.setRotationModifier(12.f);
@@ -772,7 +773,11 @@ public class GameRunningState extends AbstractAppState {
                 }
             }
 
-            counter += tpf;
+            if (stateManager.getState(VideoRecorderAppState.class) != null) {
+                counter += (tpf * 20); // / glc.getTimeDelay()
+            } else {
+                counter += tpf; // / glc.getTimeDelay()
+            }
 
             if (counter >= limit) {
                 counter = 0;
