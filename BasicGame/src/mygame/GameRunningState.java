@@ -664,15 +664,11 @@ public class GameRunningState extends AbstractAppState {
 
             if (glc.isNight()) {
 
-                if (viewPort.getProcessors().contains(glc.getDlsr())) {
-                    viewPort.removeProcessor(glc.getDlsr());
-                }
+                glc.getDlsr().setShadowIntensity(0);
 
             } else {
 
-                if (!viewPort.getProcessors().contains(glc.getDlsr())) {
-                    viewPort.addProcessor(glc.getDlsr());
-                }
+                glc.getDlsr().setShadowIntensity(0.30f);
             }
 
             if (playerControl != null) {
