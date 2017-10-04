@@ -382,12 +382,9 @@ public class WeatherControl extends AbstractControl {
                         try {
                             Vector3f position = rain.getParticles()[c].position;
                             float trueHeightAtPoint = hm.getTrueHeightAtPoint((int) position.getX(), (int) position.getZ());
-
-                            if (position.y <= trueHeightAtPoint) {
-                                debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint, position.getZ()); //
-                                debrisEffect.emitParticles(1);
-                                rain.killParticle(c);
-                            }
+                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint, position.getZ()); //
+                            debrisEffect.emitParticles(1);
+                            rain.killParticle(c);
                         } catch (Exception e) {
                         }
                     }

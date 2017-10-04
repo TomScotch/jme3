@@ -331,7 +331,7 @@ public class GameRunningState extends AbstractAppState {
 
         teapot = assetManager.loadModel("Models/Apocalyptic City/Apocalyptic City.j3o");
         teapot.setName("scene");
-        teapot.scale(0.25f);
+        teapot.scale(0.1f);
         teapot.setLocalTranslation(0, 2, 0);
         RigidBodyControl rb1 = new RigidBodyControl(0);
         teapot.addControl(rb1);
