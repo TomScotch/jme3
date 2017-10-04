@@ -27,6 +27,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -126,7 +127,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-    // private final SSAO ssao;
+    private final SSAO ssao;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
     private List<Float> fps;
@@ -275,8 +276,9 @@ public class GameRunningState extends AbstractAppState {
         }
 
         //Screen Space Ambient Occlusion
-        // ssao = new SSAO(assetManager, fpp);
-        //   localRootNode.addControl(ssao);
+        ssao = new SSAO(assetManager, fpp);
+        localRootNode.addControl(ssao);
+
         //Second Camera View
         cam2 = app.getCamera().clone();
         cam2.setViewPort(0f, 0.5f, 0f, 0.5f);
@@ -391,6 +393,7 @@ public class GameRunningState extends AbstractAppState {
             bird.addControl(wildlifeControl);
             wildlifeControl.getSkeletonControl().setHardwareSkinningPreferred(false);
             bird.setName("bird");
+            bird.setShadowMode(RenderQueue.ShadowMode.Cast);
             localRootNode.attachChild(bird);
             wildlifeControl.setAnim("fly", LoopMode.Loop);
             // bird.scale(getRandomNumberInRange(0, 1) - 0.5f);
