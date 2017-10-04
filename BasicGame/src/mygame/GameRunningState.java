@@ -678,8 +678,9 @@ public class GameRunningState extends AbstractAppState {
 
                         if (stateManager.getState(VideoRecorderAppState.class) == null) {
                             localGuiNode.attachChild(ch);
+                        } else {
+                            ch.removeFromParent();
                         }
-
                     } else {
                         ch.removeFromParent();
                     }
