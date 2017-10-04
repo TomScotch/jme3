@@ -329,9 +329,9 @@ public class GameRunningState extends AbstractAppState {
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
         limit = getRandomNumberInRange(15, 45);
 
-        teapot = assetManager.loadModel("Models/Apocalyptic City/Apocalyptic City.j3o");
+        teapot = assetManager.loadModel("Models/alternativeScene.j3o");
         teapot.setName("scene");
-        teapot.scale(0.1f);
+        teapot.scale(5);
         teapot.setLocalTranslation(0, 2, 0);
         RigidBodyControl rb1 = new RigidBodyControl(0);
         teapot.addControl(rb1);
