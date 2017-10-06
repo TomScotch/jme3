@@ -127,7 +127,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-    private final SSAO ssao;
+   // private final SSAO ssao;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
     private List<Float> fps;
@@ -276,8 +276,8 @@ public class GameRunningState extends AbstractAppState {
         }
 
         //Screen Space Ambient Occlusion
-        ssao = new SSAO(assetManager, fpp);
-        localRootNode.addControl(ssao);
+        //ssao = new SSAO(assetManager, fpp);
+        //localRootNode.addControl(ssao);
 
         //Second Camera View
         cam2 = app.getCamera().clone();
@@ -316,7 +316,7 @@ public class GameRunningState extends AbstractAppState {
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
         limit = getRandomNumberInRange(15, 45);
 
-        teapot = assetManager.loadModel("Models/alternativeScene.j3o");
+        teapot = assetManager.loadModel("Models/silenthillcity.j3o");
         teapot.setName("scene");
         teapot.scale(5);
         teapot.setLocalTranslation(0, 2, 0);
