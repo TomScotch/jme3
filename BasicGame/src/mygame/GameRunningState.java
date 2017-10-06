@@ -355,8 +355,8 @@ public class GameRunningState extends AbstractAppState {
         // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
 
-        healthText = new BitmapText(guiFont, false);
-        healthText.setSize(guiFont.getCharSet().getRenderedSize() * 3.2f);
+        healthText = new BitmapText(assetManager.loadFont("Interface/Fonts/Roboto.fnt"), false);
+        healthText.setSize(assetManager.loadFont("Interface/Fonts/Roboto.fnt").getCharSet().getRenderedSize() * 3.2f);
         healthText.setColor(ColorRGBA.Green);
         Integer i = (int) playerControl.getHealth();
         healthText.setText(i.toString());
