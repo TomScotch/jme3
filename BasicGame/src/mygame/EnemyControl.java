@@ -262,7 +262,7 @@ public class EnemyControl extends AbstractControl {
             timedActionControl2 = new TimedActionControl(6) {
                 @Override
                 void action() {
-                    Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
+                    forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
                     ec2 = new EntityControl(assetManager, forestmonster, "forestmonster", new Vector3f(-10, 0, 10), pc);
                     forestmonster.addControl(ec2);
                     localRoot.attachChild(forestmonster);
@@ -277,7 +277,7 @@ public class EnemyControl extends AbstractControl {
             timedActionControl3 = new TimedActionControl(3) {
                 @Override
                 void action() {
-                    Spatial spider = assetManager.loadModel("Models/spider/spider.j3o");
+                    spider = assetManager.loadModel("Models/spider/spider.j3o");
                     ec3 = new EntityControl(assetManager, spider, "spider", new Vector3f(-10, 0, -10), pc);
                     spider.addControl(ec3);
                     localRoot.attachChild(spider);
@@ -290,8 +290,8 @@ public class EnemyControl extends AbstractControl {
     }
 
     public void remAllEnemys() {
-        // spider.removeFromParent();
-        // forestmonster.removeFromParent();
+        spider.removeFromParent();
+        forestmonster.removeFromParent();
 
         if (timedActionControl2 != null) {
             localRoot.removeControl(timedActionControl2);

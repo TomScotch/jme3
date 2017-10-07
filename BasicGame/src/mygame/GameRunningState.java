@@ -331,8 +331,8 @@ public class GameRunningState extends AbstractAppState {
         pic = new Picture("HUD Picture");
         pic.setImage(assetManager, "Textures/cross.png", true);
         pic.setName("crosshair");
-        pic.setWidth(app.getContext().getSettings().getWidth() / 16);
-        pic.setHeight(app.getContext().getSettings().getHeight() / 16);
+        pic.setWidth(app.getContext().getSettings().getWidth() / 24);
+        pic.setHeight(app.getContext().getSettings().getHeight() / 24);
         pic.setPosition(app.getContext().getSettings().getWidth() / 2, app.getContext().getSettings().getHeight() / 2);
         guiNode.attachChild(pic);
 
@@ -364,8 +364,8 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
         // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
 
-        healthText = new BitmapText(assetManager.loadFont("Interface/Fonts/Roboto.fnt"), false);
-        healthText.setSize(assetManager.loadFont("Interface/Fonts/Roboto.fnt").getCharSet().getRenderedSize() * 2.8f);
+        healthText = new BitmapText(assetManager.loadFont("Interface/Fonts/Lato.fnt"), false);
+        healthText.setSize(assetManager.loadFont("Interface/Fonts/Lato.fnt").getCharSet().getRenderedSize() * 2.8f);
         healthText.setColor(ColorRGBA.Green);
         Integer i = (int) playerControl.getHealth();
         healthText.setText(i.toString());
