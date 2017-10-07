@@ -315,7 +315,7 @@ public class GameRunningState extends AbstractAppState {
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
         limit = getRandomNumberInRange(15, 45);
 
-        teapot = assetManager.loadModel("Models/silenthillcity.j3o");
+        teapot = assetManager.loadModel("Models/alternativeScene.j3o");
         teapot.setName("scene");
         teapot.scale(5);
         teapot.setLocalTranslation(0, 2, 0);
@@ -878,8 +878,10 @@ public class GameRunningState extends AbstractAppState {
         playerControl.setupListener();
         playerControl.setupMappings();
         view2.attachScene(localRootNode);
-        localRootNode.addControl(enemyControl);
-        enemyControl.setEnabled(true);
+        if (localRootNode.hasChild(terrainControl.getTerrain())) {
+            localRootNode.addControl(enemyControl);
+            enemyControl.setEnabled(true);
+        }
     }
 
     @Override
