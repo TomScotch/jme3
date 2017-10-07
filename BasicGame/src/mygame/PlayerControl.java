@@ -102,7 +102,7 @@ public class PlayerControl extends AbstractControl {
     private final float flashLightSpotRange = 25;
     private final float outerLamp = 15 * FastMath.PI;
     private final float innerLamp = 15 * FastMath.HALF_PI;
-    private final ColorRGBA flashLightColor = ColorRGBA.Orange.mult(flashLightStrength).addLocal(ColorRGBA.LightGray);
+    private final ColorRGBA flashLightColor = ColorRGBA.Orange.mult(flashLightStrength).add(ColorRGBA.LightGray);
 
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;

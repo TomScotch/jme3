@@ -140,7 +140,7 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setShadowIntensity(0.30f);
         slsr.setEdgesThickness(5);
 
-        sunMat.setColor("Color", ColorRGBA.Orange.addLocal(ColorRGBA.Red));
+        sunMat.setColor("Color", ColorRGBA.Orange.add(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
         al = new AmbientLight(ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray).mult(ColorRGBA.Gray));
         localRootNode.addLight(al);

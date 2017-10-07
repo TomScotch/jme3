@@ -62,7 +62,7 @@ import java.util.List;
 @SuppressWarnings("null")
 public class Main extends SimpleApplication implements ScreenController {
 
-    public static GameRunningState getGameRunningState() {
+    public GameRunningState getGameRunningState() {
         return gameRunningState;
     }
 
@@ -94,9 +94,9 @@ public class Main extends SimpleApplication implements ScreenController {
     private final Trigger statsViewTrigger = new KeyTrigger(KeyInput.KEY_F3);
     private final Trigger helpTrigger = new KeyTrigger(KeyInput.KEY_H);
     private final Trigger consoleTrigger = new KeyTrigger(KeyInput.KEY_F4);
-    private static GameRunningState gameRunningState;
-    private static StartScreenState startScreenState;
-    private static SettingsScreenState settingsScreenState;
+    private GameRunningState gameRunningState;
+    private StartScreenState startScreenState;
+    private SettingsScreenState settingsScreenState;
 
     private Future loadFuture = null;
     private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
