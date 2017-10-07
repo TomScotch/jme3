@@ -113,8 +113,8 @@ public class WeatherControl extends AbstractControl {
         Material rainMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
         rainMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/rain/rain.png"));
         rain.setMaterial(rainMat);
-        rain.setStartSize(0.375f);
-        rain.setEndSize(0.275f);
+        rain.setStartSize(0.225f);
+        rain.setEndSize(0.125f);
         rain.setGravity(0, 900, 0);
         rain.setEndColor(ColorRGBA.White);
         rain.setStartColor(ColorRGBA.White);
@@ -125,7 +125,7 @@ public class WeatherControl extends AbstractControl {
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(false);
         rain.setLocalTranslation(0, 50, 0);
-        //  rain.setQueueBucket(RenderQueue.Bucket.Translucent);
+        //rain.setQueueBucket(RenderQueue.Bucket.Translucent);
         rain.center();
         this.localRoot.attachChild(rain);
 
@@ -382,7 +382,7 @@ public class WeatherControl extends AbstractControl {
                             if (rain.getParticles()[c].life < 0.001f) {//(rain.getParticles()[c].startlife - rain.getParticles()[c].life) >= 2
                                 Vector3f position = rain.getParticles()[c].position;
                                 debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
-                                debrisEffect.emitParticles(3);
+                                debrisEffect.emitParticles(1);
                             }
                         } catch (Exception e) {
                         }
@@ -392,7 +392,7 @@ public class WeatherControl extends AbstractControl {
                             if (rain.getParticles()[c].life < 0.001f) {//(rain.getParticles()[c].startlife - rain.getParticles()[c].life) >= 2
                                 Vector3f position = rain.getParticles()[c].position;
                                 debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
-                                debrisEffect.emitParticles(3);
+                                debrisEffect.emitParticles(1);
                             }
                         } catch (Exception e) {
                         }
