@@ -3,6 +3,7 @@ package mygame;
 import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.VideoRecorderAppState;
+import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.export.binary.BinaryImporter;
 import com.jme3.font.BitmapText;
@@ -386,7 +387,7 @@ public class Main extends SimpleApplication implements ScreenController {
     @Override
     public void simpleInitApp() {
 
-
+        inputManager.setMouseCursor((JmeCursor) assetManager.loadAsset("cursor.ani"));
 
         settingsNode = loadNode("settings");
 
