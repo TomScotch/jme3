@@ -36,6 +36,8 @@ public class EnemyControl extends AbstractControl {
     private float emptyNodeTimer = 0;
     private Spatial spider;
     private Spatial forestmonster;
+    private TimedActionControl timedActionControl2;
+    private TimedActionControl timedActionControl3;
 
     public int countEnemys() {
         int c = 0;
@@ -257,7 +259,7 @@ public class EnemyControl extends AbstractControl {
         localRoot.addControl(timedActionControl1);
         }*/
         if (!hasForestmonster) {
-            TimedActionControl timedActionControl2 = new TimedActionControl(6) {
+            timedActionControl2 = new TimedActionControl(6) {
                 @Override
                 void action() {
                     Spatial forestmonster = assetManager.loadModel("Models/hostile/forestmonster/forestmonster.j3o");
@@ -272,7 +274,7 @@ public class EnemyControl extends AbstractControl {
         }
 
         if (!hasSpider) {
-            TimedActionControl timedActionControl3 = new TimedActionControl(3) {
+            timedActionControl3 = new TimedActionControl(3) {
                 @Override
                 void action() {
                     Spatial spider = assetManager.loadModel("Models/spider/spider.j3o");
@@ -290,17 +292,26 @@ public class EnemyControl extends AbstractControl {
     public void remAllEnemys() {
         // spider.removeFromParent();
         // forestmonster.removeFromParent();
-        
+
+        if (timedActionControl2 != null) {
+            localRoot.removeControl(timedActionControl2);
+        }
+        if (timedActionControl3 != null) {
+            localRoot.removeControl(timedActionControl3);
+        }
+
+        timedActionControl2 = null;
+        timedActionControl3 = null;
         localRoot.detachChild(spider);
         localRoot.detachChild(forestmonster);
         spider = (Spatial) new Node();
         forestmonster = (Spatial) new Node();
-        
-       // spider.removeControl(EntityControl.class);
-       // forestmonster.removeControl(EntityControl.class);
+
+        // spider.removeControl(EntityControl.class);
+        // forestmonster.removeControl(EntityControl.class);
         playing2 = false;
         playing3 = false;
-/*        motionControl2.stop();
+        /*        motionControl2.stop();
         motionControl3.stop();
         ec2 = null;
         ec3 = null;

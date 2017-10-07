@@ -121,7 +121,7 @@ public class WeatherControl extends AbstractControl {
         rain.setHighLife(1f);
         rain.setLowLife(1f);
         rain.setInWorldSpace(true);
-        rain.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
+        rain.setShape(new EmitterBoxShape(new Vector3f(-256, 0, -256), new Vector3f(256, 0.1f, 256)));
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(false);
         rain.setLocalTranslation(0, 50, 0);
@@ -378,13 +378,22 @@ public class WeatherControl extends AbstractControl {
                     debrisEffect.setNumParticles((int) rain.getParticlesPerSec());
 
                     for (int c = rain.getParticles().length / 2; c >= 0; c--) {
-
                         try {
-                            Vector3f position = rain.getParticles()[c].position;
-                            float trueHeightAtPoint = hm.getTrueHeightAtPoint((int) position.getX(), (int) position.getZ());
-                            debrisEffect.getWorldTranslation().set(position.getX(), trueHeightAtPoint, position.getZ()); //
-                            debrisEffect.emitParticles(1);
-                            rain.killParticle(c);
+                            if (rain.getParticles()[c].life < 0.001f) {//(rain.getParticles()[c].startlife - rain.getParticles()[c].life) >= 2
+                                Vector3f position = rain.getParticles()[c].position;
+                                debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
+                                debrisEffect.emitParticles(3);
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                    for (int c = 0; c <= rain.getParticles().length / 2; c++) {
+                        try {
+                            if (rain.getParticles()[c].life < 0.001f) {//(rain.getParticles()[c].startlife - rain.getParticles()[c].life) >= 2
+                                Vector3f position = rain.getParticles()[c].position;
+                                debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
+                                debrisEffect.emitParticles(3);
+                            }
                         } catch (Exception e) {
                         }
                     }
