@@ -127,7 +127,7 @@ public class GameRunningState extends AbstractAppState {
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-   // private final SSAO ssao;
+    // private final SSAO ssao;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
     private List<Float> fps;
@@ -278,7 +278,6 @@ public class GameRunningState extends AbstractAppState {
         //Screen Space Ambient Occlusion
         //ssao = new SSAO(assetManager, fpp);
         //localRootNode.addControl(ssao);
-
         //Second Camera View
         cam2 = app.getCamera().clone();
         cam2.setViewPort(0f, 0.5f, 0f, 0.5f);
@@ -676,11 +675,18 @@ public class GameRunningState extends AbstractAppState {
 
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
-
+                    if (playerControl.isRotating()) {
+                        ch.removeFromParent();
+                    }
                     if (playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()) {
 
                         if (stateManager.getState(VideoRecorderAppState.class) == null) {
-                            localGuiNode.attachChild(ch);
+                            if (!playerControl.isRotating()) {
+                                localGuiNode.attachChild(ch);
+                            } else {
+                                ch.removeFromParent();
+                            }
+
                         } else {
                             ch.removeFromParent();
                         }
@@ -884,6 +890,10 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
+
+        if (localGuiNode.hasChild(ch)) {
+            ch.removeFromParent();
+        }
 
         hudText.removeFromParent();
         hudText2.removeFromParent();
