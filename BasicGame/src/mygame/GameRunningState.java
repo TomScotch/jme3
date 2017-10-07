@@ -32,6 +32,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
+import com.jme3.ui.Picture;
 import com.jme3.water.SimpleWaterProcessor;
 import de.lessvoid.nifty.controls.Console;
 import java.io.File;
@@ -43,7 +44,8 @@ import java.util.Random;
 public class GameRunningState extends AbstractAppState {
 
     private final Spatial teapot;
-    private final BitmapText ch;
+    // private final BitmapText ch;
+    private final Picture pic;
 
     public AudioNode getLightRain() {
         return lightRain;
@@ -326,13 +328,21 @@ public class GameRunningState extends AbstractAppState {
         app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
         app.getCamera().update();
 
-        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        ch = new BitmapText(guiFont, false);
-        ch.setName("crosshair");
-        ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
-        ch.setText("+"); // crosshairs
-        ch.setLocalTranslation( // center
-                app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getContext().getSettings().getHeight() / 2 + ch.getLineHeight() / 2, 0);
+        pic = new Picture("HUD Picture");
+        pic.setImage(assetManager, "Textures/cross.png", true);
+        pic.setName("crosshair");
+        pic.setWidth(app.getContext().getSettings().getWidth() / 16);
+        pic.setHeight(app.getContext().getSettings().getHeight() / 16);
+        pic.setPosition(app.getContext().getSettings().getWidth() / 2, app.getContext().getSettings().getHeight() / 2);
+        guiNode.attachChild(pic);
+
+        /*        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+ch = new BitmapText(guiFont, false);
+ch.setName("crosshair");
+ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+ch.setText("+"); // crosshairs
+ch.setLocalTranslation( // center
+app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getContext().getSettings().getHeight() / 2 + ch.getLineHeight() / 2, 0);*/
     }
 
     private void setupHudText() {
@@ -355,7 +365,7 @@ public class GameRunningState extends AbstractAppState {
         localGuiNode.attachChild(hudText2);
 
         healthText = new BitmapText(assetManager.loadFont("Interface/Fonts/Roboto.fnt"), false);
-        healthText.setSize(assetManager.loadFont("Interface/Fonts/Roboto.fnt").getCharSet().getRenderedSize() * 3.2f);
+        healthText.setSize(assetManager.loadFont("Interface/Fonts/Roboto.fnt").getCharSet().getRenderedSize() * 2.8f);
         healthText.setColor(ColorRGBA.Green);
         Integer i = (int) playerControl.getHealth();
         healthText.setText(i.toString());
@@ -676,22 +686,22 @@ public class GameRunningState extends AbstractAppState {
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
                     if (playerControl.isRotating()) {
-                        ch.removeFromParent();
+                        pic.removeFromParent();
                     }
                     if (playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()) {
 
                         if (stateManager.getState(VideoRecorderAppState.class) == null) {
                             if (!playerControl.isRotating()) {
-                                localGuiNode.attachChild(ch);
+                                localGuiNode.attachChild(pic);
                             } else {
-                                ch.removeFromParent();
+                                pic.removeFromParent();
                             }
 
                         } else {
-                            ch.removeFromParent();
+                            pic.removeFromParent();
                         }
                     } else {
-                        ch.removeFromParent();
+                        pic.removeFromParent();
                     }
 
                     health = playerControl.getHealth();
@@ -893,8 +903,8 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateDetach() {
 
-        if (localGuiNode.hasChild(ch)) {
-            ch.removeFromParent();
+        if (localGuiNode.hasChild(pic)) {
+            pic.removeFromParent();
         }
 
         hudText.removeFromParent();
