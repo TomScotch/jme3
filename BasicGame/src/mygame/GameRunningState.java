@@ -490,7 +490,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
                 new KeyTrigger(KeyInput.KEY_F10));
     }
 
-    private void treeoutroot(Node node) {
+    public void treeoutroot(Node node) {
 
         int n = node.getQuantity();
 
@@ -498,16 +498,20 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
 
         if (n > 0) {
             System.out.print("+ " + name + " " + n);
+            console.output("+ " + name + " " + n);
         } else {
             System.out.println(name);
+            console.output(name);
         }
 
         for (Spatial spat : node.getChildren()) {
             int c = spat.getParent().getChildIndex(spat);
             if (c > 0) {
                 System.out.println("-" + name + " " + c);
+                console.output("-" + name + " " + c);
             } else {
                 System.out.println(name);
+                console.output(name);
             }
             if (!spat.getClass().equals(TerrainPatch.class)) {
                 if (!spat.getClass().equals(Geometry.class)) {
@@ -528,8 +532,10 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
                 if (!spat.getName().equals("null")) {
                     if (c > 0) {
                         System.out.println("-" + spat.getName() + " " + c);
+                        console.output("-" + spat.getName() + " " + c);
                     } else {
                         System.out.println(spat.getName());
+                        console.output(spat.getName());
                     }
                 }
             }

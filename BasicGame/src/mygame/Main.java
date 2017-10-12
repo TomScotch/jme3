@@ -49,7 +49,12 @@ import com.jme3.opencl.*;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.builder.EffectBuilder;
 import de.lessvoid.nifty.controls.Console;
+import de.lessvoid.nifty.controls.ConsoleExecuteCommandEvent;
 import de.lessvoid.nifty.controls.console.builder.ConsoleBuilder;
+import de.lessvoid.nifty.input.NiftyInputEvent;
+import de.lessvoid.nifty.input.mapping.DefaultInputMapping;
+import de.lessvoid.nifty.screen.KeyInputHandler;
+import de.lessvoid.nifty.tools.Color;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,7 +65,7 @@ import java.util.List;
  * @author tomscotch
  */
 @SuppressWarnings("null")
-public class Main extends SimpleApplication implements ScreenController {
+public class Main extends SimpleApplication implements ScreenController, KeyInputHandler {
 
     public GameRunningState getGameRunningState() {
         return gameRunningState;
@@ -461,6 +466,7 @@ public class Main extends SimpleApplication implements ScreenController {
         System.out.println(s);
         initStartGui();
         console = nifty.getScreen("console").findNiftyControl("console", Console.class);
+
         addListener();
         add_mapping();
 
@@ -592,6 +598,7 @@ public class Main extends SimpleApplication implements ScreenController {
                     if (showConsole) {
                         remove_trigger();
                         nifty.gotoScreen("console");
+                        console.clear();
                     } else {
                         add_mapping();
                         nifty.gotoScreen("game");
@@ -787,6 +794,8 @@ public class Main extends SimpleApplication implements ScreenController {
                 });
             }
         }.build(nifty));
+
+        nifty.getScreen("console").addKeyboardInputHandler(new DefaultInputMapping(), this);
 
         nifty.addScreen("start", new ScreenBuilder("Start Screen") {
             {
@@ -1246,6 +1255,35 @@ public class Main extends SimpleApplication implements ScreenController {
      */
     public static void setShowFps(boolean aShowFps) {
         showFps = aShowFps;
+    }
+
+    @Override
+    public boolean keyEvent(NiftyInputEvent nie) {
+        return false;
+        //
+    }
+
+    @NiftyEventSubscriber(id = "console")
+    public void onConsoleExecuteCommandEvent(final String id, final ConsoleExecuteCommandEvent cEvent) {
+
+        console.clear();
+
+        switch (cEvent.getCommand()) {
+            case "show_root":
+                if (stateManager.hasState(gameRunningState)) {
+                    gameRunningState.treeoutroot(getRootNode());
+                }
+                break;
+            case "restart":
+                console.output("restarting");
+                doRestart();
+                break;
+            case "shutdown":
+                doShutdown();
+                break;
+        }
+
+        //TODO: collect meaningful list of commands for the console
     }
 
     public static class CustomPlatformChooser implements PlatformChooser {
