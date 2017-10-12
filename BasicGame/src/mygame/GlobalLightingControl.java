@@ -142,7 +142,7 @@ public class GlobalLightingControl extends AbstractControl {
 
         sunMat.setColor("Color", ColorRGBA.Orange.add(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
-        al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.DarkGray).mult(ColorRGBA.Gray));
+        al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.DarkGray).mult(ColorRGBA.LightGray).mult(ColorRGBA.LightGray));
         localRootNode.addLight(al);
     }
 
@@ -179,7 +179,7 @@ public class GlobalLightingControl extends AbstractControl {
                 if (y > -(sunSize / 1.1f) && z < -222) {
                     //morning
                     if (isSun) {
-                        //  sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
+                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
                     }
                     morning = true;
                     day = false;
@@ -210,7 +210,7 @@ public class GlobalLightingControl extends AbstractControl {
                         slsr.setShadowIntensity(0.35f);
                     }
                     if (isSun) {
-                        //     sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
+                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
                     }
                 }
 
@@ -221,7 +221,7 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = true;
                     night = false;
                     if (isSun) {
-                        // sun.getColor().interpolateLocal(ColorRGBA.Orange, (tpf / timeDelay) / 2.5f);/// 0.0005f
+                        sun.getColor().interpolateLocal(ColorRGBA.Orange, (tpf / timeDelay) * 2.5f);/// 0.0005f
                     }
                 }
 
@@ -251,11 +251,11 @@ public class GlobalLightingControl extends AbstractControl {
             }
 
             if (isEvening()) {
-                sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) / 3);
+                sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) * 2f);
             }
 
             if (!isNight() && !isEvening()) {
-                sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));
+                sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) * 2f);
             }
             if (!isNight() && !isMorning()) {
                 vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 2.5f);

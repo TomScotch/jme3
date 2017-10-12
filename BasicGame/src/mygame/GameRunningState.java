@@ -334,7 +334,7 @@ public class GameRunningState extends AbstractAppState {
         pic.setWidth(app.getContext().getSettings().getWidth() / 24);
         pic.setHeight(app.getContext().getSettings().getHeight() / 24);
         pic.setPosition(app.getContext().getSettings().getWidth() / 2, app.getContext().getSettings().getHeight() / 2);
-        guiNode.attachChild(pic);
+
 
         /*        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
 ch = new BitmapText(guiFont, false);
@@ -347,7 +347,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
 
     private void setupHudText() {
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-
+        localGuiNode.attachChild(pic);
         hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
         hudText.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 1.75f);      // font size
         hudText.setColor(ColorRGBA.Blue);
@@ -359,7 +359,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
         hudText2 = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
         hudText2.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 2.25f);      // font size
         hudText2.setColor(ColorRGBA.Red);
-        hudText2.setText("... : ...");
+        // hudText2.setText("... : ...");
         hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - (hudText2.getLineWidth() / 2), hudText2.getLineHeight() * 3, 0); // position
         // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
@@ -692,58 +692,81 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
 
-                    if (playerControl.isSprinting()) {
-                        if (playerControl.getStamina() >= 0) {
-                            hudText2.setText(Float.toString(playerControl.getStamina()));
-                        } else {
-                            hudText2.setText("0");
-                        }
+                    /*                    if (playerControl.isSprinting()) {
+                    if (playerControl.getStamina() >= 0) {
+                    hudText2.setText(Float.toString(playerControl.getStamina()));
                     } else {
-                        if (!isTimeDemo && !playerControl.isRecovering()) {
-                            hudText2.setText("... : ...");
-                        }
+                    hudText2.setText("0");
                     }
-
-                    if (playerControl.isRecovering()) {
-                        if (playerControl.getStamina() >= 0) {
-                            if (playerControl.getStamina() < 100 && playerControl.getStamina() > 75) {
-                                hudText2.setText(">>>>");
-                            }
-                            if (playerControl.getStamina() < 75 && playerControl.getStamina() > 50) {
-                                hudText2.setText(">>>");
-                            }
-                            if (playerControl.getStamina() < 50 && playerControl.getStamina() > 25) {
-                                hudText2.setText(">>");
-                            }
-                            if (playerControl.getStamina() < 25 && playerControl.getStamina() > 0) {
-                                hudText2.setText(">");
-                            }
-                        } else {
+                    } else {
+                    if (!isTimeDemo && !playerControl.isRecovering()) {
+                    hudText2.setText("... : ...");
+                    }
+                    }*/
+                    if (playerControl.getStamina() >= 0) {
+                        if (playerControl.getStamina() >= 99 && playerControl.getStamina() > 75) {
+                            hudText2.setText(">>>>>");
+                        }
+                        if (playerControl.getStamina() < 99 && playerControl.getStamina() > 75) {
+                            hudText2.setText(">>>>");
+                        }
+                        if (playerControl.getStamina() < 75 && playerControl.getStamina() > 50) {
+                            hudText2.setText(">>>");
+                        }
+                        if (playerControl.getStamina() < 50 && playerControl.getStamina() > 25) {
+                            hudText2.setText(">>");
+                        }
+                        if (playerControl.getStamina() < 25 && playerControl.getStamina() > 0) {
+                            hudText2.setText(">");
+                        }
+                        if (playerControl.getStamina() <= 1) {
                             hudText2.setText("");
                         }
-                    } else {
-                        if (!isTimeDemo && !playerControl.isSprinting()) {
-                            hudText2.setText("... : ...");
-                        }
                     }
 
-                    if (playerControl.isRotating()) {
-                        pic.removeFromParent();
+                    /*                    if (playerControl.isRecovering()) {
+                    if (playerControl.getStamina() >= 0) {
+                    if (playerControl.getStamina() < 100 && playerControl.getStamina() > 75) {
+                    hudText2.setText(">>>>");
                     }
+                    if (playerControl.getStamina() < 75 && playerControl.getStamina() > 50) {
+                    hudText2.setText(">>>");
+                    }
+                    if (playerControl.getStamina() < 50 && playerControl.getStamina() > 25) {
+                    hudText2.setText(">>");
+                    }
+                    if (playerControl.getStamina() < 25 && playerControl.getStamina() > 0) {
+                    hudText2.setText(">");
+                    }
+                    } else {
+                    hudText2.setText("");
+                    }
+                    } else {
+                    if (!isTimeDemo && !playerControl.isSprinting()) {
+                    hudText2.setText("... : ...");
+                    }
+                    }*/
+ /*                    if (playerControl.isRotating()) {
+                    pic.removeFromParent();
+                    }*/
                     if (playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()) {
 
                         if (stateManager.getState(VideoRecorderAppState.class) == null) {
                             if (!playerControl.isRotating()) {
-                                localGuiNode.attachChild(pic);
+                                if (playerControl.isChaseEnabled()) {
+                                    pic.setCullHint(Spatial.CullHint.Never);
+                                } else {
+                                    pic.setCullHint(Spatial.CullHint.Always);
+                                }
                             } else {
-                                pic.removeFromParent();
+                                pic.setCullHint(Spatial.CullHint.Always);
                             }
 
                         } else {
-                            pic.removeFromParent();
+                            pic.setCullHint(Spatial.CullHint.Always);
                         }
                     } else {
-                        pic.removeFromParent();
+                        pic.setCullHint(Spatial.CullHint.Always);
                     }
 
                     health = playerControl.getHealth();
@@ -776,7 +799,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
                 playerControl.setRotationModifier(12.f);
                 playerControl.setIdleCounter(90);
                 if (fps.size() < 500) {
-                    hudText2.setText(" timedemo : " + fps.size() + " - 500");
+                    console.output(" timedemo : " + fps.size() + " - 500");
                     fps.add(1 / tpf);
                 } else {
                     isTimeDemo = false;
@@ -797,25 +820,26 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
                     }
 
                     minMaxFps = new Vector2f(fps.get(fps.size() - 1), fps.get(0));
+                    console.clear();
+                    console.output("min : " + (int) minMaxFps.getX() + " max : " + (int) minMaxFps.getY() + " avg : " + (int) (t / fps.size()));
+                    // console.output("finished Timedemo");
+                    fps = new ArrayList<>();
+                    //console.output(hudText2.getText());
 
-                    hudText2.setText("min : " + (int) minMaxFps.getX() + " max : " + (int) minMaxFps.getY() + " avg : " + (int) (t / fps.size()));
-                    System.out.println("finished Timedemo");
-                    System.out.println(hudText2.getText());
-
-                    if (hudText2.getControl(TimedActionControl.class) != null) {
+                    /*  if (hudText2.getControl(TimedActionControl.class) != null) {
                         hudText2.removeControl(TimedActionControl.class);
-                    }
+                    }*/
 
-                    hudText2.addControl(new TimedActionControl(15) {
-                        @Override
-                        void action() {
-                            if (!isTimeDemo) {
-                                if (fps.size() >= 500) {
-                                    hudText2.setText("... : ...");
-                                }
-                            }
-                        }
-                    });
+ /*                    hudText2.addControl(new TimedActionControl(15) {
+                    @Override
+                    void action() {
+                    if (!isTimeDemo) {
+                    if (fps.size() >= 500) {
+                    hudText2.setText("... : ...");
+                    }
+                    }
+                    }
+                    });*/
                 }
             }
 
@@ -896,7 +920,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
     public void stateAttach() {
 
         setupHudText();
-        hudText2.setText("... : ...");
+        //hudText2.setText("... : ...");
         glc.setEnabled(true);
         playerControl.setEnabled(true);
         sc.setEnabled(true);
@@ -952,7 +976,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
         hudText.removeFromParent();
         hudText2.removeFromParent();
         healthText.removeFromParent();
-        hudText2.setText("... : ...");
+        //hudText2.setText("... : ...");
 
         amb.stop();
         amb1.stop();

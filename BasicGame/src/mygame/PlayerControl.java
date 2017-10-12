@@ -81,7 +81,7 @@ public class PlayerControl extends AbstractControl {
     private final AssetManager assetManager;
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
-    private boolean chaseEnabled = true;
+    public boolean chaseEnabled = true;
 
     private final CameraNode camNode;
     private final float gravity = -9.81f;

@@ -1280,6 +1280,10 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
             case "shutdown":
                 doShutdown();
                 break;
+            case "timedemo":
+                if (stateManager.hasState(gameRunningState)) {
+                    gameRunningState.isTimeDemo = true;
+                }
         }
 
         //TODO: collect meaningful list of commands for the console

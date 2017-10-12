@@ -46,8 +46,8 @@ public class WeatherControl extends AbstractControl {
     private boolean lightnungStrikes_med = false;
     private boolean lightnungStrikes_high = false;
 
-    private final float fogDensity = 0.2f; // 1.3f
-    private final int fogDistance = 60; // 50
+    private final float fogDensity = 0.1f; // 1.3f
+    private final int fogDistance = 75; // 50
 
     private final int cloudThickness = 350; // 400
 
@@ -485,23 +485,23 @@ public class WeatherControl extends AbstractControl {
                 if (spatial != null) {
                     if (spatial.getControl(FogPostFilter.class) != null) {
                         Node n = (Node) spatial;
-                        if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-                            spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.Gray);
-                        } else {
-                            spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.LightGray);
-                        }
 
+                        /*                        if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
+                        spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.Gray);
+                        } else {
+                        spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.LightGray);
+                        }*/
                         if (misty_high) {
-                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.25f) {
-                                spatial.getControl(FogPostFilter.class).setFogDistance(fogDistance);
+                            if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() <= fogDistance / 1.25f) {
+                                spatial.getControl(FogPostFilter.class).getFog().setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + (tpf * fogDistance));
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.25f) {
-                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + (tpf * 6));
+                                spatial.getControl(FogPostFilter.class).setFogDensity(spatial.getControl(FogPostFilter.class).getFog().getFogDensity() + tpf);
                             }
                         } else if (misty_med) {
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.5f) {
-                                spatial.getControl(FogPostFilter.class).setFogDistance(fogDistance);
+                                spatial.getControl(FogPostFilter.class).getFog().setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + (tpf * fogDistance));
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.5f) {
@@ -509,7 +509,7 @@ public class WeatherControl extends AbstractControl {
                             }
                         } else if (misty_low) {
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() != fogDistance / 1.75f) {
-                                spatial.getControl(FogPostFilter.class).setFogDistance(fogDistance / 1.75f);
+                                spatial.getControl(FogPostFilter.class).getFog().setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + (tpf * fogDistance));
                             }
 
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDensity() < fogDensity / 1.75) {
