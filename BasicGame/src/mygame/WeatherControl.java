@@ -46,8 +46,8 @@ public class WeatherControl extends AbstractControl {
     private boolean lightnungStrikes_med = false;
     private boolean lightnungStrikes_high = false;
 
-    private final float fogDensity = 0.25f; // 1.3f
-    private final int fogDistance = 50; // 50
+    private final float fogDensity = 0.2f; // 1.3f
+    private final int fogDistance = 60; // 50
 
     private final int cloudThickness = 350; // 400
 
@@ -131,7 +131,7 @@ public class WeatherControl extends AbstractControl {
 
         clouds = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, cloudThickness);
         Material cloudMat = new Material(am, "Common/MatDefs/Misc/Particle.j3md");
-        cloudMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/clouds/smoketex.jpg"));
+        cloudMat.setTexture("Texture", am.loadTexture("Textures/weatherSprites/clouds/SmallCloud.png"));
         clouds.setMaterial(cloudMat);
         clouds.setStartSize(25);
         clouds.setEndSize(25);

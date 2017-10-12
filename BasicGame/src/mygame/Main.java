@@ -54,7 +54,6 @@ import de.lessvoid.nifty.controls.console.builder.ConsoleBuilder;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.input.mapping.DefaultInputMapping;
 import de.lessvoid.nifty.screen.KeyInputHandler;
-import de.lessvoid.nifty.tools.Color;
 import java.util.Collections;
 import java.util.List;
 
