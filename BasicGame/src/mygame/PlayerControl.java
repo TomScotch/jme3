@@ -41,7 +41,13 @@ import com.jme3.system.JmeContext;
 
 public class PlayerControl extends AbstractControl {
 
-    private boolean noWide;
+    private float stamina_Recover_Value = 25;
+
+    public float getStamina() {
+        return stamina;
+    }
+
+    private boolean isRecovering = false;
 
     public float getRotationModifier() {
         return rotationModifier;
@@ -124,6 +130,15 @@ public class PlayerControl extends AbstractControl {
     private boolean underAttack = false;
     private final float underAttackTimerVal = 9f;
     private float rotationModifier = 0;
+    private boolean sprint = false;
+    private float stamina_max = 100;
+    private float stamina = stamina_max;
+    private float stamina_recover_delay = 5;
+    private float stamina_recover_value = 5;
+    private float stamina_recover_counter = 0;
+    private boolean noWide;
+    private final float sprintModifier = 1.75f;
+    private boolean isSprinting = false;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode, boolean noWide) {
 
@@ -230,6 +245,11 @@ public class PlayerControl extends AbstractControl {
         public void onAction(String binding, boolean value, float tpf) {
             idleCounter = 0;
             switch (binding) {
+
+                case "sprint":
+                    sprint = value;
+                    break;
+
                 case "showHealthBar":
                     if (value && isEnabled()) {
                         showHealthBar = !showHealthBar;
@@ -364,7 +384,7 @@ public class PlayerControl extends AbstractControl {
     }
 
     public void setupListener() {
-
+        inputManager.addListener(actionListener, "sprint");
         inputManager.addListener(actionListener, "showHealthBar");
         inputManager.addListener(actionListener, "leftRotate", "rightRotate");
         inputManager.addListener(actionListener, "Strafe Left", "Strafe Right");
@@ -397,7 +417,8 @@ public class PlayerControl extends AbstractControl {
     }
 
     public void setupMappings() {
-
+        inputManager.addMapping("sprint",
+                new KeyTrigger(KeyInput.KEY_LSHIFT));
         inputManager.addMapping("showHealthBar",
                 new KeyTrigger(KeyInput.KEY_B));
         inputManager.addMapping("flashlight",
@@ -543,9 +564,48 @@ public class PlayerControl extends AbstractControl {
 
                 getPhysicsCharacter().setWalkDirection(walkDirection);
 
+                if (sprint) {
+                    if (stamina > 0) {
+                        stamina -= stamina_Recover_Value * tpf;
+                        isSprinting = true;
+                        stamina_recover_counter = 0;
+                    } else {
+                        isSprinting = false;
+                    }
+                } else {
+                    isSprinting = false;
+                }
+
+                if (!isSprinting && !sprint) {
+                    if (stamina < stamina_max) {
+                        if (stamina_recover_counter < stamina_recover_delay) {
+                            stamina_recover_counter += tpf;
+                            isRecovering = false;
+                        } else {
+                            isRecovering = true;
+                        }
+                    } else {
+                        isRecovering = false;
+                    }
+                }
+
+                if (isSprinting | sprint) {
+                    isRecovering = false;
+                }
+
+                if (isRecovering) {
+                    if (stamina_recover_counter >= stamina_recover_delay) {
+                        stamina += stamina_recover_value * tpf;
+                    }
+                }
+
                 if (forward) {
                     footsteps.play();
-                    walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
+                    if (isSprinting) {
+                        walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed / sprintModifier));
+                    } else {
+                        walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
+                    }
                 } else if (backward) {
                     footsteps.play();
                     walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
@@ -798,5 +858,13 @@ public class PlayerControl extends AbstractControl {
 
     public void setIdleCounter(float value) {
         this.idleCounter = value;
+    }
+
+    public boolean isRecovering() {
+        return isRecovering;
+    }
+
+    public boolean isSprinting() {
+        return isSprinting;
     }
 }

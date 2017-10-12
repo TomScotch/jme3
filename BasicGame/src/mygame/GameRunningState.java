@@ -691,6 +691,42 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
 
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
+
+                    if (playerControl.isSprinting()) {
+                        if (playerControl.getStamina() >= 0) {
+                            hudText2.setText(Float.toString(playerControl.getStamina()));
+                        } else {
+                            hudText2.setText("0");
+                        }
+                    } else {
+                        if (!isTimeDemo && !playerControl.isRecovering()) {
+                            hudText2.setText("... : ...");
+                        }
+                    }
+
+                    if (playerControl.isRecovering()) {
+                        if (playerControl.getStamina() >= 0) {
+                            if (playerControl.getStamina() < 100 && playerControl.getStamina() > 75) {
+                                hudText2.setText(">>>>");
+                            }
+                            if (playerControl.getStamina() < 75 && playerControl.getStamina() > 50) {
+                                hudText2.setText(">>>");
+                            }
+                            if (playerControl.getStamina() < 50 && playerControl.getStamina() > 25) {
+                                hudText2.setText(">>");
+                            }
+                            if (playerControl.getStamina() < 25 && playerControl.getStamina() > 0) {
+                                hudText2.setText(">");
+                            }
+                        } else {
+                            hudText2.setText("");
+                        }
+                    } else {
+                        if (!isTimeDemo && !playerControl.isSprinting()) {
+                            hudText2.setText("... : ...");
+                        }
+                    }
+
                     if (playerControl.isRotating()) {
                         pic.removeFromParent();
                     }
