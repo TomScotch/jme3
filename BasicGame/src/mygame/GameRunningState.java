@@ -686,7 +686,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
 
             } else {
 
-                glc.getDlsr().setShadowIntensity(0.30f);
+                glc.getDlsr().setShadowIntensity(0.7f);
             }
 
             if (playerControl != null) {
