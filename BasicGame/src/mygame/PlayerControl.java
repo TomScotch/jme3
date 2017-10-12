@@ -188,7 +188,7 @@ public class PlayerControl extends AbstractControl {
         model.scale(scale);
         characterNode.attachChild(model);
         model.setShadowMode(RenderQueue.ShadowMode.Cast);
-        model.setLocalTranslation(0, 3, 0);
+        model.setLocalTranslation(-0.375f, 3.75f, 0);
         Node n = (Node) model;
         Node n1 = (Node) n.getChild("anim");
         aniCon = n1.getControl(AnimControl.class);

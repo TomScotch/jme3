@@ -142,7 +142,7 @@ public class GlobalLightingControl extends AbstractControl {
 
         sunMat.setColor("Color", ColorRGBA.Orange.add(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
-        al = new AmbientLight(ColorRGBA.Gray.mult(ColorRGBA.Gray).mult(ColorRGBA.Gray).mult(ColorRGBA.Gray));
+        al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.DarkGray).mult(ColorRGBA.Gray));
         localRootNode.addLight(al);
     }
 
@@ -258,7 +258,7 @@ public class GlobalLightingControl extends AbstractControl {
                 sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));
             }
             if (!isNight() && !isMorning()) {
-                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 1.5f);
+                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 2.5f);
             }
             if (isMorning()) {
                 vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), (tpf / getTimeDelay()) * 3);
