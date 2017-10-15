@@ -336,13 +336,11 @@ public class GameRunningState extends AbstractAppState {
         pic.setPosition(app.getContext().getSettings().getWidth() / 2, app.getContext().getSettings().getHeight() / 2);
 
 
-        /*        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-ch = new BitmapText(guiFont, false);
-ch.setName("crosshair");
-ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
-ch.setText("+"); // crosshairs
-ch.setLocalTranslation( // center
-app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getContext().getSettings().getHeight() / 2 + ch.getLineHeight() / 2, 0);*/
+        /*        CartoonEdgeFilter toon = new CartoonEdgeFilter();
+        toon.setEdgeWidth(0.5f);
+        toon.setEdgeIntensity(1.0f);
+        toon.setNormalThreshold(0.8f);
+        fpp.addFilter(toon);*/
     }
 
     private void setupHudText() {
@@ -360,7 +358,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
         hudText2.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 2.25f);      // font size
         hudText2.setColor(ColorRGBA.Red);
         // hudText2.setText("... : ...");
-        hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - (hudText2.getLineWidth() / 2), hudText2.getLineHeight() * 3, 0); // position
+        hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - 60, hudText2.getLineHeight() * 3, 0); // position
         // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
 
@@ -792,6 +790,7 @@ app.getContext().getSettings().getWidth() / 2 - ch.getLineWidth() / 2, app.getCo
                     healthText.setText(i.toString());
                 } else {
                     healthText.setText("dead");
+                    pic.setCullHint(Spatial.CullHint.Always);
                 }
             }
 

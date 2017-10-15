@@ -7,13 +7,15 @@ import com.jme3.asset.AssetManager;
 //import com.jme3.audio.AudioData;
 //import com.jme3.audio.AudioNode;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
+import com.jme3.effect.shapes.EmitterSphereShape;
+import com.jme3.light.AmbientLight;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
-import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.queue.RenderQueue;
@@ -26,6 +28,8 @@ public class EntityControl extends AbstractControl {
     private float damage = 20;
     private final PlayerControl pc;
     private final Geometry healthbar;
+    private final AmbientLight lamp;
+    private final ParticleEmitter hit;
 
     public boolean isFighting() {
         return fighting;
@@ -67,6 +71,27 @@ public class EntityControl extends AbstractControl {
                 break;
         }
 
+        Material material = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+        material.setTexture("Texture", assetManager.loadTexture("Textures/blood/blooddrop1.png"));
+        material.setFloat("Softness", 3f); // 
+        hit = new ParticleEmitter("Hit", ParticleMesh.Type.Triangle, 16);
+        hit.setMaterial(material);
+        hit.setShape(new EmitterSphereShape(Vector3f.ZERO, 2.5f));
+        // hit.setImagesX(2);
+        // hit.setImagesY(2); // 2x2 texture animation
+        hit.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f)); // red
+        hit.setStartColor(new ColorRGBA(1f, 0f, 0f, 1f)); // red
+        hit.setStartSize(0.5f);
+        hit.setEndSize(1f);
+        hit.setGravity(0, 5, 3);
+        hit.setLowLife(3f);
+        hit.setHighLife(3f);
+        hit.setLocalTranslation(0, 2f, 0);
+        hit.setParticlesPerSec(0);
+        hit.setQueueBucket(RenderQueue.Bucket.Opaque);
+        Node n = (Node) this.spatial;
+        n.attachChild(hit);
+
         /*        bcc = new BetterCharacterControl(3, 7, mass);
         bcc.setSpatial(hostile);
         hostile.addControl(bcc);
@@ -85,14 +110,21 @@ public class EntityControl extends AbstractControl {
         Node localRootNode = (Node) this.spatial.getParent();
         localRootNode.attachChild(hit);*/
         this.spatial.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+
         // this.spatial.lookAt(new Vector3f(1, 0, 0), Vector3f.UNIT_X);
+        lamp = new AmbientLight(ColorRGBA.Red);
+        // lamp.setPosition(new Vector3f(0, 5, 1));
+        //  lamp.setColor(ColorRGBA.Red);
+        //lamp.setRadius(75);
+        lamp.setEnabled(false);
+        spatial.addLight(lamp);
+        //spatial.addLight(lamp);
 
         BillboardControl billboard = new BillboardControl();
         healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
         Material mathb = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mathb.setColor("Color", ColorRGBA.Red);
         healthbar.setMaterial(mathb);
-        Node n = (Node) this.spatial;
         n.attachChild(healthbar);
         healthbar.getLocalScale().setX((health + 1) / 75);
         healthbar.center();
@@ -133,7 +165,7 @@ public class EntityControl extends AbstractControl {
                 Vector3f b = this.spatial.getWorldTranslation();
 
                 float distance = a.distance(b);
-                if (distance > fleeDistance / 2) {
+                if (distance > fleeDistance / 1.5f) {
                     targetName = "";
                     fighting = false;
                 } else {
@@ -240,23 +272,18 @@ public class EntityControl extends AbstractControl {
                     setAnim("Hit", LoopMode.Loop);
                 }
 
-                PointLight lamp = new PointLight();
-                lamp.setPosition(Vector3f.ZERO);
-                lamp.setColor(ColorRGBA.Red);
-                this.spatial.addLight(lamp);
-                lamp.setRadius(38);
-                this.spatial.addControl(new TimedActionControl(0.20f) {
+                lamp.setEnabled(true);
+                this.spatial.addControl(new TimedActionControl(0.4f) {
                     @Override
                     void action() {
-                        this.spatial.removeLight(lamp);
+                        lamp.setEnabled(false);
                     }
                 });
-
                 // hit.play();
                 hitParticles();
-                if (health >= 0) {
-                    this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
-                }
+                /*                if (health >= 0) {
+                this.spatial.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) this.spatial));
+                }*/
             }
         }
     }
@@ -268,10 +295,7 @@ public class EntityControl extends AbstractControl {
     }
 
     private void hitParticles() {
-        Node n = (Node) this.spatial;
-        Node n1 = (Node) n.getChild("hit");
-        ParticleEmitter child = (ParticleEmitter) n1.getChild("emitter");
-        child.emitAllParticles();
+        hit.emitParticles(15);
     }
 
     private void deadParticles(int num) {
@@ -291,7 +315,6 @@ public class EntityControl extends AbstractControl {
                 fighting = false;
                 attacking = false;
                 targetName = "";
-
             }
 
         }

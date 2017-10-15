@@ -709,86 +709,24 @@ public class PlayerControl extends AbstractControl {
     private void attack() {
 
         if (attackTimer <= 0) {
-            //hit.play();
-
             doAnim("player", "Attack", LoopMode.DontLoop);
             attackTimer = attackTime;
-
-            Ray ray1 = new Ray(model.getWorldTranslation(), physicsCharacter.getViewDirection()); //model.getWorldTranslation()
+            Ray ray1 = new Ray(model.getWorldTranslation(), physicsCharacter.getViewDirection()); //
             CollisionResults results1 = new CollisionResults();
+            Node n = model.getParent();
+            model.removeFromParent();
             localRootNode.collideWith(ray1, results1);
+            n.attachChild(model);
 
             if (results1.size() > 1) {
-
                 Geometry g = results1.getCollision(1).getGeometry();
-
                 if (g != null) {
-
-                    Node n = g.getParent().getParent().getParent();
-
-                    if (n != null) {
-
-                        String target = n.getName();
-                        if (target != null) {
-                            if (!target.equals("")) {
-                                if (!target.equals("terrain")) {
-                                    if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 25) {
-                                        attack(target);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                ray1 = new Ray(viewPort.getCamera().getLocation(), viewPort.getCamera().getDirection());
-                results1 = new CollisionResults();
-                localRootNode.collideWith(ray1, results1);
-                if (results1.size() > 1) {
-
-                    Geometry g = results1.getCollision(1).getGeometry();
-
-                    if (g != null) {
-
-                        Node n = g.getParent().getParent().getParent();
-
-                        if (n != null) {
-
-                            String target = n.getName();
-                            if (target != null) {
-                                if (!target.equals("")) {
-                                    if (!target.equals("terrain")) {
-                                        if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 25) {
-                                            attack(target);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    ray1 = new Ray(model.getWorldTranslation(), viewPort.getCamera().getDirection());
-                    results1 = new CollisionResults();
-                    localRootNode.collideWith(ray1, results1);
-                    if (results1.size() > 1) {
-
-                        Geometry g = results1.getCollision(1).getGeometry();
-
-                        if (g != null) {
-
-                            Node n = g.getParent().getParent().getParent();
-
-                            if (n != null) {
-
-                                String target = n.getName();
-                                if (target != null) {
-                                    if (!target.equals("")) {
-                                        if (!target.equals("terrain")) {
-                                            if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 25) {
-                                                attack(target);
-                                            }
-                                        }
-                                    }
+                    String target = g.getName();
+                    if (target != null) {
+                        if (!target.equals("")) {
+                            if (!target.equals("terrain")) {
+                                if (model.getWorldTranslation().distance(results1.getCollision(1).getGeometry().getWorldTranslation()) < 30) {
+                                    attack(target);
                                 }
                             }
                         }
