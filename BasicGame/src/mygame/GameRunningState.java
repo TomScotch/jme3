@@ -16,13 +16,19 @@ import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.collision.CollisionResults;
+import com.jme3.effect.Particle;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
+import com.jme3.effect.shapes.EmitterBoxShape;
+import com.jme3.effect.shapes.EmitterSphereShape;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.light.DirectionalLight;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
@@ -30,6 +36,8 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
+import com.jme3.post.filters.FogFilter;
+import com.jme3.post.filters.PosterizationFilter;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
@@ -48,39 +56,9 @@ import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
 
-    public AudioNode getLightRain() {
-        return lightRain;
-    }
-
-    public AudioNode getNormalRain() {
-        return normalRain;
-    }
-
-    public AudioNode getHeavyRain() {
-        return heavyRain;
-    }
-
+    private FogFilter fog;
     private BitmapText healthText;
     private boolean noWide;
-
-    public void setConsole(Console console) {
-        this.console = console;
-    }
-
-    public Console getConsole() {
-        return console;
-    }
-
-    private Console console;
-
-    public float getHealth() {
-        return health;
-    }
-
-    public void setHealth(float health) {
-        this.health = health;
-    }
-
     private final Camera cam2;
     private final AudioNode amb;
     private final AudioNode amb1;
@@ -111,7 +89,6 @@ public class GameRunningState extends AbstractAppState {
     private final boolean shadows;
     private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
-
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
@@ -125,7 +102,6 @@ public class GameRunningState extends AbstractAppState {
     private final AppStateManager stateManager;
     private float health = 100;
     private final int birdLimit = 29;
-
     private BloomFilter bloom;
     private float density = 2f;//2
     private float sampling = 1f;//1
@@ -134,15 +110,47 @@ public class GameRunningState extends AbstractAppState {
     private float cutOff = 0.1f; // 0.1 - 1.0
     private AssetEventListener asl;
     private int samples = 4;
+    private final PosterizationFilter pf;
+    private ParticleEmitter rain;
+    private ParticleEmitter flash;
+    private ParticleEmitter clouds;
+    private boolean misty = false;
+    private boolean clouded = false;
+    private boolean raining = false;
+    private boolean lightnungStrikes = false;
+    private boolean clouded_low = false;
+    private boolean clouded_med = false;
+    private boolean clouded_high = false;
+    private boolean raining_low = false;
+    private boolean raining_med = false;
+    private boolean raining_high = false;
+    private boolean misty_low = false;
+    private boolean misty_med = false;
+    private boolean misty_high = false;
+    private boolean lightnungStrikes_low = false;
+    private boolean lightnungStrikes_med = false;
+    private boolean lightnungStrikes_high = false;
+    private final float fogDensity = 0.1f; // 1.3f
+    private final int fogDistance = 75; // 50
+    private final int cloudThickness = 350; // 400
+    private final float rainStrength = 800; // 3000
+    private final float rainThickness = 4000; // 6000
+    private float weatherCounter = 0f;
+    private float weatherLimit = 0f;
+    private float flashCounter = 0f;
+    private float flashLimit = 0f;
+    private final int maximumWeatherLength = 8;
+    private final int minimumWeatherLength = 4;
+    private ParticleEmitter debrisEffect;
+    private DirectionalLight sun;
+    private GlobalLightingControl glc;
+
     // private final SSAO ssao;
-    private WeatherControl weatherControl;
     private final SkyControl sc;
     private final Terrain terrainControl;
     private final PlayerControl playerControl;
-    private GlobalLightingControl glc;
     private EnemyControl enemyControl;
     private LightScatterFilter lightScatterFilter;
-    private final PosterizationFilterControl posterizationFilterControl;
     private WaterPostFilter wpf;
     private simpleWaterControl swc;
 
@@ -168,7 +176,6 @@ public class GameRunningState extends AbstractAppState {
         this.inputManager = app.getInputManager();
 
         fps = new ArrayList<>();
-
         fpp = new FilterPostProcessor(assetManager);
 
 //      PHYSICS STATE
@@ -251,19 +258,100 @@ public class GameRunningState extends AbstractAppState {
 
 //      FOG
         if (fogEnabled) {
-            FogPostFilter fogPostFilter = new FogPostFilter(fpp);
-            if (localRootNode.getControl(FogPostFilter.class) == null) {
-                localRootNode.addControl(fogPostFilter);
-            }
+            fog = new FogFilter();
+            fog.setFogColor(ColorRGBA.Gray);
+            fog.setFogDistance(0);
+            fog.setFogDensity(0);
+            fpp.addFilter(fog);
         }
 
         //      Weather
         if (weatherEnabled) {
-            if (localRootNode.getControl(WeatherControl.class) == null) {
-                weatherControl = new WeatherControl(glc, assetManager, localRootNode, terrainControl.getHeightmap());
-                weatherControl.setEnabled(false);
-                localRootNode.addControl(weatherControl);
-            }
+            weatherLimit = getLimit();
+            flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 8);
+            Material flash_mat = new Material(
+                    assetManager, "Common/MatDefs/Misc/Particle.j3md");
+            flash_mat.setTexture("Texture",
+                    assetManager.loadTexture("Textures/weatherSprites/lightning/Xz2ctMGg_5c2UF-vqdqT3dMZLvs.png"));
+            flash.setMaterial(flash_mat);
+            flash.setShape(new EmitterBoxShape(new Vector3f(-256f, -1f, -256f), new Vector3f(256f, 1f, 256f)));
+            flash.setParticlesPerSec(0);
+            flash.setLocalTranslation(0, 75, 0);
+            flash.center();
+            localRootNode.attachChild(flash);
+
+            flash.setEndColor(ColorRGBA.Blue);
+            flash.setStartColor(ColorRGBA.White);
+
+            flash.setStartSize(3);
+            flash.setEndSize(28);
+
+            flash.setHighLife(0.35f);
+            flash.setLowLife(0.1f);
+
+            flash.setFacingVelocity(false);
+            flash.setInWorldSpace(false);
+            flash.setGravity(0, 0, 0);
+            flash.setFaceNormal(new Vector3f(0, 0, 1));
+
+            rain = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, (int) rainThickness);
+            Material rainMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+            rainMat.setTexture("Texture", assetManager.loadTexture("Textures/weatherSprites/rain/rain.png"));
+            rain.setMaterial(rainMat);
+            rain.setStartSize(0.225f);
+            rain.setEndSize(0.125f);
+            rain.setGravity(0, 900, 0);
+            rain.setEndColor(ColorRGBA.White);
+            rain.setStartColor(ColorRGBA.White);
+            rain.setHighLife(1f);
+            rain.setLowLife(1f);
+            rain.setInWorldSpace(true);
+            rain.setShape(new EmitterBoxShape(new Vector3f(-256, 0, -256), new Vector3f(256, 0.1f, 256)));
+            rain.setParticlesPerSec(0);
+            rain.setFacingVelocity(false);
+            rain.setLocalTranslation(0, 50, 0);
+            rain.center();
+            localRootNode.attachChild(rain);
+
+            clouds = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, cloudThickness);
+            Material cloudMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+            cloudMat.setTexture("Texture", assetManager.loadTexture("Textures/weatherSprites/clouds/SmallCloud.png"));
+            clouds.setMaterial(cloudMat);
+            clouds.setStartSize(25);
+            clouds.setEndSize(25);
+            clouds.setGravity(0.015f, 0, 0.015f);
+            clouds.setHighLife(200f);
+            clouds.setLowLife(200f);
+            clouds.setShape(new EmitterBoxShape(new Vector3f(-256, -1f, -256), new Vector3f(256, 1f, 256)));
+            clouds.setParticlesPerSec(0);
+            clouds.setFacingVelocity(false);
+            clouds.setInWorldSpace(true);
+            clouds.setFaceNormal(new Vector3f(0, -1, 0));
+            clouds.getParticleInfluencer().setVelocityVariation(3f);
+            clouds.setLocalTranslation(0, 120, 0);
+            clouds.center();
+            clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
+            localRootNode.attachChild(clouds);
+
+            debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 128);
+            Material debrisMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+            debrisMat.setTexture("Texture", assetManager.loadTexture("Textures/weatherSprites/rain/splash.png"));
+            debrisEffect.setMaterial(debrisMat);
+            debrisEffect.setStartSize(0.1f);
+            debrisEffect.setEndSize(0.01f);
+            debrisEffect.setEndColor(ColorRGBA.White);
+            debrisEffect.setStartColor(ColorRGBA.White);
+            debrisEffect.setHighLife(0.5f);
+            debrisEffect.setLowLife(0.25f);
+            debrisEffect.setInWorldSpace(true);
+            debrisEffect.setFacingVelocity(false);
+            debrisEffect.setShape(new EmitterSphereShape(Vector3f.ZERO, 64));
+            debrisEffect.getWorldTranslation().set(0, 6, 0);
+            localRootNode.attachChild(debrisEffect);
+
+            sun = new DirectionalLight();
+            sun.setDirection((new Vector3f(0f, -0.5f, 0f)).normalizeLocal());
+            sun.setColor(ColorRGBA.White);
         }
 
 //      ANISOTROPY
@@ -294,8 +382,9 @@ public class GameRunningState extends AbstractAppState {
         }
 
 //      PosterizationFilter
-        posterizationFilterControl = new PosterizationFilterControl(fpp);
-        localRootNode.addControl(posterizationFilterControl);
+        pf = new PosterizationFilter();
+        pf.setNumColors(8);
+        fpp.addFilter(pf);
 
         //Depth of Field
         dof = new DepthOfField(fpp, app.getContext(), viewPort, assetManager);
@@ -463,7 +552,6 @@ public class GameRunningState extends AbstractAppState {
         }
 
         inputManager.setCursorVisible(false);
-
         bulletAppState.setEnabled(true);
 
         //      WATER
@@ -479,15 +567,10 @@ public class GameRunningState extends AbstractAppState {
             }
         }
 
-        if (weatherEnabled) {
-            weatherControl.setEnabled(true);
-        }
-
         playerControl.getPhysicsCharacter().setEnabled(true);
         amb.play();
         amb1.play();
         amb2.play();
-
     }
 
     private void setupKeys() {
@@ -704,6 +787,209 @@ public class GameRunningState extends AbstractAppState {
 
             super.update(tpf);
 
+            weatherCounter += tpf;
+
+            if (pf.getStrength() > 0) {
+                pf.setStrength(pf.getStrength() - tpf);
+            }
+            if (pf.getStrength() < 0) {
+                pf.setStrength(0);
+            }
+
+            if (weatherCounter >= weatherLimit) {
+                weatherCounter = 0;
+                startRandomWeather();
+
+                weatherLimit = getLimit();
+            }
+
+            if (clouded) {
+                if (clouded_high) {
+                    if (clouds.getNumVisibleParticles() < cloudThickness * 2) {
+                        clouds.emitParticles(cloudThickness / 5);
+                    }
+                } else if (clouded_med) {
+                    if (clouds.getNumVisibleParticles() < cloudThickness) {
+                        clouds.emitParticles(cloudThickness / 10);
+                    }
+                } else if (clouded_low) {
+                    if (clouds.getNumVisibleParticles() < cloudThickness / 2) {
+                        clouds.emitParticles(cloudThickness / 20);
+                    }
+                }
+            } else {
+
+                clouded_low = false;
+                clouded_med = false;
+                clouded_high = false;
+
+                if (clouds.getNumVisibleParticles() > 0) {
+                    clouds.killParticle(0);
+                }
+            }
+
+            if (raining) {
+
+                if (raining_high) {
+                    rain.setParticlesPerSec(rainStrength * 2);
+                } else if (raining_med) {
+                    rain.setParticlesPerSec(rainStrength);
+                } else if (raining_low) {
+                    rain.setParticlesPerSec(rainStrength / 2);
+                }
+
+                if (rain.getNumVisibleParticles() > 0) {
+
+                    debrisEffect.setNumParticles((int) rain.getParticlesPerSec());
+
+                    for (int c = rain.getParticles().length / 2; c >= 0; c--) {
+                        try {
+                            if (rain.getParticles()[c].life < 0.001f) {//(rain.getParticles()[c].startlife - rain.getParticles()[c].life) >= 2
+                                Vector3f position = rain.getParticles()[c].position;
+                                debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
+                                debrisEffect.emitParticles(1);
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                    for (int c = 0; c <= rain.getParticles().length / 2; c++) {
+                        try {
+                            if (rain.getParticles()[c].life < 0.001f) {//(rain.getParticles()[c].startlife - rain.getParticles()[c].life) >= 2
+                                Vector3f position = rain.getParticles()[c].position;
+                                debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
+                                debrisEffect.emitParticles(1);
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+
+            } else {
+
+                debrisEffect.setParticlesPerSec(0);
+                debrisEffect.killAllParticles();
+
+                raining_low = false;
+                raining_med = false;
+                raining_high = false;
+
+                if (rain.getParticlesPerSec() > 0) {
+                    rain.setParticlesPerSec(0);
+                }
+            }
+
+            if (lightnungStrikes) {
+
+                flashCounter += tpf;
+
+                setLightningFrequency();
+
+                if (flashCounter >= flashLimit) {
+
+                    flashCounter = 0;
+
+                    if (lightnungStrikes_high) {
+                        flash.emitParticles(getRandomNumberInRange(1, 3));
+                    } else if (lightnungStrikes_med) {
+                        flash.emitParticles(getRandomNumberInRange(1, 2));
+                    } else if (lightnungStrikes_low) {
+                        flash.emitParticles(getRandomNumberInRange(1, 1));
+                    }
+
+                    Particle p = flash.getParticles()[0];
+                    Node n = new Node();
+                    Spatial spat = (Spatial) n;
+
+                    spat.setLocalTranslation((p.position));
+                    spat.lookAt(Vector3f.ZERO, Vector3f.UNIT_XYZ);
+
+                    DirectionalLight clone = new DirectionalLight();
+                    clone.setColor(ColorRGBA.White);
+                    clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
+                    localRootNode.addLight(clone);
+
+                    float lightDelay = 1;
+                    switch (getRandomNumberInRange(0, 2)) {
+                        case 0:
+                            lightDelay = 0.25f;
+                            break;
+                        case 1:
+                            lightDelay = 0.3f;
+                            break;
+                        case 2:
+                            lightDelay = 0.35f;
+                            break;
+                    }
+
+                    flash.addControl(new TimedActionControl(lightDelay) {
+
+                        @Override
+                        void action() {
+
+                            localRootNode.removeLight(clone);
+                        }
+                    });
+                    //}
+
+                }
+
+            } else {
+
+                lightnungStrikes_low = false;
+                lightnungStrikes_med = false;
+                lightnungStrikes_high = false;
+
+                if (flash.getParticlesPerSec() > 0) {
+                    flash.killAllParticles();
+                    flash.setParticlesPerSec(0);
+                }
+            }
+
+            if (misty) {
+                if (fog != null) {
+
+                    if (misty_high) {
+                        if (fog.getFogDistance() <= fogDistance / 1.25f) {
+                            fog.setFogDistance(fog.getFogDistance() + (tpf * fogDistance));
+                        }
+
+                        if (fog.getFogDensity() < fogDensity / 1.25f) {
+                            fog.setFogDensity(fog.getFogDensity() + tpf);
+                        }
+                    } else if (misty_med) {
+                        if (fog.getFogDistance() != fogDistance / 1.5f) {
+                            fog.setFogDistance(fog.getFogDistance() + (tpf * fogDistance));
+                        }
+
+                        if (fog.getFogDensity() < fogDensity / 1.5f) {
+                            fog.setFogDensity(fog.getFogDensity() + (tpf * 4));
+                        }
+                    } else if (misty_low) {
+                        if (fog.getFogDistance() != fogDistance / 1.75f) {
+                            fog.setFogDistance(fog.getFogDistance() + (tpf * fogDistance));
+                        }
+
+                        if (fog.getFogDensity() < fogDensity / 1.75) {
+                            fog.setFogDensity(fog.getFogDensity() + (tpf * 2));
+                        }
+                    }
+                }
+
+            } else {
+
+                misty_low = false;
+                misty_med = false;
+                misty_high = false;
+                if (fog != null) {
+                    if (fog.getFogDistance() > 0) {
+                        fog.setFogDistance(fog.getFogDistance() - (tpf * fogDistance));
+                    }
+
+                    if (fog.getFogDensity() > 0) {
+                        fog.setFogDensity(fog.getFogDensity() - (tpf * fogDensity));
+                    }
+                }
+            }
             Ray ray1 = new Ray(viewPort.getCamera().getLocation(), viewPort.getCamera().getDirection());
             CollisionResults results1 = new CollisionResults();
             localRootNode.collideWith(ray1, results1);
@@ -750,15 +1036,6 @@ public class GameRunningState extends AbstractAppState {
                 }
             } else {
                 playerControl.getChaseCam().setMaxDistance(30);
-            }
-
-            if (glc.isNight()) {
-
-                glc.getDlsr().setShadowIntensity(0);
-
-            } else {
-
-                glc.getDlsr().setShadowIntensity(0.7f);
             }
 
             if (playerControl != null) {
@@ -821,8 +1098,8 @@ public class GameRunningState extends AbstractAppState {
 
                     if (health < 25) {
                         healthText.setColor(ColorRGBA.Red);
-                        localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
-                        localRootNode.getControl(PosterizationFilterControl.class).setStrength(1.25f);
+                        pf.setEnabled(true);
+                        pf.setStrength(1.25f);
                     }
 
                     healthText.setText(i.toString());
@@ -940,9 +1217,8 @@ public class GameRunningState extends AbstractAppState {
         glc.setEnabled(true);
         playerControl.setEnabled(true);
         sc.setEnabled(true);
-        weatherControl.setEnabled(true);
-        localRootNode.getControl(PosterizationFilterControl.class).setEnabled(true);
-        localRootNode.getControl(PosterizationFilterControl.class).setStrength(1.75f);
+        pf.setEnabled(true);
+        pf.setStrength(1.75f);
 
         if (shadows) {
             if (!viewPort.getProcessors().contains(glc.getSlsr())) {
@@ -1005,15 +1281,11 @@ public class GameRunningState extends AbstractAppState {
 
         view2.setEnabled(false);
         view2.detachScene(localRootNode);
-        localRootNode.getControl(PosterizationFilterControl.class).setEnabled(false);
+        pf.setEnabled(false);
         playerControl.setEnabled(false);
 
         sc.setEnabled(false);
         glc.setEnabled(false);
-
-        if (weatherControl != null) {
-            weatherControl.setEnabled(false);
-        }
 
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
@@ -1052,6 +1324,229 @@ public class GameRunningState extends AbstractAppState {
         inputManager.deleteMapping("delayUp");
         inputManager.deleteMapping("delayDown");
         inputManager.deleteMapping("timeDemo");
+    }
+
+    public final void startRandomWeather() {
+
+        switch (getRandomNumberInRange(0, 6)) {
+            case 5:
+                makeMisty();
+                break;
+        }
+
+        switch (getRandomNumberInRange(0, 3)) {
+
+            case 2:
+                makeCloudy();
+                break;
+        }
+
+        switch (getRandomNumberInRange(0, 2)) {
+
+            case 1:
+                makeLightning();
+                break;
+        }
+
+        switch (getRandomNumberInRange(0, 1)) {
+
+            case 0:
+                makeRain();
+                break;
+
+            case 1:
+                makeSuny();
+                break;
+        }
+        weatherLimit = getLimit();
+    }
+
+    private void makeMisty() {
+
+        misty = true;
+        clouded = false;
+        switch (getRandomNumberInRange(0, 2)) {
+            case 0:
+                misty_low = true;
+                misty_med = false;
+                misty_high = false;
+                System.out.println("misty low");
+                break;
+            case 1:
+                misty_low = false;
+                misty_med = true;
+                misty_high = false;
+                System.out.println("misty med");
+                break;
+            case 2:
+                misty_low = false;
+                misty_med = false;
+                misty_high = true;
+                System.out.println("misty high");
+                break;
+        }
+    }
+
+    public void makeRain() {
+        raining = true;
+        makeCloudy();
+        switch (getRandomNumberInRange(0, 2)) {
+            case 0:
+                raining_high = true;
+                raining_med = false;
+                raining_low = false;
+                System.out.println("raining_high");
+                break;
+            case 1:
+                raining_high = false;
+                raining_med = true;
+                raining_low = false;
+                System.out.println("raining_med");
+                break;
+            case 2:
+                raining_high = false;
+                raining_med = false;
+                raining_low = true;
+                System.out.println("raining_low");
+                break;
+        }
+
+        switch (getRandomNumberInRange(0, 1)) {
+            case 0:
+                makeLightning();
+                break;
+        }
+    }
+
+    public void makeLightning() {
+
+        lightnungStrikes = true;
+
+        switch (getRandomNumberInRange(0, 2)) {
+            case 0:
+                lightnungStrikes_high = true;
+                lightnungStrikes_med = false;
+                lightnungStrikes_low = false;
+                System.out.println("lightnungStrikes_high");
+                break;
+            case 1:
+                lightnungStrikes_high = false;
+                lightnungStrikes_med = true;
+                lightnungStrikes_low = false;
+                System.out.println("lightnungStrikes_med");
+                break;
+            case 2:
+                lightnungStrikes_high = false;
+                lightnungStrikes_med = false;
+                lightnungStrikes_low = true;
+                System.out.println("lightnungStrikes_low");
+                break;
+        }
+        setLightningFrequency();
+    }
+
+    private void setLightningFrequency() {
+        if (lightnungStrikes_high) {
+            flashLimit = (float) getRandomNumberInRange(4, 8);
+        } else if (lightnungStrikes_med) {
+            flashLimit = (float) getRandomNumberInRange(6, 12);
+        } else if (lightnungStrikes_low) {
+            flashLimit = (float) getRandomNumberInRange(8, 16);
+        }
+    }
+
+    private int getRandomNumberInRange(int min, int max) {
+        Random r = new Random();
+        return r.ints(min, (max + 1)).findFirst().getAsInt();
+    }
+
+    public void makeCloudy() {
+        clouded = true;
+        switch (getRandomNumberInRange(0, 1)) {
+            case 0:
+                clouded_high = true;
+                clouded_med = false;
+                clouded_low = false;
+                System.out.println("clouded_high");
+                break;
+            case 1:
+                clouded_high = false;
+                clouded_med = true;
+                clouded_low = false;
+                System.out.println("clouded_med");
+                break;
+            case 2:
+                clouded_high = false;
+                clouded_med = false;
+                clouded_low = true;
+                System.out.println("clouded_low");
+                break;
+        }
+    }
+
+    public void makeSuny() {
+
+        clouded = false;
+        raining = false;
+        misty = false;
+        lightnungStrikes = false;
+        System.out.println("sunny");
+    }
+
+    private float getLimit() {
+        int delayValue = 0;
+        switch (glc.getTimeDelay()) {
+            case 4:
+                delayValue = 2;
+                break;
+            case 8:
+                delayValue = 4;
+                break;
+            case 16:
+                delayValue = 6;
+                break;
+            case 32:
+                delayValue = 8;
+                break;
+            case 64:
+                delayValue = 10;
+                break;
+            case 128:
+                delayValue = 12;
+                break;
+            case 256:
+                delayValue = 14;
+                break;
+            case 512:
+                delayValue = 16;
+                break;
+            case 1024:
+                delayValue = 18;
+                break;
+            case 2048:
+                delayValue = 20;
+                break;
+            case 4096:
+                delayValue = 22;
+                break;
+            case 8192:
+                delayValue = 24;
+                break;
+            case 16384:
+                delayValue = 26;
+                break;
+            case 32768:
+                delayValue = 28;
+                break;
+            case 65536:
+                delayValue = 30;
+                break;
+            case 131072:
+                delayValue = 32;
+                break;
+        }
+
+        return (float) getRandomNumberInRange(minimumWeatherLength + delayValue, maximumWeatherLength + delayValue);
     }
 
     public boolean getIsRunning() {
@@ -1142,12 +1637,37 @@ public class GameRunningState extends AbstractAppState {
         return playerControl;
     }
 
-    private int getRandomNumberInRange(int min, int max) {
-        Random r = new Random();
-        return r.ints(min, (max + 1)).findFirst().getAsInt();
-    }
-
     public AudioNode getAudioNode(String path) {
         return (AudioNode) new AudioNode(assetManager, path, AudioData.DataType.Buffer);
+    }
+
+    public AudioNode getLightRain() {
+        return lightRain;
+    }
+
+    public AudioNode getNormalRain() {
+        return normalRain;
+    }
+
+    public AudioNode getHeavyRain() {
+        return heavyRain;
+    }
+
+    public void setConsole(Console console) {
+        this.console = console;
+    }
+
+    public Console getConsole() {
+        return console;
+    }
+
+    private Console console;
+
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
     }
 };

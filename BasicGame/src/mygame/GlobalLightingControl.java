@@ -142,7 +142,7 @@ public class GlobalLightingControl extends AbstractControl {
 
         sunMat.setColor("Color", ColorRGBA.Orange.add(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
-        al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.DarkGray).mult(ColorRGBA.LightGray).mult(ColorRGBA.LightGray));
+        al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.Gray).mult(ColorRGBA.LightGray).mult(ColorRGBA.LightGray));
         localRootNode.addLight(al);
     }
 
@@ -177,16 +177,14 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (y > -(sunSize / 1.1f) && z < -222) {
                     //morning
-                    if (isSun) {
-                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
-                    }
                     morning = true;
                     day = false;
                     evening = false;
                     night = false;
                     if (isSun == false) {
                         if (sl != null) {
-                            slsr.setShadowIntensity(0.25f);
+                            dlsr.setShadowIntensity(0.4f);
+                            slsr.setShadowIntensity(0.4f);
                         }
                         isSun = true;
                         System.out.println("Sun is Up");
@@ -199,28 +197,30 @@ public class GlobalLightingControl extends AbstractControl {
 
                 if (y > 422 && z > 0) {
                     //day
+                    if (day == false) {
+                        if (sl != null) {
+                            dlsr.setShadowIntensity(0.5f);
+                            //slsr.setShadowIntensity(0.35f);
+                        }
+                    }
                     morning = false;
                     day = true;
                     evening = false;
                     night = false;
-
-                    if (sl != null) {
-                        slsr.setShadowIntensity(0.35f);
-                    }
-                    if (isSun) {
-                        sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));/// 0.0005f
-                    }
                 }
 
                 if (y > 90 && z > 233) {
                     //evening
+                    if (evening == false) {
+                        if (sl != null) {
+                            //  slsr.setShadowIntensity(0.6f);
+                            dlsr.setShadowIntensity(0.45f);
+                        }
+                    }
                     morning = false;
                     day = false;
                     evening = true;
                     night = false;
-                    if (isSun) {
-                        sun.getColor().interpolateLocal(ColorRGBA.Orange, (tpf / timeDelay) * 2.5f);/// 0.0005f
-                    }
                 }
 
                 if (y < -(sunSize * 1.1f) && z > 444) {
@@ -236,7 +236,8 @@ public class GlobalLightingControl extends AbstractControl {
                         isSun = false;
                         System.out.println("Sun is Down");
                         if (sl != null) {
-                            slsr.setShadowIntensity(0.45f);
+                            dlsr.setShadowIntensity(0);
+                            //   slsr.setShadowIntensity(2);
                         }
                     }
                 }
@@ -248,17 +249,17 @@ public class GlobalLightingControl extends AbstractControl {
             }
 
             if (isEvening()) {
-                sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay) * 2f);
+                sun.getColor().interpolateLocal(ColorRGBA.Red, (tpf / timeDelay));
             }
 
             if (!isNight() && !isEvening()) {
-                sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay) * 2f);
+                sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));
             }
             if (!isNight() && !isMorning()) {
-                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, (tpf / getTimeDelay()) * 2.5f);
+                vp.getBackgroundColor().interpolateLocal(vp.getBackgroundColor(), ColorRGBA.Black, sphereGeo.getWorldTranslation().getY() / 37000);
             }
             if (isMorning()) {
-                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), (tpf / getTimeDelay()) * 3);
+                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, ColorRGBA.Blue.add(ColorRGBA.White), sphereGeo.getWorldTranslation().getY() / 400);
             }
         } else {
             System.out.println("glc stopped");

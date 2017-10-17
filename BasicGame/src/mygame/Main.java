@@ -633,7 +633,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
              */
             if (name.equals("rain_trigger") && !isPressed) {
                 if (stateManager.hasState(getGameRunningState())) {
-                    getGameRunningState().getLocalRoot().getControl(WeatherControl.class).startRandomWeather();
+                    gameRunningState.startRandomWeather();
                 }
             }
 

@@ -19,8 +19,7 @@ public class DepthOfField extends AbstractControl {
     private final DepthOfFieldFilter dofFilter;
     private final JmeContext context;
     private final Camera cam;
-
-    private float focusDistance = 12f; // 10f
+    private final float focusDistance = 12f; // 10f
     private final float range = 55; // 50f
     private final float scale = 0.8f; // 1f
 
@@ -54,21 +53,5 @@ public class DepthOfField extends AbstractControl {
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //
-    }
-
-    public float getRange() {
-        return range;
-    }
-
-    public float getScale() {
-        return scale;
-    }
-
-    public float getFocusDistance() {
-        return focusDistance;
-    }
-
-    public void setFocusDistance(float focusDistance) {
-        this.focusDistance = focusDistance;
     }
 }
