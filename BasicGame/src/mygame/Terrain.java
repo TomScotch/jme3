@@ -67,12 +67,12 @@ public class Terrain extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        //TODO: add code that controls Spatial,
+        //
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations
+        //
     }
 
 }

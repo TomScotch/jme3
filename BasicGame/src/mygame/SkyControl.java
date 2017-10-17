@@ -140,8 +140,7 @@ public class SkyControl extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations
-        //rm.setAlphaToCoverage(enabled);
+        //
     }
 
 }

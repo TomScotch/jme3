@@ -41,7 +41,7 @@ import com.jme3.system.JmeContext;
 
 public class PlayerControl extends AbstractControl {
 
-    private float stamina_Recover_Value = 25;
+    private final float stamina_Recover_Value = 25;
 
     public float getStamina() {
         return stamina;
@@ -131,10 +131,10 @@ public class PlayerControl extends AbstractControl {
     private final float underAttackTimerVal = 9f;
     private float rotationModifier = 0;
     private boolean sprint = false;
-    private float stamina_max = 100;
+    private final float stamina_max = 100;
     private float stamina = stamina_max;
-    private float stamina_recover_delay = 5;
-    private float stamina_recover_value = 5;
+    private final float stamina_recover_delay = 5;
+    private final float stamina_recover_value = 5;
     private float stamina_recover_counter = 0;
     private boolean noWide;
     private final float sprintModifier = 1.75f;
@@ -212,7 +212,6 @@ public class PlayerControl extends AbstractControl {
             aniCon.getChannel(0).setLoopMode(LoopMode.Loop);
         }
 
-        localRootNode.addControl(new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, this));
         footsteps = new AudioNode(assetManager, "Sound/Effects/Foot steps.ogg", AudioData.DataType.Buffer);
         footsteps.setLooping(false);
         footsteps.setPositional(false);
@@ -505,13 +504,9 @@ public class PlayerControl extends AbstractControl {
                 if (health <= 0) {
 
                     dead = true;
-                    // doAnim("player", "Idle", LoopMode.DontLoop);
                 }
                 if (hitAnimationDelay > 0) {
                     hitAnimationDelay -= tpf;
-                    if (hitAnimationDelay <= 0) {
-                        // doAnim("player", "Idle", LoopMode.Loop);
-                    }
                 }
                 if (attackTimer > 0) {
                     attackTimer -= tpf;
@@ -637,7 +632,9 @@ public class PlayerControl extends AbstractControl {
                 this.spatial.removeControl(this);
 
             }
-
+            healthbar.getLocalScale().setX((health + 1) / 75);
+            healthbar.center();
+            healthbar.move((health / 200) + 1, 9, 0);
             if (dead) {
                 healthbar.getLocalScale().setX(0);
                 if (deadDelay >= 3f) {
@@ -738,7 +735,7 @@ public class PlayerControl extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations
+        //
     }
 
     public BetterCharacterControl getPhysicsCharacter() {
@@ -767,11 +764,7 @@ public class PlayerControl extends AbstractControl {
             if ((dmg - armor) > 0) {
                 health -= (dmg - armor);
                 underAttackTimer = underAttackTimerVal;
-                healthbar.getLocalScale().setX((health + 1) / 75);
-                healthbar.center();
-                healthbar.move((health / 200) + 1, 9, 0);
                 hitAnimationDelay = 1.5f;
-                // doAnim("player", "Hit", LoopMode.Loop);
                 System.out.println("ouch" + dmg + " damage " + " from " + name + "");
                 PointLight shine = new PointLight();
                 shine.setPosition(Vector3f.ZERO);
@@ -784,11 +777,7 @@ public class PlayerControl extends AbstractControl {
                         characterNode.removeLight(shine);
                     }
                 });
-
                 hit.play();
-                /*                if (health >= 0) {
-                 characterNode.addControl(new ShowDamage(assetManager, Float.toString(dmg), (Node) characterNode));
-                 }*/
             }
         }
         return dead;

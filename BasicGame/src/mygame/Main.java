@@ -82,8 +82,8 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private static AppSettings cfg;
     private static Main app;
 
-    private static final boolean opencl = false;
-    private static final boolean openAl = true;
+    private static final boolean OPENCL = false;
+    private static final boolean OPENAL = true;
 
     private VideoRecorderAppState videoRecorderAppState;
     private static DisplayMode[] modes;
@@ -121,7 +121,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private static Platform selectedPlatform;
     private Node settingsNode;
 
-    private static final Object sync = new Object();
+    private static final Object SYNC = new Object();
     private static List<? extends Device> availableDevices;
     private static int currentDeviceIndex;
     private BitmapText helloText;
@@ -243,7 +243,6 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
             exporter.save(node, file);
             x = true;
         } catch (IOException ex) {
-            // Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Failed to save node!", ex);
             x = false;
         }
         return x;
@@ -347,11 +346,11 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
 
         System.out.println("isGamaCorrection : " + cfg.isGammaCorrection());
 
-        if (openAl) {
+        if (OPENAL) {
             cfg.setAudioRenderer(AppSettings.LWJGL_OPENAL);
         }
 
-        if (opencl) {
+        if (OPENCL) {
             cfg.setOpenCLSupport(true);
             cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
         }
@@ -1296,7 +1295,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
 
         @Override
         public List<? extends Device> chooseDevices(List<? extends Platform> platforms) {
-            synchronized (sync) {
+            synchronized (SYNC) {
                 if (currentDeviceIndex == -1) {
                     return Collections.emptyList();
                 }

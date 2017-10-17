@@ -45,8 +45,7 @@ public abstract class TimedActionControl extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations,
-        //not called when spatial is culled.
+        //
     }
 
     public float getCounter() {

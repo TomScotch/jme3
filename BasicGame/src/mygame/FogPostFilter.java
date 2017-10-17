@@ -44,7 +44,7 @@ public class FogPostFilter extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        //TODO: add code that controls Spatial
+        //
     }
 
     @Override

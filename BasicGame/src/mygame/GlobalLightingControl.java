@@ -80,7 +80,7 @@ public class GlobalLightingControl extends AbstractControl {
 
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
         material.setTexture("Texture", assetManager.loadTexture("Effects/Explosion/flame.png"));
-        material.setFloat("Softness", 3f); // 
+        material.setFloat("Softness", 3f);
 
         //Fire
         fire = new ParticleEmitter("Fire", ParticleMesh.Type.Triangle, 30);
@@ -163,7 +163,6 @@ public class GlobalLightingControl extends AbstractControl {
 
                 fire.setLocalTranslation(sphereGeo.getWorldTranslation());
                 rotation = tpf / timeDelay;
-                //               fire.rotate(0, 0, 0);
                 pivot.rotate(rotation, 0, 0);
                 float z = sphereGeo.getWorldTranslation().getZ();
                 float y = sphereGeo.getWorldTranslation().getY();
@@ -186,7 +185,6 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = false;
                     night = false;
                     if (isSun == false) {
-                        //    localRootNode.removeLight(al);
                         if (sl != null) {
                             slsr.setShadowIntensity(0.25f);
                         }
@@ -232,7 +230,6 @@ public class GlobalLightingControl extends AbstractControl {
                     evening = false;
                     night = true;
                     if (isSun == true) {
-                        //   localRootNode.addLight(al);
                         sun.setEnabled(false);
                         fire.setEnabled(false);
                         fire.killAllParticles();
@@ -294,8 +291,7 @@ public class GlobalLightingControl extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations,
-        //not called when spatial is culled.
+        //
     }
 
     public Vector3f getSunPosition() {

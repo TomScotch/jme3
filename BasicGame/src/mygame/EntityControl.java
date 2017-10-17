@@ -73,12 +73,10 @@ public class EntityControl extends AbstractControl {
 
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
         material.setTexture("Texture", assetManager.loadTexture("Textures/blood/blooddrop1.png"));
-        material.setFloat("Softness", 3f); // 
+        material.setFloat("Softness", 3f);
         hit = new ParticleEmitter("Hit", ParticleMesh.Type.Triangle, 16);
         hit.setMaterial(material);
         hit.setShape(new EmitterSphereShape(Vector3f.ZERO, 2.5f));
-        // hit.setImagesX(2);
-        // hit.setImagesY(2); // 2x2 texture animation
         hit.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f)); // red
         hit.setStartColor(new ColorRGBA(1f, 0f, 0f, 1f)); // red
         hit.setStartSize(0.5f);
@@ -91,12 +89,6 @@ public class EntityControl extends AbstractControl {
         hit.setQueueBucket(RenderQueue.Bucket.Opaque);
         Node n = (Node) this.spatial;
         n.attachChild(hit);
-
-        /*        bcc = new BetterCharacterControl(3, 7, mass);
-        bcc.setSpatial(hostile);
-        hostile.addControl(bcc);
-        bulletState.getPhysicsSpace().add(bcc);s
-        bcc.warp(new Vector3f(pos));*/
         setAnim("Walk", LoopMode.Loop);
         getSkeletonControl().setHardwareSkinningPreferred(false);
         this.spatial.setQueueBucket(RenderQueue.Bucket.Opaque);
@@ -110,15 +102,9 @@ public class EntityControl extends AbstractControl {
         Node localRootNode = (Node) this.spatial.getParent();
         localRootNode.attachChild(hit);*/
         this.spatial.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-
-        // this.spatial.lookAt(new Vector3f(1, 0, 0), Vector3f.UNIT_X);
         lamp = new AmbientLight(ColorRGBA.Red);
-        // lamp.setPosition(new Vector3f(0, 5, 1));
-        //  lamp.setColor(ColorRGBA.Red);
-        //lamp.setRadius(75);
         lamp.setEnabled(false);
         spatial.addLight(lamp);
-        //spatial.addLight(lamp);
 
         BillboardControl billboard = new BillboardControl();
         healthbar = new Geometry("healthbar", new Quad(4f, 0.2f));
@@ -169,8 +155,6 @@ public class EntityControl extends AbstractControl {
                     targetName = "";
                     fighting = false;
                 } else {
-                    //  spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
-                    //   spatial.lookAt(Vector3f.ZERO, Vector3f.UNIT_Z);
                     spatial.lookAt(targetSpatial.getWorldTranslation(), Vector3f.UNIT_Y);
                 }
             } else {
@@ -202,11 +186,6 @@ public class EntityControl extends AbstractControl {
         }
 
         if (deadDelay <= 0) {
-
-            /*            BetterCharacterControl control = this.spatial.
-            getControl(BetterCharacterControl.class);
-            control.getPhysicsSpace().remove(control);
-            this.spatial.removeControl(BetterCharacterControl.class);*/
             this.spatial.removeFromParent();
             this.spatial.removeControl(this);
         }
@@ -290,8 +269,7 @@ public class EntityControl extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations,
-        //not called when spatial is culled.
+        //
     }
 
     private void hitParticles() {

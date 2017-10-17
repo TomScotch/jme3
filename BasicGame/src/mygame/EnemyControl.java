@@ -75,13 +75,11 @@ public class EnemyControl extends AbstractControl {
         path1.addWayPoint(new Vector3f(-15, 2.2f, 7.5f));
         path1.addWayPoint(new Vector3f(0, 2.f, 30));
 
-        //  path1.enableDebugShape(assetManager, localRoot);
         path2.addWayPoint(new Vector3f(-35, 5f, 30));
         path2.addWayPoint(new Vector3f(-50, 5.15f, 7.5f));
         path2.addWayPoint(new Vector3f(-20, 2, 7.5f));
         path2.addWayPoint(new Vector3f(-35, 5f, 30));
 
-        //  path2.enableDebugShape(assetManager, localRoot);
         path3.addWayPoint(new Vector3f(0, 1f, 30));
         path3.addWayPoint(new Vector3f(35, 0.5f, 30));
         path3.addWayPoint(new Vector3f(35, 0.25f, 7.5f));
@@ -119,21 +117,18 @@ public class EnemyControl extends AbstractControl {
                 motionControl1.setDirectionType(MotionEvent.Direction.PathAndRotation);
                 motionControl1.setRotation(new Quaternion().fromAngleNormalAxis(-FastMath.TWO_PI, Vector3f.UNIT_Y));
                 motionControl1.setInitialDuration(10);
-                //motionControl1.setSpeed(0.5f);
                 break;
             case "forestmonster":
                 motionControl2 = new MotionEvent(spa, path);
                 motionControl2.setDirectionType(MotionEvent.Direction.PathAndRotation);
                 motionControl2.setRotation(new Quaternion().fromAngleNormalAxis(-FastMath.TWO_PI, Vector3f.UNIT_Y));
                 motionControl2.setInitialDuration(10);
-                // motionControl2.setSpeed(0.25f);
                 break;
             case "spider":
                 motionControl3 = new MotionEvent(spa, path);
                 motionControl3.setDirectionType(MotionEvent.Direction.PathAndRotation);
                 motionControl3.setRotation(new Quaternion().fromAngleNormalAxis(-FastMath.TWO_PI, Vector3f.UNIT_Y));
                 motionControl3.setInitialDuration(10);
-                //motionControl3.setSpeed(0.75f);
                 break;
         }
 
@@ -307,21 +302,13 @@ public class EnemyControl extends AbstractControl {
         spider = (Spatial) new Node();
         forestmonster = (Spatial) new Node();
 
-        // spider.removeControl(EntityControl.class);
-        // forestmonster.removeControl(EntityControl.class);
         playing2 = false;
         playing3 = false;
-        /*        motionControl2.stop();
-        motionControl3.stop();
-        ec2 = null;
-        ec3 = null;
-        motionControl2 = null;
-        motionControl3 = null;*/
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations
+        //
     }
 
 }

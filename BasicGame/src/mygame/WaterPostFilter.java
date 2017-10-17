@@ -50,8 +50,6 @@ public class WaterPostFilter extends AbstractControl {
         water.setUseRipples(ripples);
         this.dynamicLighting = dynamicLight;
         this.dynamicWater = dynamicWater;
-        // water.setWaterTransparency(1f);
-        //water.setColorExtinction(new Vector3f(30f, 20f, 10f));
     }
 
     @Override
@@ -84,7 +82,7 @@ public class WaterPostFilter extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //throw new UnsupportedOperationException("Not supported yet.");
+        //
     }
 
     public boolean isDynamicWater() {

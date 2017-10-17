@@ -51,8 +51,6 @@ public class WeatherControl extends AbstractControl {
 
     private final int cloudThickness = 350; // 400
 
-    //private final int lightningFrequency = 100; // 360
-    //private final int lightningVoloume = 10; // 180
     private float rainStrength = 800; // 3000
     private float rainThickness = 4000; // 6000
 
@@ -125,7 +123,6 @@ public class WeatherControl extends AbstractControl {
         rain.setParticlesPerSec(0);
         rain.setFacingVelocity(false);
         rain.setLocalTranslation(0, 50, 0);
-        //rain.setQueueBucket(RenderQueue.Bucket.Translucent);
         rain.center();
         this.localRoot.attachChild(rain);
 
@@ -162,7 +159,6 @@ public class WeatherControl extends AbstractControl {
         debrisEffect.setInWorldSpace(true);
         debrisEffect.setFacingVelocity(false);
         debrisEffect.setShape(new EmitterSphereShape(Vector3f.ZERO, 64));
-        //debrisEffect.setQueueBucket(RenderQueue.Bucket.Opaque);
         debrisEffect.getWorldTranslation().set(0, 6, 0);
         this.localRoot.attachChild(debrisEffect);
 
@@ -330,7 +326,6 @@ public class WeatherControl extends AbstractControl {
 
             counter += tpf;
 
-            //clouds.setGravity(((tpf / (glc.getTimeDelay() / 4)) * 200) + 0.15f, 0, 0);
             if (counter >= limit) {
                 counter = 0;
                 startRandomWeather();
@@ -431,7 +426,6 @@ public class WeatherControl extends AbstractControl {
                         flash.emitParticles(getRandomNumberInRange(1, 1));
                     }
 
-                    // for (Particle p : flash.getParticles()) {
                     Particle p = flash.getParticles()[0];
                     Node n = new Node();
                     Spatial spat = (Spatial) n;
@@ -485,12 +479,7 @@ public class WeatherControl extends AbstractControl {
                 if (spatial != null) {
                     if (spatial.getControl(FogPostFilter.class) != null) {
                         Node n = (Node) spatial;
-
-                        /*                        if (!n.getChild("sunNode").getControl(GlobalLightingControl.class).getIsSun()) {
-                        spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.Gray);
-                        } else {
-                        spatial.getControl(FogPostFilter.class).getFog().setFogColor(ColorRGBA.LightGray);
-                        }*/
+                        
                         if (misty_high) {
                             if (spatial.getControl(FogPostFilter.class).getFog().getFogDistance() <= fogDistance / 1.25f) {
                                 spatial.getControl(FogPostFilter.class).getFog().setFogDistance(spatial.getControl(FogPostFilter.class).getFog().getFogDistance() + (tpf * fogDistance));

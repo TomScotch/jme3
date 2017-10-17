@@ -37,12 +37,12 @@ public class AnisotropyControl extends AbstractControl {
 
             @Override
             public void assetLoaded(AssetKey key) {
-                //throw new UnsupportedOperationException("Not supported yet.");
+                //
             }
 
             @Override
             public void assetDependencyNotFound(AssetKey parentKey, AssetKey dependentAssetKey) {
-                //throw new UnsupportedOperationException("Not supported yet.");
+                //
             }
         };
         assetManager.addAssetEventListener(asl);

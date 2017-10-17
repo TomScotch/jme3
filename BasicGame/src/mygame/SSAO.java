@@ -26,14 +26,12 @@ public class SSAO extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        //TODO: add code that controls Spatial,
-        //e.g. spatial.rotate(tpf,tpf,tpf);
+        //
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations,
-        //not called when spatial is culled.
+        //
     }
 
     public float getIntensity() {

@@ -14,7 +14,6 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
-import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -25,6 +24,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.BloomFilter;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
@@ -43,10 +43,6 @@ import java.util.Random;
 
 public class GameRunningState extends AbstractAppState {
 
-    private final Spatial teapot;
-    // private final BitmapText ch;
-    private final Picture pic;
-
     public AudioNode getLightRain() {
         return lightRain;
     }
@@ -60,7 +56,6 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private BitmapText healthText;
-    private BitmapFont guiFont;
     private boolean noWide;
 
     public void setConsole(Console console) {
@@ -85,19 +80,11 @@ public class GameRunningState extends AbstractAppState {
     private final AudioNode amb;
     private final AudioNode amb1;
     private final AudioNode amb2;
-
     private final AudioNode lightRain;
     private final AudioNode normalRain;
     private final AudioNode heavyRain;
-
     private final int ambienceVolume = 3;
-
-    private WeatherControl weatherControl;
-    private final SkyControl sc;
-    private final Terrain terrainControl;
-
     private final ViewPort view2;
-
     private final ViewPort viewPort;
     private final Node rootNode;
     private final Node guiNode;
@@ -106,15 +93,10 @@ public class GameRunningState extends AbstractAppState {
     private final Node localGuiNode = new Node("Game Screen GuiNode");
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
-
-    private final PlayerControl playerControl;
     private boolean isRunning = false;
-
     private boolean bgmOn = false;
     private int bgmVolume = 8;
     private int anisotrpy_samples = 4;
-    private GlobalLightingControl glc;
-
     private boolean bloomEnabled;
     private boolean fogEnabled;
     private boolean lightScatterEnabled;
@@ -122,23 +104,42 @@ public class GameRunningState extends AbstractAppState {
     private boolean waterPostProcessing;
     private final boolean globalLightningEnabled;
     private final boolean shadows;
-
     private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
 
     private float counter = 0;
     private float limit = 0;
     private final DepthOfField dof;
-    // private final SSAO ssao;
+    private final Spatial teapot;
+    private final Picture pic;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
     private List<Float> fps;
     private BitmapText hudText2;
     private Vector2f minMaxFps;
     private final AppStateManager stateManager;
-    private EnemyControl enemyControl;
     private float health = 100;
     private final int birdLimit = 29;
+
+    private BloomFilter bloom;
+    private float density = 2f;//2
+    private float sampling = 1f;//1
+    private float blurScale = 1.5f;//1.5f
+    private float exposurePower = 5f;//5
+    private float cutOff = 0.1f; // 0.1 - 1.0
+
+    // private final SSAO ssao;
+    private WeatherControl weatherControl;
+    private final SkyControl sc;
+    private final Terrain terrainControl;
+    private final PlayerControl playerControl;
+    private GlobalLightingControl glc;
+    private EnemyControl enemyControl;
+    private LightScatterFilter lightScatterFilter;
+    private final PosterizationFilterControl posterizationFilterControl;
+    private final CameraCollisionControl cc;
+    private WaterPostFilter wpf;
+    private simpleWaterControl swc;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -221,6 +222,8 @@ public class GameRunningState extends AbstractAppState {
         Node player = new Node("playerNode");
         player.addControl(playerControl);
         localRootNode.attachChild(player);
+        cc = new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, playerControl);
+        localRootNode.addControl(cc);
         localRootNode.getControl(CameraCollisionControl.class).setEnabled(false);
 
 //      SUN
@@ -237,15 +240,18 @@ public class GameRunningState extends AbstractAppState {
 //      LightScatter
         if (lightScatterEnabled) {
 
+            lightScatterFilter = new LightScatterFilter(fpp, glc, true);
+
             if (localRootNode.getControl(LightScatterFilter.class) == null) {
-                localRootNode.addControl(new LightScatterFilter(fpp, glc, true));
+                localRootNode.addControl(lightScatterFilter);
             }
         }
 
 //      FOG
         if (fogEnabled) {
+            FogPostFilter fogPostFilter = new FogPostFilter(fpp);
             if (localRootNode.getControl(FogPostFilter.class) == null) {
-                localRootNode.addControl(new FogPostFilter(fpp));
+                localRootNode.addControl(fogPostFilter);
             }
         }
 
@@ -264,7 +270,8 @@ public class GameRunningState extends AbstractAppState {
         }
 
 //      PosterizationFilter
-        localRootNode.addControl(new PosterizationFilterControl(fpp));
+        posterizationFilterControl = new PosterizationFilterControl(fpp);
+        localRootNode.addControl(posterizationFilterControl);
 
         //Depth of Field
         dof = new DepthOfField(fpp, app.getContext(), viewPort, assetManager);
@@ -272,9 +279,13 @@ public class GameRunningState extends AbstractAppState {
 
 //      Bloom
         if (bloomEnabled) {
-            if (localRootNode.getControl(BloomPostFilter.class) == null) {
-                localRootNode.addControl(new BloomPostFilter(fpp));
-            }
+            bloom = new BloomFilter(BloomFilter.GlowMode.SceneAndObjects);
+            bloom.setExposureCutOff(cutOff);
+            bloom.setBloomIntensity(density);
+            bloom.setDownSamplingFactor(sampling);
+            bloom.setBlurScale(blurScale);
+            bloom.setExposurePower(exposurePower);
+            fpp.addFilter(bloom);
         }
 
         //Screen Space Ambient Occlusion
@@ -288,7 +299,6 @@ public class GameRunningState extends AbstractAppState {
 
         view2 = app.getRenderManager().createMainView("Bottom Left", cam2);
         view2.setClearFlags(true, true, true);
-        //view2.attachScene(localRootNode);
         view2.setEnabled(false);
 
         //Audio
@@ -344,7 +354,6 @@ public class GameRunningState extends AbstractAppState {
     }
 
     private void setupHudText() {
-        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         localGuiNode.attachChild(pic);
         hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
         hudText.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 1.75f);      // font size
@@ -357,9 +366,7 @@ public class GameRunningState extends AbstractAppState {
         hudText2 = new BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt"), false);
         hudText2.setSize(assetManager.loadFont("Interface/Fonts/Console.fnt").getCharSet().getRenderedSize() * 2.25f);      // font size
         hudText2.setColor(ColorRGBA.Red);
-        // hudText2.setText("... : ...");
         hudText2.setLocalTranslation((viewPort.getCamera().getWidth() / 2) - 60, hudText2.getLineHeight() * 3, 0); // position
-        // hudText2.setAlpha(-2);
         localGuiNode.attachChild(hudText2);
 
         healthText = new BitmapText(assetManager.loadFont("Interface/Fonts/Lato.fnt"), false);
@@ -394,7 +401,6 @@ public class GameRunningState extends AbstractAppState {
 
             bird.setLocalTranslation(getRandomNumberInRange(-512, 512), getRandomNumberInRange(100, 150), getRandomNumberInRange(-512, 512));
 
-            //bird.lookAt(new Vector3f(getRandomNumberInRange(0, 32), 0, getRandomNumberInRange(0, 32)), Vector3f.UNIT_Y);
             WildLifeControl wildlifeControl = new WildLifeControl(glc);
 
             bird.addControl(wildlifeControl);
@@ -403,7 +409,6 @@ public class GameRunningState extends AbstractAppState {
             bird.setShadowMode(RenderQueue.ShadowMode.Cast);
             localRootNode.attachChild(bird);
             wildlifeControl.setAnim("fly", LoopMode.Loop);
-            // bird.scale(getRandomNumberInRange(0, 1) - 0.5f);
         }
     }
 
@@ -440,11 +445,13 @@ public class GameRunningState extends AbstractAppState {
         //      WATER
         if (waterPostProcessing) {
             if (localRootNode.getControl(WaterPostFilter.class) == null) {
-                localRootNode.addControl(new WaterPostFilter(fpp, glc, true, false, false, false, false, false, true, true));
+                wpf = new WaterPostFilter(fpp, glc, true, false, false, false, false, false, true, true);
+                localRootNode.addControl(wpf);
             }
         } else {
             if (localRootNode.getControl(simpleWaterControl.class) == null) {
-                localRootNode.addControl(new simpleWaterControl((SimpleApplication) app, localRootNode));
+                swc = new simpleWaterControl((SimpleApplication) app, localRootNode);
+                localRootNode.addControl(swc);
             }
         }
 
@@ -560,7 +567,6 @@ public class GameRunningState extends AbstractAppState {
                                 enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
                                 localRootNode.addControl(enemyControl);
                                 enemyControl.setEnabled(true);
-                                //   enemyControl.remAllEnemys();
                             } else if (localRootNode.hasChild(terrainControl.getTerrain())) {
                                 terrainControl.getTerrain().removeFromParent();
                                 localRootNode.attachChild(teapot);
@@ -570,7 +576,6 @@ public class GameRunningState extends AbstractAppState {
                                 enemyControl.remAllEnemys();
                                 enemyControl.setEnabled(false);
                                 localRootNode.removeControl(enemyControl);
-                                //enemyControl = null;
                             }
                         }
                     }
@@ -666,7 +671,6 @@ public class GameRunningState extends AbstractAppState {
             exporter.save(node, file);
         } catch (IOException ex) {
             System.out.println("Failed to save node!");
-            // Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Failed to save node!", ex);
         }
         playerControl.attachChaseCam();
     }
@@ -690,17 +694,6 @@ public class GameRunningState extends AbstractAppState {
             if (playerControl != null) {
                 if (!playerControl.isDead()) {
 
-                    /*                    if (playerControl.isSprinting()) {
-                    if (playerControl.getStamina() >= 0) {
-                    hudText2.setText(Float.toString(playerControl.getStamina()));
-                    } else {
-                    hudText2.setText("0");
-                    }
-                    } else {
-                    if (!isTimeDemo && !playerControl.isRecovering()) {
-                    hudText2.setText("... : ...");
-                    }
-                    }*/
                     if (playerControl.getStamina() >= 0) {
                         if (playerControl.getStamina() >= 99 && playerControl.getStamina() > 75) {
                             hudText2.setText(">>>>>");
@@ -722,31 +715,6 @@ public class GameRunningState extends AbstractAppState {
                         }
                     }
 
-                    /*                    if (playerControl.isRecovering()) {
-                    if (playerControl.getStamina() >= 0) {
-                    if (playerControl.getStamina() < 100 && playerControl.getStamina() > 75) {
-                    hudText2.setText(">>>>");
-                    }
-                    if (playerControl.getStamina() < 75 && playerControl.getStamina() > 50) {
-                    hudText2.setText(">>>");
-                    }
-                    if (playerControl.getStamina() < 50 && playerControl.getStamina() > 25) {
-                    hudText2.setText(">>");
-                    }
-                    if (playerControl.getStamina() < 25 && playerControl.getStamina() > 0) {
-                    hudText2.setText(">");
-                    }
-                    } else {
-                    hudText2.setText("");
-                    }
-                    } else {
-                    if (!isTimeDemo && !playerControl.isSprinting()) {
-                    hudText2.setText("... : ...");
-                    }
-                    }*/
- /*                    if (playerControl.isRotating()) {
-                    pic.removeFromParent();
-                    }*/
                     if (playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()) {
 
                         if (stateManager.getState(VideoRecorderAppState.class) == null) {
@@ -821,30 +789,10 @@ public class GameRunningState extends AbstractAppState {
                     minMaxFps = new Vector2f(fps.get(fps.size() - 1), fps.get(0));
                     console.clear();
                     console.output("min : " + (int) minMaxFps.getX() + " max : " + (int) minMaxFps.getY() + " avg : " + (int) (t / fps.size()));
-                    // console.output("finished Timedemo");
                     fps = new ArrayList<>();
-                    //console.output(hudText2.getText());
-
-                    /*  if (hudText2.getControl(TimedActionControl.class) != null) {
-                        hudText2.removeControl(TimedActionControl.class);
-                    }*/
-
- /*                    hudText2.addControl(new TimedActionControl(15) {
-                    @Override
-                    void action() {
-                    if (!isTimeDemo) {
-                    if (fps.size() >= 500) {
-                    hudText2.setText("... : ...");
-                    }
-                    }
-                    }
-                    });*/
                 }
             }
 
-            /*            if (hudText.getAlpha() >= -2 && hudText.getAlpha() <= 2) {
-            hudText.setAlpha(hudText.getAlpha() + (1 / tpf));
-            }*/
             if (globalLightningEnabled) {
                 if (view2.isEnabled()) {
                     cam2.setLocation(glc.getSunPosition());
@@ -919,7 +867,6 @@ public class GameRunningState extends AbstractAppState {
     public void stateAttach() {
 
         setupHudText();
-        //hudText2.setText("... : ...");
         glc.setEnabled(true);
         playerControl.setEnabled(true);
         sc.setEnabled(true);
@@ -975,7 +922,6 @@ public class GameRunningState extends AbstractAppState {
         hudText.removeFromParent();
         hudText2.removeFromParent();
         healthText.removeFromParent();
-        //hudText2.setText("... : ...");
 
         amb.stop();
         amb1.stop();

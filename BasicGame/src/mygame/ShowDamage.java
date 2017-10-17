@@ -18,7 +18,6 @@ public class ShowDamage extends AbstractControl {
     public ShowDamage(AssetManager assetManager, String val, Node n) {
         BitmapFont fnt = assetManager.loadFont("Interface/Fonts/Default.fnt");
         txt = new BitmapText(fnt, false);
-        //txt.setBox(new Rectangle(0, 0, 1f, 1f));
         txt.setQueueBucket(RenderQueue.Bucket.Transparent);
         txt.setSize(1f);
         txt.center();
@@ -45,7 +44,7 @@ public class ShowDamage extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations,
+        //
     }
 
 }
