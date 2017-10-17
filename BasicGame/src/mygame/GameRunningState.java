@@ -6,12 +6,16 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.app.state.VideoRecorderAppState;
+import com.jme3.asset.AssetEventListener;
+import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetManager;
+import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.collision.CollisionResults;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.font.BitmapText;
@@ -21,6 +25,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -127,7 +132,8 @@ public class GameRunningState extends AbstractAppState {
     private float blurScale = 1.5f;//1.5f
     private float exposurePower = 5f;//5
     private float cutOff = 0.1f; // 0.1 - 1.0
-
+    private AssetEventListener asl;
+    private int samples = 4;
     // private final SSAO ssao;
     private WeatherControl weatherControl;
     private final SkyControl sc;
@@ -137,7 +143,6 @@ public class GameRunningState extends AbstractAppState {
     private EnemyControl enemyControl;
     private LightScatterFilter lightScatterFilter;
     private final PosterizationFilterControl posterizationFilterControl;
-    private final CameraCollisionControl cc;
     private WaterPostFilter wpf;
     private simpleWaterControl swc;
 
@@ -222,9 +227,6 @@ public class GameRunningState extends AbstractAppState {
         Node player = new Node("playerNode");
         player.addControl(playerControl);
         localRootNode.attachChild(player);
-        cc = new CameraCollisionControl(bulletAppState, app.getCamera(), localRootNode, playerControl);
-        localRootNode.addControl(cc);
-        localRootNode.getControl(CameraCollisionControl.class).setEnabled(false);
 
 //      SUN
         Node sunNode = new Node("sunNode");
@@ -266,7 +268,29 @@ public class GameRunningState extends AbstractAppState {
 
 //      ANISOTROPY
         if (anisotropyEnabled) {
-            localRootNode.addControl(new AnisotropyControl(assetManager, 2));
+
+            asl = new AssetEventListener() {
+
+                @Override
+                public void assetLoaded(AssetKey key) {
+                    //
+                }
+
+                @Override
+                public void assetRequested(AssetKey key) {
+                    if (key.getExtension().equals("png") || key.getExtension().equals("jpg") || key.getExtension().equals("dds")) {
+                        TextureKey tkey = (TextureKey) key;
+                        tkey.setAnisotropy(samples);
+                    }
+                }
+
+                @Override
+                public void assetDependencyNotFound(AssetKey parentKey, AssetKey dependentAssetKey) {
+                    //
+                }
+
+            };
+            assetManager.addAssetEventListener(asl);
         }
 
 //      PosterizationFilter
@@ -454,8 +478,6 @@ public class GameRunningState extends AbstractAppState {
                 localRootNode.addControl(swc);
             }
         }
-
-        localRootNode.getControl(CameraCollisionControl.class).setEnabled(true);
 
         if (weatherEnabled) {
             weatherControl.setEnabled(true);
@@ -681,6 +703,54 @@ public class GameRunningState extends AbstractAppState {
         if (isRunning) {
 
             super.update(tpf);
+
+            Ray ray1 = new Ray(viewPort.getCamera().getLocation(), viewPort.getCamera().getDirection());
+            CollisionResults results1 = new CollisionResults();
+            localRootNode.collideWith(ray1, results1);
+            if (results1.size() > 0) {
+                if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+
+                    if (results1.getClosestCollision().getDistance() < 16f) {
+                        playerControl.getChaseCam().setMaxDistance((playerControl.getChaseCam().getMaxDistance() - (tpf * 115)));
+                    }
+                } else {
+                    playerControl.getChaseCam().setMaxDistance(30);
+                }
+            } else {
+                playerControl.getChaseCam().setMaxDistance(30);
+            }
+
+            ray1 = new Ray(viewPort.getCamera().getLocation(), Vector3f.UNIT_X);
+            results1 = new CollisionResults();
+            localRootNode.collideWith(ray1, results1);
+            if (results1.size() > 0) {
+                if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+
+                    if (results1.getClosestCollision().getDistance() < 16f) {
+                        playerControl.getChaseCam().setMaxDistance((playerControl.getChaseCam().getMaxDistance() - (tpf * 115)));
+                    }
+                } else {
+                    playerControl.getChaseCam().setMaxDistance(30);
+                }
+            } else {
+                playerControl.getChaseCam().setMaxDistance(30);
+            }
+
+            ray1 = new Ray(viewPort.getCamera().getLocation(), Vector3f.UNIT_X.negate());
+            results1 = new CollisionResults();
+            localRootNode.collideWith(ray1, results1);
+            if (results1.size() > 0) {
+                if (results1.getClosestCollision().getGeometry().getName().contains("terrain")) {
+
+                    if (results1.getClosestCollision().getDistance() < 16f) {
+                        playerControl.getChaseCam().setMaxDistance((playerControl.getChaseCam().getMaxDistance() - (tpf * 115)));
+                    }
+                } else {
+                    playerControl.getChaseCam().setMaxDistance(30);
+                }
+            } else {
+                playerControl.getChaseCam().setMaxDistance(30);
+            }
 
             if (glc.isNight()) {
 
