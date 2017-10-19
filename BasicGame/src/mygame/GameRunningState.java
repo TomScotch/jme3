@@ -42,13 +42,19 @@ import com.jme3.post.filters.DepthOfFieldFilter;
 import com.jme3.post.filters.FogFilter;
 import com.jme3.post.filters.LightScatteringFilter;
 import com.jme3.post.filters.PosterizationFilter;
+import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainPatch;
+import com.jme3.terrain.geomipmap.TerrainQuad;
+import com.jme3.terrain.heightmap.AbstractHeightMap;
+import com.jme3.terrain.heightmap.ImageBasedHeightMap;
+import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
 import com.jme3.water.SimpleWaterProcessor;
 import com.jme3.water.WaterFilter;
@@ -172,10 +178,19 @@ public class GameRunningState extends AbstractAppState {
     private boolean refraction = true;
     private boolean ripples = true;
 
-    // private final SSAO ssao;
+    private final float ssaoSampleRadius = 0.5f; // 5.1f 12.94f, 
+    private final float ssaoIntensity = 0.5f; // 1.2f 43.92f, 
+    private final float ssaoScale = 0.2f;// 0.2f 0.33f, 
+    private final float ssaoBias = 0.3f; // 0.1f 0.61f
+    private final boolean approximateNormals = true;
+    private SSAOFilter ssaoFilter;
+    private boolean ssaoEnabled = false;
+
+    private TerrainQuad terrain;
+    private AbstractHeightMap heightmap;
+
     private GlobalLightingControl glc;
     private final SkyControl sc;
-    private final Terrain terrainControl;
     private final PlayerControl playerControl;
     private EnemyControl enemyControl;
     private simpleWaterControl swc;
@@ -195,7 +210,7 @@ public class GameRunningState extends AbstractAppState {
         this.weatherEnabled = true;
         this.stateManager = app.getStateManager();
 
-//      CONSTRUKTOR
+        //CONSTRUKTOR
         this.rootNode = app.getRootNode();
         this.viewPort = app.getViewPort();
         this.guiNode = app.getGuiNode();
@@ -205,26 +220,41 @@ public class GameRunningState extends AbstractAppState {
         fps = new ArrayList<>();
         fpp = new FilterPostProcessor(assetManager);
 
-//      PHYSICS STATE
+        //PHYSICS STATE
         bulletAppState = new BulletAppState();
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setEnabled(false);
         bulletAppState.setDebugEnabled(false);
 
-//      CAMERA        
+        //CAMERA        
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
 
-//      TERRAIN
-        terrainControl = new Terrain(assetManager, bulletAppState, localRootNode, viewPort);
-        Node terrainNode = new Node("terrainNode");
-        terrainNode.addControl(terrainControl);
-        localRootNode.attachChild(terrainNode);
-//      FOV
+        //TERRAIN
+        Texture heightMapImage = assetManager.loadTexture("Textures/Terrain/splat/mountains512.png");
+        heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 0.275f);
+        heightmap.load();
+        terrain = new TerrainQuad("terrain", 65, 513, heightmap.getHeightMap());
+        Material sphereMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        Texture diff = assetManager.loadTexture("Textures/Terrain/splat/dirt.jpg");
+        diff.setWrap(Texture.WrapMode.Repeat);
+        sphereMat.setTexture("DiffuseMap", diff);
+        Texture norm = assetManager.loadTexture("Textures/Terrain/splat/dirt_normal.png");
+        norm.setWrap(Texture.WrapMode.Repeat);
+        sphereMat.setTexture("NormalMap", norm);
+        terrain.setMaterial(sphereMat);
+        TerrainLodControl control = new TerrainLodControl(terrain, viewPort.getCamera());
+        terrain.addControl(control);
+        terrain.setLocalTranslation(-164.0f, -3.75f, 8.9f);
+        terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
+        RigidBodyControl rb = new RigidBodyControl(0);
+        terrain.addControl(rb);
+        bulletAppState.getPhysicsSpace().addAll(terrain);
+        localRootNode.attachChild(terrain);
+        rb.setFriction(1);
 
+        //FOV
         String xy = String.valueOf(viewPort.getCamera().getWidth()) + "x" + String.valueOf(viewPort.getCamera().getHeight());
-
         noWide = false;
-
         switch (xy) {
             case "320x240":
                 noWide = true;
@@ -255,25 +285,25 @@ public class GameRunningState extends AbstractAppState {
                 break;
         }
 
-//      PLAYER
+        //PLAYER
         playerControl = new PlayerControl(app, bulletAppState, localRootNode, noWide);
         playerControl.getPhysicsCharacter().setEnabled(false);
         Node player = new Node("playerNode");
         player.addControl(playerControl);
         localRootNode.attachChild(player);
 
-//      SUN
+        //SUN
         Node sunNode = new Node("sunNode");
         glc = new GlobalLightingControl(viewPort, assetManager, playerControl.getLamp(), localRootNode);
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
 
-//      SKY
+        //SKY
         sc = new SkyControl(assetManager, glc, localRootNode);
         localRootNode.addControl(sc);
 
-//      LightScatter
+        //LightScatter
         if (lightScatterEnabled) {
             sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
             sunlight.setLightDensity(lightScatterFilterDensity);
@@ -281,7 +311,7 @@ public class GameRunningState extends AbstractAppState {
             fpp.addFilter(sunlight);
         }
 
-//      FOG
+        //FOG
         if (fogEnabled) {
             fog = new FogFilter();
             fog.setFogColor(ColorRGBA.Gray);
@@ -290,7 +320,7 @@ public class GameRunningState extends AbstractAppState {
             fpp.addFilter(fog);
         }
 
-        //      Weather
+        //Weather
         if (weatherEnabled) {
             weatherLimit = getLimit();
             flash = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 8);
@@ -379,7 +409,7 @@ public class GameRunningState extends AbstractAppState {
             sun.setColor(ColorRGBA.White);
         }
 
-//      ANISOTROPY
+        //ANISOTROPY
         if (anisotropyEnabled) {
 
             asl = new AssetEventListener() {
@@ -406,7 +436,7 @@ public class GameRunningState extends AbstractAppState {
             assetManager.addAssetEventListener(asl);
         }
 
-//      PosterizationFilter
+        //PosterizationFilter
         pf = new PosterizationFilter();
         pf.setNumColors(8);
         fpp.addFilter(pf);
@@ -417,7 +447,7 @@ public class GameRunningState extends AbstractAppState {
         dofFilter.setBlurScale(scale);
         fpp.addFilter(dofFilter);
 
-//      Bloom
+        //Bloom
         if (bloomEnabled) {
             bloom = new BloomFilter(BloomFilter.GlowMode.SceneAndObjects);
             bloom.setExposureCutOff(cutOff);
@@ -429,8 +459,12 @@ public class GameRunningState extends AbstractAppState {
         }
 
         //Screen Space Ambient Occlusion
-        //ssao = new SSAO(assetManager, fpp);
-        //localRootNode.addControl(ssao);
+        if (ssaoEnabled) {
+            ssaoFilter = new SSAOFilter(ssaoSampleRadius, ssaoIntensity, ssaoScale, ssaoBias);
+            ssaoFilter.setApproximateNormals(approximateNormals);
+            fpp.addFilter(ssaoFilter);
+        }
+
         //Second Camera View
         cam2 = app.getCamera().clone();
         cam2.setViewPort(0f, 0.5f, 0f, 0.5f);
@@ -581,7 +615,7 @@ public class GameRunningState extends AbstractAppState {
         inputManager.setCursorVisible(false);
         bulletAppState.setEnabled(true);
 
-        //      WATER
+        //WATER
         if (waterPostProcessing) {
             water = new WaterFilter((Node) localRootNode, new Vector3f(0, 0, 0));
             water.setWaterHeight(initialWaterHeight);
@@ -697,19 +731,19 @@ public class GameRunningState extends AbstractAppState {
                         if (!isTimeDemo) {
                             if (localRootNode.getChild("scene") != null) {
                                 teapot.removeFromParent();
-                                bulletAppState.getPhysicsSpace().addAll(terrainControl.getTerrain());
+                                bulletAppState.getPhysicsSpace().addAll(terrain);
                                 bulletAppState.getPhysicsSpace().removeAll(teapot);
                                 playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
-                                localRootNode.attachChild(terrainControl.getTerrain());
+                                localRootNode.attachChild(terrain);
                                 enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
                                 localRootNode.addControl(enemyControl);
                                 enemyControl.setEnabled(true);
-                            } else if (localRootNode.hasChild(terrainControl.getTerrain())) {
-                                terrainControl.getTerrain().removeFromParent();
+                            } else if (localRootNode.hasChild(terrain)) {
+                                terrain.removeFromParent();
                                 localRootNode.attachChild(teapot);
                                 playerControl.getPhysicsCharacter().warp(new Vector3f(0, 6, 0));
                                 bulletAppState.getPhysicsSpace().addAll(teapot);
-                                bulletAppState.getPhysicsSpace().removeAll(terrainControl.getTerrain());
+                                bulletAppState.getPhysicsSpace().removeAll(terrain);
                                 enemyControl.remAllEnemys();
                                 enemyControl.setEnabled(false);
                                 localRootNode.removeControl(enemyControl);
@@ -1313,7 +1347,7 @@ public class GameRunningState extends AbstractAppState {
         playerControl.setupListener();
         playerControl.setupMappings();
         view2.attachScene(localRootNode);
-        if (localRootNode.hasChild(terrainControl.getTerrain())) {
+        if (localRootNode.hasChild(terrain)) {
             localRootNode.addControl(enemyControl);
             enemyControl.setEnabled(true);
         }
