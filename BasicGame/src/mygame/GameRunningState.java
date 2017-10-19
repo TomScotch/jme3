@@ -1005,13 +1005,14 @@ public class GameRunningState extends AbstractAppState {
                 waterProcessor.setWaveSpeed(waterSpeed);
             }
 
-            if (dynamicLighting) {
+            if (lightScatterEnabled) {
                 if (!glc.isNight()) {
                     sunlight.setEnabled(true);
                     sunlight.setLightPosition(glc.getSunPosition());
                 } else {
                     sunlight.setEnabled(false);
                 }
+
             }
 
             Ray ray = new Ray(viewPort.getCamera().getLocation(), viewPort.getCamera().getDirection());
@@ -1138,7 +1139,7 @@ public class GameRunningState extends AbstractAppState {
                     spat.setLocalTranslation((p.position));
                     spat.lookAt(Vector3f.ZERO, Vector3f.UNIT_XYZ);
 
-                    DirectionalLight clone = new DirectionalLight();
+                    final DirectionalLight clone = new DirectionalLight();
                     clone.setColor(ColorRGBA.White);
                     clone.setDirection(spat.getLocalRotation().getRotationColumn(2));
                     localRootNode.addLight(clone);

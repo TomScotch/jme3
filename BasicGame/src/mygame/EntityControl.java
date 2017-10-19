@@ -59,17 +59,18 @@ public class EntityControl extends AbstractControl {
         this.pc = pc;
         hostile.setShadowMode(RenderQueue.ShadowMode.Cast);
 
-        switch (spatial.getName()) {
-            case "bear":
-                damage = 0;
-                break;
-            case "spider":
-                damage = 15;
-                break;
-            default:
-                damage = 20;
-                break;
-        }
+        /*        switch (spatial.getName()) {
+        case "bear":
+        damage = 0;
+        break;
+        case "spider":
+        damage = 15;
+        break;
+        default:
+        damage = 20;
+        break;
+        }*/
+        damage = 15;
 
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
         material.setTexture("Texture", assetManager.loadTexture("Textures/blood/blooddrop1.png"));

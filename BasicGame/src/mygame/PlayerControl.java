@@ -41,55 +41,20 @@ import com.jme3.system.JmeContext;
 
 public class PlayerControl extends AbstractControl {
 
-    private final float stamina_Recover_Value = 25;
-
-    public float getStamina() {
-        return stamina;
-    }
-
-    private boolean isRecovering = false;
-
-    public float getRotationModifier() {
-        return rotationModifier;
-    }
-
-    public void setRotationModifier(float rotationModifier) {
-        this.rotationModifier = rotationModifier;
-    }
-
-    public boolean isDead() {
-        return dead;
-    }
-
-    public void setDead(boolean dead) {
-        this.dead = dead;
-    }
-
-    public float getHealth() {
-        return health;
-    }
-
-    public void setHealth(float health) {
-        this.health = health;
-    }
-
     private final SkeletonControl skelCon;
     private final AudioNode footsteps;
     private final AudioNode hit;
-
     private final ViewPort viewPort;
     private final AssetManager assetManager;
     private final InputManager inputManager;
     private final BulletAppState bulletAppState;
     public boolean chaseEnabled = true;
-
     private final CameraNode camNode;
     private final float gravity = -9.81f;
     private final float playerMass = 75f;
     private final float jump_Speed = 500f;
     private final float chaseCamRotationSpeed = 0.375f;
     private final SpotLight lamp;
-
     private final Vector3f walkDirection = new Vector3f(0, 0, 0);
     private final Vector3f viewDirection = new Vector3f(0, 0, 0);
     private final float move_speed = 0.1f;
@@ -109,7 +74,6 @@ public class PlayerControl extends AbstractControl {
     private final float outerLamp = 15 * FastMath.PI;
     private final float innerLamp = 15 * FastMath.HALF_PI;
     private final ColorRGBA flashLightColor = ColorRGBA.Orange.mult(flashLightStrength).add(ColorRGBA.LightGray);
-
     boolean leftRotate = false, rightRotate = false, leftStrafe = false, rightStrafe = false, forward = false, backward = false;
     private final Node localRootNode;
     private final AnimControl aniCon;
@@ -119,7 +83,6 @@ public class PlayerControl extends AbstractControl {
     private float idleCounter = 0;
     private final JmeContext context;
     private final float idleTimeOutValue = 90f;
-
     private float health = 100;
     private boolean dead = false;
     private final float armor = 10;
@@ -139,6 +102,7 @@ public class PlayerControl extends AbstractControl {
     private boolean noWide;
     private final float sprintModifier = 1.75f;
     private boolean isSprinting = false;
+    private final float stamina_Recover_Value = 25;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode, boolean noWide) {
 
@@ -236,6 +200,189 @@ public class PlayerControl extends AbstractControl {
         healthbar.move(5, 9, 0);
         healthbar.addControl(billboard);
         characterNode.getLocalTranslation().addLocal(60, 3, -10);
+    }
+
+    private float hitAnimationDelay = 0;
+
+    @Override
+    protected void controlUpdate(float tpf) {
+
+        if (isEnabled()) {
+
+            if (!dead) {
+
+                underAttackTimer -= tpf;
+
+                underAttack = underAttackTimer > 0;
+
+                if (!underAttack) {
+                    if (getHealth() < 100) {
+                        if ((getHealth() + 10) < 100) {
+                            underAttackTimer = underAttackTimerVal / 2;
+                            setHealth(getHealth() + 10);
+                        } else {
+                            setHealth(100);
+                        }
+                    }
+                }
+
+                if (showHealthBar) {
+                    healthbar.setCullHint(Spatial.CullHint.Never);
+                } else {
+                    healthbar.setCullHint(Spatial.CullHint.Always);
+                }
+
+                checkIdleforPlayer();
+
+                if (attackTimer <= 0) {
+                    if (attacking) {
+                        attack();
+                    }
+                }
+                if (health <= 0) {
+
+                    dead = true;
+                }
+                if (hitAnimationDelay > 0) {
+                    hitAnimationDelay -= tpf;
+                }
+                if (attackTimer > 0) {
+                    attackTimer -= tpf;
+                }
+
+                if (model.getWorldTranslation().y < -300f) {
+                    getPhysicsCharacter().warp(new Vector3f(0, 2, 0));
+                }
+
+                Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
+                Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
+
+                camDir.y = 0;
+                camLeft.y = 0;
+
+                if (idleCounter >= idleTimeOutValue) {
+                    if (!rotateAround) {
+                        System.out.println("start idleing");
+                        makeRotateAround(true);
+                    }
+                }
+
+                if (idleCounter == 0) {
+                    if (rotateAround) {
+                        System.out.println("stop idleing");
+                        makeRotateAround(false);
+                    }
+                }
+                if (idleCounter <= idleTimeOutValue) {
+                    idleCounter += tpf;
+                }
+
+                if (chaseEnabled) {
+                    viewDirection.set(camDir);
+                }
+
+                if (rotateAround) {
+                    viewDirection.addLocal(camLeft.mult((rotationSpeed * (1.5f + rotationModifier)) * tpf));
+                }
+
+                walkDirection.set(0, 0, 0);
+
+                if (leftStrafe) {
+                    footsteps.play();
+                    walkDirection.addLocal(camLeft);
+                } else if (rightStrafe) {
+                    footsteps.play();
+                    walkDirection.addLocal(camLeft.negate());
+                }
+
+                getPhysicsCharacter().setWalkDirection(walkDirection);
+
+                if (sprint) {
+                    if (stamina > 0) {
+                        stamina -= stamina_Recover_Value * tpf;
+                        isSprinting = true;
+                        stamina_recover_counter = 0;
+                    } else {
+                        isSprinting = false;
+                    }
+                } else {
+                    isSprinting = false;
+                }
+
+                if (!isSprinting && !sprint) {
+                    if (stamina < stamina_max) {
+                        if (stamina_recover_counter < stamina_recover_delay) {
+                            stamina_recover_counter += tpf;
+                            isRecovering = false;
+                        } else {
+                            isRecovering = true;
+                        }
+                    } else {
+                        isRecovering = false;
+                    }
+                }
+
+                if (isSprinting | sprint) {
+                    isRecovering = false;
+                }
+
+                if (isRecovering) {
+                    if (stamina_recover_counter >= stamina_recover_delay) {
+                        stamina += stamina_recover_value * tpf;
+                    }
+                }
+
+                if (forward) {
+                    footsteps.play();
+                    if (isSprinting) {
+                        walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed / sprintModifier));
+                    } else {
+                        walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
+                    }
+                } else if (backward) {
+                    footsteps.play();
+                    walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
+                }
+
+                if (!forward && !backward && !rightStrafe && !leftStrafe) {
+                    footsteps.stop();
+                }
+
+                getPhysicsCharacter().setViewDirection(viewDirection);
+                getPhysicsCharacter().setWalkDirection(walkDirection);
+
+                if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
+                    model.setCullHint(Spatial.CullHint.Always);
+                    lamp.setDirection(viewPort.getCamera().getDirection());
+                } else {
+                    if (!rotateAround) {
+                        model.setCullHint(Spatial.CullHint.Dynamic);
+                    }
+                    lamp.setDirection(model.getWorldRotation().getRotationColumn(2));
+                }
+            }
+            //dead
+            if (deadDelay <= 0) {
+
+                bulletAppState.getPhysicsSpace().remove(physicsCharacter);
+                this.spatial.removeControl(BetterCharacterControl.class);
+                this.spatial.removeFromParent();
+                this.spatial.removeControl(this);
+
+            }
+            healthbar.getLocalScale().setX((health + 1) / 75);
+            healthbar.center();
+            healthbar.move((health / 200) + 1, 9, 0);
+            if (dead) {
+                healthbar.getLocalScale().setX(0);
+                if (deadDelay >= 3f) {
+                    System.out.println("YOU ARE DEAD");
+                    inputManager.clearMappings();
+                    doAnim("player", "Die", LoopMode.DontLoop);
+                }
+                deadDelay -= tpf;
+            }
+        }
     }
 
     private final ActionListener actionListener = new ActionListener() {
@@ -464,188 +611,6 @@ public class PlayerControl extends AbstractControl {
             chaseCam.setDragToRotate(false);
         }
     }
-    private float hitAnimationDelay = 0;
-
-    @Override
-    protected void controlUpdate(float tpf) {
-
-        if (isEnabled()) {
-
-            if (!dead) {
-
-                underAttackTimer -= tpf;
-
-                underAttack = underAttackTimer > 0;
-
-                if (!underAttack) {
-                    if (getHealth() < 100) {
-                        if ((getHealth() + 10) < 100) {
-                            underAttackTimer = underAttackTimerVal / 2;
-                            setHealth(getHealth() + 10);
-                        } else {
-                            setHealth(100);
-                        }
-                    }
-                }
-
-                if (showHealthBar) {
-                    healthbar.setCullHint(Spatial.CullHint.Never);
-                } else {
-                    healthbar.setCullHint(Spatial.CullHint.Always);
-                }
-
-                checkIdleforPlayer();
-
-                if (attackTimer <= 0) {
-                    if (attacking) {
-                        attack();
-                    }
-                }
-                if (health <= 0) {
-
-                    dead = true;
-                }
-                if (hitAnimationDelay > 0) {
-                    hitAnimationDelay -= tpf;
-                }
-                if (attackTimer > 0) {
-                    attackTimer -= tpf;
-                }
-
-                if (model.getWorldTranslation().y < -300f) {
-                    getPhysicsCharacter().warp(new Vector3f(0, 2, 0));
-                }
-
-                Vector3f camDir = viewPort.getCamera().getDirection().normalizeLocal();
-                Vector3f camLeft = viewPort.getCamera().getLeft().divide(strafe_speed);
-
-                camDir.y = 0;
-                camLeft.y = 0;
-
-                if (idleCounter >= idleTimeOutValue) {
-                    if (!rotateAround) {
-                        System.out.println("start idleing");
-                        makeRotateAround(true);
-                    }
-                }
-
-                if (idleCounter == 0) {
-                    if (rotateAround) {
-                        System.out.println("stop idleing");
-                        makeRotateAround(false);
-                    }
-                }
-                if (idleCounter <= idleTimeOutValue) {
-                    idleCounter += tpf;
-                }
-
-                if (chaseEnabled) {
-                    viewDirection.set(camDir);
-                }
-
-                if (rotateAround) {
-                    viewDirection.addLocal(camLeft.mult((rotationSpeed * (1.5f + rotationModifier)) * tpf));
-                }
-
-                walkDirection.set(0, 0, 0);
-
-                if (leftStrafe) {
-                    footsteps.play();
-                    walkDirection.addLocal(camLeft);
-                } else if (rightStrafe) {
-                    footsteps.play();
-                    walkDirection.addLocal(camLeft.negate());
-                }
-
-                getPhysicsCharacter().setWalkDirection(walkDirection);
-
-                if (sprint) {
-                    if (stamina > 0) {
-                        stamina -= stamina_Recover_Value * tpf;
-                        isSprinting = true;
-                        stamina_recover_counter = 0;
-                    } else {
-                        isSprinting = false;
-                    }
-                } else {
-                    isSprinting = false;
-                }
-
-                if (!isSprinting && !sprint) {
-                    if (stamina < stamina_max) {
-                        if (stamina_recover_counter < stamina_recover_delay) {
-                            stamina_recover_counter += tpf;
-                            isRecovering = false;
-                        } else {
-                            isRecovering = true;
-                        }
-                    } else {
-                        isRecovering = false;
-                    }
-                }
-
-                if (isSprinting | sprint) {
-                    isRecovering = false;
-                }
-
-                if (isRecovering) {
-                    if (stamina_recover_counter >= stamina_recover_delay) {
-                        stamina += stamina_recover_value * tpf;
-                    }
-                }
-
-                if (forward) {
-                    footsteps.play();
-                    if (isSprinting) {
-                        walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed / sprintModifier));
-                    } else {
-                        walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalizeLocal().divide(move_speed));
-                    }
-                } else if (backward) {
-                    footsteps.play();
-                    walkDirection.addLocal(model.getWorldRotation().getRotationColumn(2).normalize().negate().divide(move_speed));
-                }
-
-                if (!forward && !backward && !rightStrafe && !leftStrafe) {
-                    footsteps.stop();
-                }
-
-                getPhysicsCharacter().setViewDirection(viewDirection);
-                getPhysicsCharacter().setWalkDirection(walkDirection);
-
-                if (chaseCam.getDistanceToTarget() <= chaseCam.getMinDistance()) {
-                    model.setCullHint(Spatial.CullHint.Always);
-                    lamp.setDirection(viewPort.getCamera().getDirection());
-                } else {
-                    if (!rotateAround) {
-                        model.setCullHint(Spatial.CullHint.Dynamic);
-                    }
-                    lamp.setDirection(model.getWorldRotation().getRotationColumn(2));
-                }
-            }
-            //dead
-            if (deadDelay <= 0) {
-
-                bulletAppState.getPhysicsSpace().remove(physicsCharacter);
-                this.spatial.removeControl(BetterCharacterControl.class);
-                this.spatial.removeFromParent();
-                this.spatial.removeControl(this);
-
-            }
-            healthbar.getLocalScale().setX((health + 1) / 75);
-            healthbar.center();
-            healthbar.move((health / 200) + 1, 9, 0);
-            if (dead) {
-                healthbar.getLocalScale().setX(0);
-                if (deadDelay >= 3f) {
-                    System.out.println("YOU ARE DEAD");
-                    inputManager.clearMappings();
-                    doAnim("player", "Die", LoopMode.DontLoop);
-                }
-                deadDelay -= tpf;
-            }
-        }
-    }
 
     private void attack(final String name) {
         @SuppressWarnings("Convert2Lambda")
@@ -766,7 +731,7 @@ public class PlayerControl extends AbstractControl {
                 underAttackTimer = underAttackTimerVal;
                 hitAnimationDelay = 1.5f;
                 System.out.println("ouch" + dmg + " damage " + " from " + name + "");
-                PointLight shine = new PointLight();
+                final PointLight shine = new PointLight();
                 shine.setPosition(Vector3f.ZERO);
                 shine.setColor(ColorRGBA.Red);
                 characterNode.addLight(shine);
@@ -781,6 +746,36 @@ public class PlayerControl extends AbstractControl {
             }
         }
         return dead;
+    }
+
+    public float getStamina() {
+        return stamina;
+    }
+
+    private boolean isRecovering = false;
+
+    public float getRotationModifier() {
+        return rotationModifier;
+    }
+
+    public void setRotationModifier(float rotationModifier) {
+        this.rotationModifier = rotationModifier;
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
+    public void setDead(boolean dead) {
+        this.dead = dead;
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
     }
 
     public void setIdleCounter(float value) {
