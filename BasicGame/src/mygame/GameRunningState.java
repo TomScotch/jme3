@@ -31,6 +31,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
@@ -50,6 +51,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainPatch;
 import com.jme3.ui.Picture;
 import com.jme3.water.SimpleWaterProcessor;
+import com.jme3.water.WaterFilter;
 import de.lessvoid.nifty.controls.Console;
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +90,7 @@ public class GameRunningState extends AbstractAppState {
     private boolean lightScatterEnabled;
     private boolean anisotropyEnabled;
     private boolean waterPostProcessing;
-    private final boolean globalLightningEnabled;
+    private boolean globalLightningEnabled;
     private final boolean shadows;
     private final FilterPostProcessor fpp;
     private boolean weatherEnabled;
@@ -145,10 +147,9 @@ public class GameRunningState extends AbstractAppState {
     private final int minimumWeatherLength = 4;
     private ParticleEmitter debrisEffect;
     private DirectionalLight sun;
-    private GlobalLightingControl glc;
 
     private LightScatteringFilter sunlight;
-    private boolean dynamicLightScatter;
+
     private final float lightScatterFilterDensity = 0.45f;//1.4f
     private final int lightScatterFiltersamples = 9;//50
 
@@ -157,24 +158,38 @@ public class GameRunningState extends AbstractAppState {
     private float range = 55; // 50f
     private float scale = 0.8f; // 1f
 
+    private float timeWater = 0.0f;
+    private float waterHeight = -5f;
+    private final float initialWaterHeight = -7f;
+    private WaterFilter water;
+    private boolean dynamicWater = true;
+    private boolean dynamicLighting = true;
+
+    private boolean specular = true;
+    private boolean hqshore = true;
+    private boolean caustics = true;
+    private boolean foam = true;
+    private boolean refraction = true;
+    private boolean ripples = true;
+
     // private final SSAO ssao;
+    private GlobalLightingControl glc;
     private final SkyControl sc;
     private final Terrain terrainControl;
     private final PlayerControl playerControl;
     private EnemyControl enemyControl;
-    private LightScatterFilter lightScatterFilter;
-    private WaterPostFilter wpf;
     private simpleWaterControl swc;
 
-    public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessing, Boolean shadows, Boolean globalLightningEnabled) {
+    public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessingEnabled, Boolean shadows, Boolean globalLightningEnabled) {
 
         System.out.println("Game State is being constructed");
         this.console = mygame.Main.getConsole();
+
         this.fogEnabled = fogEnabled;
         this.bloomEnabled = bloomEnabled;
         this.lightScatterEnabled = lightScatterEnabled;
         this.anisotropyEnabled = anisotropyEnabled;
-        this.waterPostProcessing = waterPostProcessing;
+        this.waterPostProcessing = waterPostProcessingEnabled;
         this.globalLightningEnabled = globalLightningEnabled;
         this.shadows = shadows;
         this.weatherEnabled = true;
@@ -568,10 +583,15 @@ public class GameRunningState extends AbstractAppState {
 
         //      WATER
         if (waterPostProcessing) {
-            if (localRootNode.getControl(WaterPostFilter.class) == null) {
-                wpf = new WaterPostFilter(fpp, glc, true, false, false, false, false, false, true, true);
-                localRootNode.addControl(wpf);
-            }
+            water = new WaterFilter((Node) localRootNode, new Vector3f(0, 0, 0));
+            water.setWaterHeight(initialWaterHeight);
+            water.setUseSpecular(specular);
+            water.setUseHQShoreline(hqshore);
+            water.setUseCaustics(caustics);
+            water.setUseFoam(foam);
+            water.setUseRefraction(refraction);
+            water.setUseRipples(ripples);
+            fpp.addFilter(water);
         } else {
             if (localRootNode.getControl(simpleWaterControl.class) == null) {
                 swc = new simpleWaterControl((SimpleApplication) app, localRootNode);
@@ -799,9 +819,29 @@ public class GameRunningState extends AbstractAppState {
 
             super.update(tpf);
 
-            if (dynamicLightScatter) {
+            timeWater += tpf;
+
+            if (dynamicWater) {
+                waterHeight = (float) Math.cos(((timeWater * 0.6f) % FastMath.TWO_PI)) * 1.5f;
+                water.setWaterHeight(initialWaterHeight + waterHeight);
+            }
+
+            if (dynamicLighting) {
                 if (!glc.isNight()) {
-                    sunlight.setEnabled(false);
+                    water.setDeepWaterColor(glc.getBackgroundColor());
+                    water.setWaterColor(ColorRGBA.Blue);
+                    water.setLightColor(glc.getSun().getColor());
+                    water.getLightDirection().set(glc.getSunDirection());
+                } else {
+                    water.setDeepWaterColor(ColorRGBA.Black);
+                    water.setLightColor(ColorRGBA.Black);
+                    water.setLightDirection(new Vector3f(0, 1, 0));
+                }
+            }
+
+            if (dynamicLighting) {
+                if (!glc.isNight()) {
+                    sunlight.setEnabled(true);
                     sunlight.setLightPosition(glc.getSunPosition());
                 } else {
                     sunlight.setEnabled(false);
