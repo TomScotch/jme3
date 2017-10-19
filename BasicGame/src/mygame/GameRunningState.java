@@ -863,7 +863,21 @@ public class GameRunningState extends AbstractAppState {
 
                 case "write":
                     if (value && isRunning) {
-                        write(localRootNode, "localRootNode");
+                        // write(localRootNode, "localRootNode");
+                        for (Spatial kid : localRootNode.getChildren()) {
+                            try {
+                                Node childNode = (Node) kid;
+                                if (childNode != null) {
+                                    if (childNode.getName() != null) {
+                                        if (childNode.getQuantity() >= 1) {
+                                            write(childNode, childNode.getName());
+                                        }
+                                    }
+                                }
+                            } catch (ClassCastException classCastException) {
+                                System.out.println(classCastException.getLocalizedMessage());
+                            }
+                        }
                     }
                     break;
 
@@ -931,20 +945,52 @@ public class GameRunningState extends AbstractAppState {
 
         String userHome = System.getProperty("user.home");
         BinaryExporter exporter = BinaryExporter.getInstance();
-        File file = new File(userHome + "/" + name + ".j3o");
+        File file = new File(userHome + "/" + "j3o" + "/" + name + ".j3o");
 
         playerControl.removeChaseCam();
 
-        try {
-            exporter.save(node, file);
-        } catch (IOException ex) {
-            System.out.println("Failed to save node!");
+        if (teapot.getParent() != null) {
+            teapot.removeFromParent();
+            bulletAppState.getPhysicsSpace().removeAll(teapot);
+            bulletAppState.getPhysicsSpace().addAll(terrain);
+            playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
+            localRootNode.attachChild(terrain);
+            enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
+            localRootNode.addControl(enemyControl);
+            enemyControl.setEnabled(true);
         }
+
+        try {
+            try {
+                exporter.save(node, file);
+                System.out.println("Succesfully saved " + node.getName() + " to " + file.getPath());
+            } catch (OutOfMemoryError outOfMemoryError) {
+                System.out.println("run out of memory while saving root : " + outOfMemoryError.getLocalizedMessage());
+                /*
+                    for (Spatial kid : localRootNode.getChildren()) {
+                      try {
+                          Node childNode = (Node) kid;
+                           try {
+                            exporter.save(childNode, file);
+                               } catch (IOException ex) {
+                                 System.out.println("Failed to save : " + childNode.getName() + " < - > " + ex.getLocalizedMessage());
+                                }
+                            } catch (ClassCastException classCastException) {
+                          System.out.println(classCastException.getLocalizedMessage());
+                         }
+                    }
+                 */
+            }
+        } catch (IOException ex) {
+            System.out.println("Failed to save Root : " + ex.getLocalizedMessage());
+        }
+
         playerControl.attachChaseCam();
     }
 
     @Override
-    public void update(float tpf) {
+    public void update(float tpf
+    ) {
 
         if (isRunning) {
 
