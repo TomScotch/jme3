@@ -256,21 +256,13 @@ public class GlobalLightingControl extends AbstractControl {
                 sun.getColor().interpolateLocal(ColorRGBA.White, (tpf / timeDelay));
             }
             if (!isNight() && !isMorning()) {
-                vp.getBackgroundColor().interpolateLocal(vp.getBackgroundColor(), ColorRGBA.Black, sphereGeo.getWorldTranslation().getY() / 37000);
+                vp.getBackgroundColor().interpolateLocal(ColorRGBA.Blue.add(ColorRGBA.White), ColorRGBA.Black, (400 - sphereGeo.getWorldTranslation().getY()) / 370);
             }
             if (isMorning()) {
                 vp.getBackgroundColor().interpolateLocal(ColorRGBA.Black, ColorRGBA.Blue.add(ColorRGBA.White), sphereGeo.getWorldTranslation().getY() / 400);
             }
         } else {
             System.out.println("glc stopped");
-        }
-
-        if (localRootNode.getControl(LightScatterFilter.class) != null) {
-            if (night) {
-                localRootNode.getControl(LightScatterFilter.class).setEnabled(false);
-            } else {
-                localRootNode.getControl(LightScatterFilter.class).setEnabled(true);
-            }
         }
     }
 

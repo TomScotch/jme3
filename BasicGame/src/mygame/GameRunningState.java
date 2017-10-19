@@ -15,6 +15,7 @@ import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.effect.Particle;
 import com.jme3.effect.ParticleEmitter;
@@ -36,7 +37,9 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
+import com.jme3.post.filters.DepthOfFieldFilter;
 import com.jme3.post.filters.FogFilter;
+import com.jme3.post.filters.LightScatteringFilter;
 import com.jme3.post.filters.PosterizationFilter;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
@@ -91,7 +94,6 @@ public class GameRunningState extends AbstractAppState {
     private boolean weatherEnabled;
     private float counter = 0;
     private float limit = 0;
-    private final DepthOfField dof;
     private final Spatial teapot;
     private final Picture pic;
     private BitmapText hudText;
@@ -144,6 +146,16 @@ public class GameRunningState extends AbstractAppState {
     private ParticleEmitter debrisEffect;
     private DirectionalLight sun;
     private GlobalLightingControl glc;
+
+    private LightScatteringFilter sunlight;
+    private boolean dynamicLightScatter;
+    private final float lightScatterFilterDensity = 0.45f;//1.4f
+    private final int lightScatterFiltersamples = 9;//50
+
+    private final DepthOfFieldFilter dofFilter;
+    private float focusDistance = 12f; // 10f
+    private float range = 55; // 50f
+    private float scale = 0.8f; // 1f
 
     // private final SSAO ssao;
     private final SkyControl sc;
@@ -248,12 +260,10 @@ public class GameRunningState extends AbstractAppState {
 
 //      LightScatter
         if (lightScatterEnabled) {
-
-            lightScatterFilter = new LightScatterFilter(fpp, glc, true);
-
-            if (localRootNode.getControl(LightScatterFilter.class) == null) {
-                localRootNode.addControl(lightScatterFilter);
-            }
+            sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
+            sunlight.setLightDensity(lightScatterFilterDensity);
+            sunlight.setNbSamples(lightScatterFiltersamples);
+            fpp.addFilter(sunlight);
         }
 
 //      FOG
@@ -387,8 +397,10 @@ public class GameRunningState extends AbstractAppState {
         fpp.addFilter(pf);
 
         //Depth of Field
-        dof = new DepthOfField(fpp, app.getContext(), viewPort, assetManager);
-        localRootNode.addControl(dof);
+        dofFilter = new DepthOfFieldFilter();
+        dofFilter.setFocusRange(range);
+        dofFilter.setBlurScale(scale);
+        fpp.addFilter(dofFilter);
 
 //      Bloom
         if (bloomEnabled) {
@@ -786,6 +798,23 @@ public class GameRunningState extends AbstractAppState {
         if (isRunning) {
 
             super.update(tpf);
+
+            if (dynamicLightScatter) {
+                if (!glc.isNight()) {
+                    sunlight.setEnabled(false);
+                    sunlight.setLightPosition(glc.getSunPosition());
+                } else {
+                    sunlight.setEnabled(false);
+                }
+            }
+
+            Ray ray = new Ray(viewPort.getCamera().getLocation(), viewPort.getCamera().getDirection());
+            CollisionResults results = new CollisionResults();
+            int numCollisions = localRootNode.collideWith(ray, results);
+            if (numCollisions > 0) {
+                CollisionResult hit = results.getClosestCollision();
+                dofFilter.setFocusDistance(hit.getDistance() / focusDistance);
+            }
 
             weatherCounter += tpf;
 

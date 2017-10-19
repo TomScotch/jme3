@@ -12,13 +12,14 @@ import com.jme3.water.WaterFilter;
 
 public class WaterPostFilter extends AbstractControl {
 
-    private float time = 0.0f;
+    private final GlobalLightingControl glc;
+
+    private float timeWater = 0.0f;
     private float waterHeight = -5f;
     private final float initialWaterHeight = -7f;
     private final WaterFilter water;
-    private GlobalLightingControl glc;
-    private boolean dynamicWater;
-    private boolean dynamicLighting;
+    private final boolean dynamicWater;
+    private final boolean dynamicLighting;
 
     public WaterPostFilter(FilterPostProcessor fpp, GlobalLightingControl glc, boolean specular, boolean hqshore, boolean caustics, boolean foam, boolean refraction, boolean ripples, boolean dynamicLight, boolean dynamicWater) {
 
@@ -27,29 +28,13 @@ public class WaterPostFilter extends AbstractControl {
         water.setWaterHeight(initialWaterHeight);
         this.dynamicLighting = dynamicLight;
         this.dynamicWater = dynamicWater;
-        initWater(specular, hqshore, caustics, foam, refraction, ripples, dynamicLight, dynamicWater);
-        fpp.addFilter(water);
-    }
-
-    public WaterPostFilter(FilterPostProcessor fpp, boolean specular, boolean hqshore, boolean caustics, boolean foam, boolean refraction, boolean ripples, boolean dynamicLight, boolean dynamicWater) {
-
-        water = new WaterFilter((Node) spatial, new Vector3f(0, 0, 0));
-        water.setWaterHeight(initialWaterHeight);
-        initWater(specular, hqshore, caustics, foam, refraction, ripples, false, dynamicWater);
-        fpp.addFilter(water);
-        this.dynamicLighting = dynamicLight;
-        this.dynamicWater = dynamicWater;
-    }
-
-    private void initWater(boolean specular, boolean hqShore, boolean caustic, boolean foam, boolean refraction, boolean ripples, boolean dynamicLight, boolean dynamicWater) {
         water.setUseSpecular(specular);
-        water.setUseHQShoreline(hqShore);
-        water.setUseCaustics(caustic);
+        water.setUseHQShoreline(hqshore);
+        water.setUseCaustics(caustics);
         water.setUseFoam(foam);
         water.setUseRefraction(refraction);
         water.setUseRipples(ripples);
-        this.dynamicLighting = dynamicLight;
-        this.dynamicWater = dynamicWater;
+        fpp.addFilter(water);
     }
 
     @Override
@@ -57,10 +42,10 @@ public class WaterPostFilter extends AbstractControl {
 
         if (isEnabled()) {
 
-            time += tpf;
+            timeWater += tpf;
 
             if (dynamicWater) {
-                waterHeight = (float) Math.cos(((time * 0.6f) % FastMath.TWO_PI)) * 1.5f;
+                waterHeight = (float) Math.cos(((timeWater * 0.6f) % FastMath.TWO_PI)) * 1.5f;
                 water.setWaterHeight(initialWaterHeight + waterHeight);
             }
 
@@ -83,21 +68,5 @@ public class WaterPostFilter extends AbstractControl {
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //
-    }
-
-    public boolean isDynamicWater() {
-        return dynamicWater;
-    }
-
-    public boolean isDynamicLighting() {
-        return dynamicLighting;
-    }
-
-    public void setDynamicWater(boolean dynamicWater) {
-        this.dynamicWater = dynamicWater;
-    }
-
-    public void setDynamicLighting(boolean dynamicLighting) {
-        this.dynamicLighting = dynamicLighting;
     }
 }

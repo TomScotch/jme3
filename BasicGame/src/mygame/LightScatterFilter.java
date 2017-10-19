@@ -9,27 +9,19 @@ import com.jme3.scene.control.AbstractControl;
 
 public class LightScatterFilter extends AbstractControl {
 
+    private final GlobalLightingControl glc;
+    
     private final LightScatteringFilter sunlight;
-    private GlobalLightingControl glc;
-    private boolean dynamicLightScatter;
-    private final float density = 0.45f;//1.4f
-    private final int samples = 9;//50
-
-    public LightScatterFilter(FilterPostProcessor fpp, boolean dynamicLightScatter) {
-
-        sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
-        sunlight.setLightDensity(density);
-        sunlight.setNbSamples(samples);
-        fpp.addFilter(sunlight);
-        this.dynamicLightScatter = dynamicLightScatter;
-    }
+    private final boolean dynamicLightScatter;
+    private final float lightScatterFilterDensity = 0.45f;//1.4f
+    private final int lightScatterFiltersamples = 9;//50
 
     public LightScatterFilter(FilterPostProcessor fpp, GlobalLightingControl glc, boolean dynamicLightScatter) {
 
         this.glc = glc;
         sunlight = new LightScatteringFilter(new Vector3f(.5f, .5f, .5f).multLocal(-3000));
-        sunlight.setLightDensity(density);
-        sunlight.setNbSamples(samples);
+        sunlight.setLightDensity(lightScatterFilterDensity);
+        sunlight.setNbSamples(lightScatterFiltersamples);
         fpp.addFilter(sunlight);
         this.dynamicLightScatter = dynamicLightScatter;
     }
@@ -37,12 +29,9 @@ public class LightScatterFilter extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
 
-        if (isEnabled() && dynamicLightScatter) {
-            if (glc.getIsSun()) {
-
-                if (isDynamicLightScatter()) {
-                    sunlight.setLightPosition(glc.getSunPosition());
-                }
+        if (glc.getIsSun()) {
+            if (dynamicLightScatter) {
+                sunlight.setLightPosition(glc.getSunPosition());
             }
         }
     }
@@ -51,13 +40,4 @@ public class LightScatterFilter extends AbstractControl {
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //
     }
-
-    public boolean isDynamicLightScatter() {
-        return dynamicLightScatter;
-    }
-
-    public void setDynamicLightScatter(boolean dynamicLightScatter) {
-        this.dynamicLightScatter = dynamicLightScatter;
-    }
-
 }
