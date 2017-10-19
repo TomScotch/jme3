@@ -28,23 +28,16 @@ import com.jme3.shadow.SpotLightShadowRenderer;
 
 public class GlobalLightingControl extends AbstractControl {
 
+    private final ViewPort vp;
+    private final SpotLight sl;
+
     private final Material sunMat;
     private final ParticleEmitter fire;
     private float rotation;
-    private final SpotLight dummySpotLight;
-
-    private final Node localRootNode;
-    private final ViewPort vp;
     private final AmbientLight al;
-
-    public DirectionalLight getSun() {
-        return sun;
-    }
-
     private final Node pivot = new Node();
-    private int timeDelay = 32;// INSTANE=32  to REALISTIC = 8192  
+    private int timeDelay = 32;// 32 - 8192  
     private boolean isSun = true;
-    private final SpotLight sl;
     private final DirectionalLight sun;
     private final Node pivotSun;
     private final float sunHeight = 300f;
@@ -54,7 +47,6 @@ public class GlobalLightingControl extends AbstractControl {
     private final DirectionalLightShadowRenderer dlsr;
     private final int shadowmapSize = 1024;
     private boolean globalLightning = true;
-
     private boolean morning = true;
     private boolean day = false;
     private boolean evening = false;
@@ -63,8 +55,6 @@ public class GlobalLightingControl extends AbstractControl {
     public GlobalLightingControl(ViewPort vp, AssetManager assetManager, SpotLight sl, Node localRootNode) {
 
         this.sl = sl;
-        this.localRootNode = localRootNode;
-        dummySpotLight = new SpotLight(Vector3f.ZERO, Vector3f.ZERO);
         this.vp = vp;
 
         //PointLightSunPivotNode
@@ -88,8 +78,8 @@ public class GlobalLightingControl extends AbstractControl {
         fire.setShape(new EmitterSphereShape(Vector3f.ZERO, 0.1f));
         fire.setImagesX(2);
         fire.setImagesY(2);
-        fire.setEndColor(ColorRGBA.Red);//new ColorRGBA(1f, 0f, 0f, 1f)
-        fire.setStartColor(ColorRGBA.Orange);//new ColorRGBA(1f, 1f, 0f, 0.5f)
+        fire.setEndColor(ColorRGBA.Red);
+        fire.setStartColor(ColorRGBA.Orange);
         fire.setStartSize(sunSize * 2);
         fire.setEndSize(sunSize * 1.5f);
         fire.setGravity(0, -3, 0);
@@ -104,14 +94,15 @@ public class GlobalLightingControl extends AbstractControl {
 
         sunMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         sunMat.setColor("Color", ColorRGBA.Orange);
-        sphereGeo.setMaterial(sunMat);//assetManager.loadMaterial("Common/Materials/WhiteColor.j3m")
+        sphereGeo.setMaterial(sunMat);
         sphereGeo.getLocalTranslation().addLocal(0, (-sunHeight * FastMath.QUARTER_PI), (-sunHeight * FastMath.HALF_PI));
         pivotSun.attachChild(sphereGeo);
         sphereGeo.setShadowMode(RenderQueue.ShadowMode.Off);
-        //sphereGeo.setQueueBucket(RenderQueue.Bucket.Translucent);
 
         //Sun
         sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.Orange);
+        sunMat.setColor("Color", ColorRGBA.Orange.add(ColorRGBA.Red));
         sun.setColor(ColorRGBA.Orange);
         localRootNode.addLight(sun);
 
@@ -135,13 +126,12 @@ public class GlobalLightingControl extends AbstractControl {
 
         //Spot Light Shadow Renderer
         slsr = new SpotLightShadowRenderer(assetManager, shadowmapSize);
-        slsr.setLight(dummySpotLight);
         slsr.setShadowCompareMode(CompareMode.Hardware);
         slsr.setShadowIntensity(0.35f);
         slsr.setEdgesThickness(5);
+        slsr.setLight(sl);
 
-        sunMat.setColor("Color", ColorRGBA.Orange.add(ColorRGBA.Red));
-        sun.setColor(ColorRGBA.Orange);
+        //AmbientLight
         al = new AmbientLight(ColorRGBA.DarkGray.mult(ColorRGBA.DarkGray).mult(ColorRGBA.Gray).mult(ColorRGBA.LightGray).mult(ColorRGBA.LightGray));
         localRootNode.addLight(al);
     }
@@ -152,20 +142,12 @@ public class GlobalLightingControl extends AbstractControl {
         if (this.isEnabled()) {
 
             if (sl.isEnabled()) {
-
-                slsr.setLight(sl);
+                slsr.setShadowIntensity(0.35f);
             } else {
-
-                slsr.setLight(dummySpotLight);
+                slsr.setShadowIntensity(0);
             }
 
             if (globalLightning) {
-
-                fire.setLocalTranslation(sphereGeo.getWorldTranslation());
-                rotation = tpf / timeDelay;
-                pivot.rotate(rotation, 0, 0);
-                float z = sphereGeo.getWorldTranslation().getZ();
-                float y = sphereGeo.getWorldTranslation().getY();
 
                 if (isSun) {
                     sun.setEnabled(true);
@@ -173,9 +155,16 @@ public class GlobalLightingControl extends AbstractControl {
                     sun.setEnabled(false);
                 }
 
+                fire.setLocalTranslation(sphereGeo.getWorldTranslation());
+                rotation = tpf / timeDelay;
+                pivot.rotate(rotation, 0, 0);
+                float z = sphereGeo.getWorldTranslation().getZ();
+                float y = sphereGeo.getWorldTranslation().getY();
+
                 sun.setDirection(pivot.getLocalRotation().getRotationColumn(2));
 
                 if (y > -(sunSize / 1.1f) && z < -222) {
+
                     //morning
                     morning = true;
                     day = false;
@@ -196,6 +185,7 @@ public class GlobalLightingControl extends AbstractControl {
                 }
 
                 if (y > 422 && z > 0) {
+
                     //day
                     if (day == false) {
                         if (sl != null) {
@@ -266,6 +256,15 @@ public class GlobalLightingControl extends AbstractControl {
         }
     }
 
+    @Override
+    protected void controlRender(RenderManager rm, ViewPort vp) {
+        //
+    }
+
+    public DirectionalLight getSun() {
+        return sun;
+    }
+
     public boolean isGlobalLightning() {
         return globalLightning;
     }
@@ -280,11 +279,6 @@ public class GlobalLightingControl extends AbstractControl {
 
     public void setTimeDelay(int timeDelay) {
         this.timeDelay = timeDelay;
-    }
-
-    @Override
-    protected void controlRender(RenderManager rm, ViewPort vp) {
-        //
     }
 
     public Vector3f getSunPosition() {

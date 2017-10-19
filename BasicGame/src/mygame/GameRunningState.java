@@ -998,8 +998,6 @@ public class GameRunningState extends AbstractAppState {
                             localRootNode.removeLight(clone);
                         }
                     });
-                    //}
-
                 }
 
             } else {
