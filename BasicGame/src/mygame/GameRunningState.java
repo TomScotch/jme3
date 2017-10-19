@@ -466,7 +466,7 @@ public class GameRunningState extends AbstractAppState {
             clouds.setInWorldSpace(true);
             clouds.setFaceNormal(new Vector3f(0, -1, 0));
             clouds.getParticleInfluencer().setVelocityVariation(3f);
-            clouds.setLocalTranslation(0, 120, 0);
+            clouds.setLocalTranslation(0, 200, 0);
             clouds.center();
             clouds.setShadowMode(RenderQueue.ShadowMode.Cast);
             localRootNode.attachChild(clouds);
