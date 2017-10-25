@@ -45,7 +45,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
-import com.jme3.opencl.*;
+//import com.jme3.opencl.*;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.builder.EffectBuilder;
 import de.lessvoid.nifty.controls.Console;
@@ -54,8 +54,8 @@ import de.lessvoid.nifty.controls.console.builder.ConsoleBuilder;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.input.mapping.DefaultInputMapping;
 import de.lessvoid.nifty.screen.KeyInputHandler;
-import java.util.Collections;
-import java.util.List;
+//import java.util.Collections;
+//import java.util.List;
 
 /**
  * Application Main Method
@@ -82,7 +82,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private static AppSettings cfg;
     private static Main app;
 
-    private static final boolean OPENCL = false;
+    // private static final boolean OPENCL = false;
     private static final boolean OPENAL = true;
 
     private VideoRecorderAppState videoRecorderAppState;
@@ -118,12 +118,12 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private static boolean showFps = false;
     private boolean displayStatView = false;
     private boolean wireframe = false;
-    private static Platform selectedPlatform;
+    //private static Platform selectedPlatform;
     private Node settingsNode;
 
-    private static final Object SYNC = new Object();
-    private static List<? extends Device> availableDevices;
-    private static int currentDeviceIndex;
+    //private static final Object SYNC = new Object();
+    //private static List<? extends Device> availableDevices;
+    //private static int currentDeviceIndex;
     private BitmapText helloText;
     private float deathCounter = 0;
     private BitmapText deathText;
@@ -140,8 +140,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     }
 
     /**
-     * nifty gui switch procedure nifty gui switch procedure to turn bloom
-     * on/off
+     * nifty gui switch procedure to turn bloom on/off
      */
     public void switchBloom() {
         bloomEnabled = !bloomEnabled;
@@ -167,8 +166,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     }
 
     /**
-     * nifty gui switch procedure nifty gui switch procedure to turn water post
-     * processing on/off
+     * nifty gui switch procedure to turn water post processing on/off
      */
     public void switchPostProcessWater() {
         waterPostProcessing = !waterPostProcessing;
@@ -177,8 +175,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     }
 
     /**
-     * nifty gui switch procedure nifty gui switch procedure to turn anisotropy
-     * on/off
+     * nifty gui switch procedure to turn anisotropy on/off
      */
     public void switchAnisotropy() {
         anisotropyEnabled = !anisotropyEnabled;
@@ -187,8 +184,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     }
 
     /**
-     * nifty gui switch procedure nifty gui switch procedure to turn
-     * LightScatter on/off
+     * nifty gui switch procedure to turn LightScatter on/off
      */
     public void switchLightScatter() {
 
@@ -198,7 +194,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     }
 
     /**
-     * nifty gui switch procedure nifty gui switch procedure to turn fog on/off
+     * nifty gui switch procedure to turn fog on/off
      */
     public void switchFog() {
         fogEnabled = !fogEnabled;
@@ -207,8 +203,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     }
 
     /**
-     * nifty gui switch procedure nifty gui switch procedure to turn global
-     * lighting on/off
+     * nifty gui switch procedure to turn global lighting on/off
      */
     public void switchGlobalLightning() {
         globalLightningEnabled = !globalLightningEnabled;
@@ -318,43 +313,43 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     public static void main(String[] args) throws BackingStoreException {
 
         app = new Main();
-        cfg = new AppSettings(true);
+        cfg = new AppSettings(false);
         cfg.setTitle("Serenity");
-        app.setShowSettings(false);
+        app.setShowSettings(true);
 
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = sortModes(device.getDisplayModes());
 
         cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
-        cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
-        cfg.setFullscreen(device.isFullScreenSupported());
-        cfg.setVSync(false);
-        cfg.setSamples(0);
-        cfg.setDepthBits(-1);
-        cfg.setFrameRate(60);
-        cfg.setFrequency(cfg.getFrameRate());
+        //   cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
+        //   cfg.setFullscreen(device.isFullScreenSupported());
+        //   cfg.setVSync(false);
+        //   cfg.setSamples(0);
+        //   cfg.setDepthBits(-1);
+        //   cfg.setFrameRate(60);
+        //   cfg.setFrequency(cfg.getFrameRate());
         app.setDisplayFps(showFps);
         app.setDisplayStatView(false);
 
-        cfg.load(cfg.getTitle());
+        //    cfg.load(cfg.getTitle());
 
+        /*   
         if (cfg.getRenderer().equals(AppSettings.LWJGL_OPENGL3)) {
             cfg.setGammaCorrection(true);
         } else {
             cfg.setGammaCorrection(false);
         }
-
-        System.out.println("isGamaCorrection : " + cfg.isGammaCorrection());
-
+         
+         */
+        //System.out.println("isGamaCorrection : " + cfg.isGammaCorrection());
         if (OPENAL) {
             cfg.setAudioRenderer(AppSettings.LWJGL_OPENAL);
         }
 
-        if (OPENCL) {
-            cfg.setOpenCLSupport(true);
-            cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
-        }
-
+        /*        if (OPENCL) {
+        cfg.setOpenCLSupport(true);
+        cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
+        }*/
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
 
@@ -1288,31 +1283,31 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
         //TODO: collect meaningful list of commands for the console
     }
 
-    public static class CustomPlatformChooser implements PlatformChooser {
-
-        public CustomPlatformChooser() {
-        }
-
-        @Override
-        public List<? extends Device> chooseDevices(List<? extends Platform> platforms) {
-            synchronized (SYNC) {
-                if (currentDeviceIndex == -1) {
-                    return Collections.emptyList();
-                }
-
-                Platform platform = platforms.get(0);
-                availableDevices = platform.getDevices();
-                selectedPlatform = platform;
-
-                Device device = platform.getDevices().get(currentDeviceIndex);
-                currentDeviceIndex++;
-                if (currentDeviceIndex >= availableDevices.size()) {
-                    currentDeviceIndex = -1;
-                }
-
-                return Collections.singletonList(device);
-            }
-        }
-
+    /*    public static class CustomPlatformChooser implements PlatformChooser {
+    
+    public CustomPlatformChooser() {
     }
+    
+    @Override
+    public List<? extends Device> chooseDevices(List<? extends Platform> platforms) {
+    synchronized (SYNC) {
+    if (currentDeviceIndex == -1) {
+    return Collections.emptyList();
+    }
+    
+    Platform platform = platforms.get(0);
+    availableDevices = platform.getDevices();
+    selectedPlatform = platform;
+    
+    Device device = platform.getDevices().get(currentDeviceIndex);
+    currentDeviceIndex++;
+    if (currentDeviceIndex >= availableDevices.size()) {
+    currentDeviceIndex = -1;
+    }
+    
+    return Collections.singletonList(device);
+    }
+    }
+    
+    }*/
 }
