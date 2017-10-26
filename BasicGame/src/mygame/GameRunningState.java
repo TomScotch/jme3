@@ -544,7 +544,7 @@ public class GameRunningState extends AbstractAppState {
         //Screen Space Ambient Occlusion
         if (ssaoEnabled) {
             ssaoFilter = new SSAOFilter(ssaoSampleRadius, ssaoIntensity, ssaoScale, ssaoBias);
-            ssaoFilter.setApproximateNormals(approximateNormals);
+            //ssaoFilter.setApproximateNormals(approximateNormals);
             fpp.addFilter(ssaoFilter);
         }
 

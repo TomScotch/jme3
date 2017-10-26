@@ -21,14 +21,12 @@ import java.io.IOException;
 public class client extends SimpleApplication {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Serializer.registerClass(ServerMain.PingMessage.class);
-        Serializer.registerClass(ServerMain.PongMessage.class);
+        Serializer.registerClass(PingMessage.class);
+        Serializer.registerClass(PongMessage.class);
         Client client = Network.connectToServer("localhost", 5110);
         client.start();
-        client.addMessageListener(new ClientPingResponder(), ServerMain.PongMessage.class);
-        client.send(new ServerMain.PingMessage());
-
-        System.out.println("Client: Sending ping message..");
+        client.addMessageListener(new ClientPingResponder(), PongMessage.class);
+        client.send(new PingMessage());
     }
 
     @Serializable
@@ -39,10 +37,7 @@ public class client extends SimpleApplication {
     public static class PongMessage extends AbstractMessage {
     }
 
-    @Override
-    public void simpleInitApp() {
-        //
-    }
+
 
     private static class ClientPingResponder implements MessageListener<Client> {
 
@@ -52,5 +47,10 @@ public class client extends SimpleApplication {
                 System.out.println("Client: Received pong message!");
             }
         }
+    }
+    
+        @Override
+    public void simpleInitApp() {
+        //
     }
 }
