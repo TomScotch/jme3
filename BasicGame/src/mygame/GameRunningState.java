@@ -400,7 +400,7 @@ public class GameRunningState extends AbstractAppState {
             fog.setFogColor(ColorRGBA.Gray);
             fog.setFogDistance(0);
             fog.setFogDensity(0);
-            //fpp.addFilter(fog);
+            fpp.addFilter(fog);
         }
 
         //Weather
@@ -1228,8 +1228,6 @@ public class GameRunningState extends AbstractAppState {
             if (misty) {
                 if (fog != null) {
 
-                    fpp.addFilter(fog);
-
                     if (misty_high) {
                         if (fog.getFogDistance() <= fogDistance / 1.25f) {
                             fog.setFogDistance(fog.getFogDistance() + (tpf * fogDistance));
@@ -1258,8 +1256,6 @@ public class GameRunningState extends AbstractAppState {
                 }
 
             } else {
-
-                fpp.removeFilter(fog);
 
                 misty_low = false;
                 misty_med = false;

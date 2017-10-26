@@ -132,7 +132,7 @@ public class GlobalLightingControl extends AbstractControl {
         slsr.setLight(sl);
 
         //AmbientLight
-        al = new AmbientLight(ColorRGBA.DarkGray);
+        al = new AmbientLight(ColorRGBA.DarkGray.mult(0.05f));
         localRootNode.addLight(al);
     }
 
