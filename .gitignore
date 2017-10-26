@@ -6,3 +6,7 @@
 /BasicGame2/nbproject/private/myServer/build
 myServer/nbproject
 myServer/build/
+myServer/dist/
+myServer/nbproject/
+myServer/nbproject/* D
+myServer/nbproject/private D
