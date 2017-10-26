@@ -14,8 +14,6 @@ import com.jme3.input.controls.Trigger;
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.MessageListener;
-import com.jme3.network.Network;
-import com.jme3.network.serializing.Serializer;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -370,17 +368,17 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
         app.setSettings(cfg);
         app.start();
 
+        /*
         Serializer.registerClass(ServerCommunication.PingMessage.class);
         Serializer.registerClass(ServerCommunication.PongMessage.class);
-
         try {
             Client client = Network.connectToServer("192.168.0.24", 5110);
             client.start();
-            client.addMessageListener(new ClientPingResponder(), ServerCommunication.PongMessage.class);
+                        client.addMessageListener(new ClientPingResponder(), ServerCommunication.PongMessage.class);
             client.send(new ServerCommunication.PingMessage());
         } catch (IOException ex) {
-            System.out.println(ex.getCause().getLocalizedMessage());
-        }
+              System.out.println(ex.getCause().getLocalizedMessage());
+        }*/
     }
 
     /**
