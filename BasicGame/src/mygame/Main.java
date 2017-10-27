@@ -582,7 +582,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
                 stateManager.attach(startScreenState);
                 app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
-                viewPort.clearProcessors();
+                //viewPort.clearProcessors();
                 gameRunningState = null;
                 deathCounter = 0;
                 app.restart();

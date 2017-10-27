@@ -33,7 +33,6 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Plane;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
@@ -51,7 +50,6 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Quad;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainPatch;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -60,7 +58,7 @@ import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
 import com.jme3.util.SkyFactory;
-import com.jme3.water.SimpleWaterProcessor;
+//import com.jme3.water.SimpleWaterProcessor;
 import com.jme3.water.WaterFilter;
 import de.lessvoid.nifty.controls.Console;
 import java.io.File;
@@ -186,7 +184,7 @@ public class GameRunningState extends AbstractAppState {
     private final float ssaoIntensity = 0.5f; // 1.2f 43.92f, 
     private final float ssaoScale = 0.2f;// 0.2f 0.33f, 
     private final float ssaoBias = 0.3f; // 0.1f 0.61f
-    private final boolean approximateNormals = true;
+    // private final boolean approximateNormals = true;
     private SSAOFilter ssaoFilter;
     private boolean ssaoEnabled = false;
 
@@ -202,14 +200,14 @@ public class GameRunningState extends AbstractAppState {
     private final Material matEvening;
     private final Material matNight;
 
-    public SimpleWaterProcessor waterProcessor;
-    private final float waterSpeed = 0.015f;
-    private final float waterStrength = 0.05f;
-    private final int waterDepth = 75;
-
+    // public SimpleWaterProcessor waterProcessor;
+    // private final float waterSpeed = 0.015f;
+    // private final float waterStrength = 0.05f;
+    // private final int waterDepth = 75;
     private GlobalLightingControl glc;
     private final PlayerControl playerControl;
     private EnemyControl enemyControl;
+    // private Geometry waterGeom;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessingEnabled, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -699,37 +697,51 @@ public class GameRunningState extends AbstractAppState {
         bulletAppState.setEnabled(true);
 
         //WATER
+        water = new WaterFilter((Node) localRootNode, new Vector3f(0, 0, 0));
+        water.setWaterHeight(initialWaterHeight);
+        water.setUseSpecular(specular);
+        water.setUseHQShoreline(hqshore);
+        water.setUseCaustics(caustics);
+        water.setUseFoam(foam);
+        water.setUseRefraction(refraction);
+        water.setUseRipples(ripples);
         if (waterPostProcessing) {
-            water = new WaterFilter((Node) localRootNode, new Vector3f(0, 0, 0));
-            water.setWaterHeight(initialWaterHeight);
-            water.setUseSpecular(specular);
-            water.setUseHQShoreline(hqshore);
-            water.setUseCaustics(caustics);
-            water.setUseFoam(foam);
-            water.setUseRefraction(refraction);
-            water.setUseRipples(ripples);
-            fpp.addFilter(water);
-        } else {
-            waterProcessor = new SimpleWaterProcessor(app.getAssetManager());
-            waterProcessor.setReflectionScene(localRootNode);
-            waterProcessor.setWaterDepth(waterDepth);
-            waterProcessor.setWaterColor(ColorRGBA.Blue);
-            waterProcessor.setDistortionScale(waterStrength);
-            waterProcessor.setWaveSpeed(waterSpeed);
-            waterProcessor.setRenderSize(256, 256);
-            Vector3f waterLocation = new Vector3f(0, -4f, 0);
-            waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
-            Quad quad = new Quad(4096, 4096);
-            quad.scaleTextureCoordinates(new Vector2f(6f, 6f));
-            Geometry waterGeom = new Geometry("water", quad);
-            waterGeom.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
-            waterGeom.setLocalTranslation(-1024, -4f, 1024);
-            waterGeom.setShadowMode(RenderQueue.ShadowMode.Off);
-            app.getViewPort().addProcessor(waterProcessor);
-            waterGeom.setMaterial(waterProcessor.getMaterial());
-            localRootNode.attachChild(waterGeom);
+            if (!fpp.getFilterList().contains(water)) {
+                fpp.addFilter(water);
+            }
         }
 
+        //WATER
+        /*        if (waterPostProcessing) {
+        water = new WaterFilter((Node) localRootNode, new Vector3f(0, 0, 0));
+        water.setWaterHeight(initialWaterHeight);
+        water.setUseSpecular(specular);
+        water.setUseHQShoreline(hqshore);
+        water.setUseCaustics(caustics);
+        water.setUseFoam(foam);
+        water.setUseRefraction(refraction);
+        water.setUseRipples(ripples);
+        fpp.addFilter(water);
+        } else {
+        waterProcessor = new SimpleWaterProcessor(app.getAssetManager());
+        waterProcessor.setReflectionScene(localRootNode);
+        waterProcessor.setWaterDepth(waterDepth);
+        waterProcessor.setWaterColor(ColorRGBA.Blue);
+        waterProcessor.setDistortionScale(waterStrength);
+        waterProcessor.setWaveSpeed(waterSpeed);
+        waterProcessor.setRenderSize(256, 256);
+        Vector3f waterLocation = new Vector3f(0, -4f, 0);
+        waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
+        Quad quad = new Quad(4096, 4096);
+        quad.scaleTextureCoordinates(new Vector2f(6f, 6f));
+        waterGeom = new Geometry("water", quad);
+        waterGeom.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
+        waterGeom.setLocalTranslation(-1024, -4f, 1024);
+        waterGeom.setShadowMode(RenderQueue.ShadowMode.Off);
+        waterGeom.setMaterial(waterProcessor.getMaterial());
+        app.getViewPort().addProcessor(waterProcessor);
+        localRootNode.attachChild(waterGeom);
+        }*/
         playerControl.getPhysicsCharacter().setEnabled(true);
         amb.play();
         amb1.play();
@@ -1045,11 +1057,12 @@ public class GameRunningState extends AbstractAppState {
                     waterHeight = (float) Math.cos(((timeWater * 0.6f) % FastMath.TWO_PI)) * 1.5f;
                     water.setWaterHeight(initialWaterHeight + waterHeight);
                 }
-            } else {
-                waterProcessor.setWaterDepth(waterDepth);
-                waterProcessor.setDistortionScale(waterStrength);
-                waterProcessor.setWaveSpeed(waterSpeed);
             }
+            /*            else {
+            waterProcessor.setWaterDepth(waterDepth);
+            waterProcessor.setDistortionScale(waterStrength);
+            waterProcessor.setWaveSpeed(waterSpeed);
+            }*/
 
             if (lightScatterEnabled) {
                 if (!glc.isNight()) {
@@ -1342,6 +1355,12 @@ public class GameRunningState extends AbstractAppState {
                         }
                     }
 
+                    if (playerControl.isRotating()) {
+                        localGuiNode.setCullHint(Spatial.CullHint.Always);
+                    } else {
+                        localGuiNode.setCullHint(Spatial.CullHint.Never);
+                    }
+
                     if (playerControl.getChaseCam().getDistanceToTarget() <= playerControl.getChaseCam().getMinDistance()) {
 
                         if (stateManager.getState(VideoRecorderAppState.class) == null) {
@@ -1488,7 +1507,6 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being attached");
         stateAttach();
         setIsRunning(true);
-
     }
 
     public void stateAttach() {
@@ -1512,12 +1530,16 @@ public class GameRunningState extends AbstractAppState {
             viewPort.addProcessor(fpp);
         }
 
-        if (!waterPostProcessing) {
-            if (waterProcessor != null) {
-                viewPort.addProcessor(waterProcessor);
-            } else {
-                System.out.println("Water Processor is null");
-            }
+        /*        if (!waterPostProcessing) {
+        if (waterProcessor != null) {
+        localRootNode.attachChild(waterGeom);
+        viewPort.addProcessor(waterProcessor);
+        } else {
+        System.out.println("Water Processor is null");
+        }
+        }*/
+        if (waterPostProcessing) {
+            //fpp.addFilter(water);
         }
 
         attachLocalGuiNode();
@@ -1541,6 +1563,8 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
+
+        Main.setShowFps(false);
 
         if (localGuiNode.hasChild(pic)) {
             pic.removeFromParent();
@@ -1567,6 +1591,9 @@ public class GameRunningState extends AbstractAppState {
 
         glc.setEnabled(false);
 
+        if (waterPostProcessing) {
+            // fpp.removeFilter(water);
+        }
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
         }
@@ -1578,12 +1605,15 @@ public class GameRunningState extends AbstractAppState {
             viewPort.removeProcessor(glc.getSlsr());
         }
 
-        if (!waterPostProcessing) {
-            viewPort.removeProcessor(waterProcessor);
-        }
-
         enemyControl.setEnabled(false);
         localRootNode.removeControl(enemyControl);
+
+        /*        if (!waterPostProcessing) {
+        if (waterProcessor != null) {
+        viewPort.removeProcessor(waterProcessor);
+        waterGeom.removeFromParent();
+        }
+        }*/
         dettachLocalRootNode();
         detachLocalGuiNode();
     }
