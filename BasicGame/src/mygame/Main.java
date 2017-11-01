@@ -79,10 +79,9 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private static AppSettings cfg;
     private static Main app;
 
-    // private static final boolean OPENCL = false;
     private static final boolean OPENAL = true;
 
-    private VideoRecorderAppState videoRecorderAppState;
+    // private VideoRecorderAppState videoRecorderAppState;
     private static DisplayMode[] modes;
 
     private final Trigger rain_trigger = new KeyTrigger(KeyInput.KEY_R);
@@ -100,7 +99,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private SettingsScreenState settingsScreenState;
 
     private Future loadFuture = null;
-    private final ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
+    private ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
     private Nifty nifty;
     private NiftyJmeDisplay niftyDisplay;
 
@@ -418,8 +417,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
         inputManager.setCursorVisible(false);
         flyCam.setEnabled(false);
 
-        videoRecorderAppState = new VideoRecorderAppState();
-
+        // videoRecorderAppState = new VideoRecorderAppState();
         startScreenState = new StartScreenState(this);
         settingsScreenState = new SettingsScreenState(this);
 
@@ -558,14 +556,22 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
             if (loadFuture == null) {
 
                 inputEnabled = false;
-                rootNode.detachAllChildren();
                 stateManager.attach(startScreenState);
                 app.getStateManager().detach(gameRunningState.getBulletAppState());
                 stateManager.detach(gameRunningState);
-                //viewPort.clearProcessors();
                 gameRunningState = null;
                 deathCounter = 0;
+
+                viewPort.clearProcessors();
                 app.restart();
+
+                try {
+                    Thread.sleep(15);
+                    //switchGameState();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
                 switchGameState();
             }
         }
@@ -694,16 +700,16 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
             if (name.equals("record") && !isPressed) {
 
                 if (stateManager.hasState(getGameRunningState())) {
-                    if (stateManager.hasState(videoRecorderAppState)) {
-                        stateManager.detach(videoRecorderAppState);
+                    if (stateManager.getState(VideoRecorderAppState.class) != null) {
+                        stateManager.detach(stateManager.getState(VideoRecorderAppState.class));
                         isRecording = false;
                         if (helloText.getCullHint() == Spatial.CullHint.Always) {
                             helloText.setCullHint(Spatial.CullHint.Never);
                         }
                         System.out.println("finished recording");
-                    } else if (!stateManager.hasState(videoRecorderAppState)) {
+                    } else {
                         if (!gameRunningState.isTimeDemo) {
-                            stateManager.attach(videoRecorderAppState);
+                            stateManager.attach(new VideoRecorderAppState(1.0f, 30));
                             helloText.setCullHint(Spatial.CullHint.Never);
                             isRecording = true;
                             System.out.println("start record");

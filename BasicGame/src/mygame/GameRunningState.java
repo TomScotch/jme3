@@ -1500,6 +1500,9 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateDetach() {
 
+        dettachLocalRootNode();
+        detachLocalGuiNode();
+
         Main.setShowFps(false);
 
         if (localGuiNode.hasChild(pic)) {
@@ -1527,8 +1530,8 @@ public class GameRunningState extends AbstractAppState {
 
         glc.setEnabled(false);
 
-        if (waterPostProcessing) {
-            // fpp.removeFilter(water);
+        if (waterPostProcessing && water != null) {
+            fpp.removeFilter(water);
         }
         if (viewPort.getProcessors().contains(fpp)) {
             viewPort.removeProcessor(fpp);
@@ -1544,14 +1547,6 @@ public class GameRunningState extends AbstractAppState {
         enemyControl.setEnabled(false);
         localRootNode.removeControl(enemyControl);
 
-        /*        if (!waterPostProcessing) {
-        if (waterProcessor != null) {
-        viewPort.removeProcessor(waterProcessor);
-        waterGeom.removeFromParent();
-        }
-        }*/
-        dettachLocalRootNode();
-        detachLocalGuiNode();
     }
 
     private void removeMappings() {
