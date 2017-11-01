@@ -1,1 +1,1 @@
- git commit -am "$(date)" ; git push
+git pull ; git commit -am "$(date)" ; git push
