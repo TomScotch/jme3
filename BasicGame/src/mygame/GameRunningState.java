@@ -103,7 +103,7 @@ public class GameRunningState extends AbstractAppState {
     private boolean weatherEnabled;
     private float counter = 0;
     private float limit = 0;
-    private final Spatial teapot;
+    //private Spatial teapot;
     private final Picture pic;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
@@ -200,7 +200,7 @@ public class GameRunningState extends AbstractAppState {
 
     private GlobalLightingControl glc;
     private final PlayerControl playerControl;
-    private EnemyControl enemyControl;
+    private final EnemyControl enemyControl;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessingEnabled, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -223,6 +223,7 @@ public class GameRunningState extends AbstractAppState {
         this.guiNode = app.getGuiNode();
         this.assetManager = app.getAssetManager();
         this.inputManager = app.getInputManager();
+        System.out.println("Game State CONSTRUKTOR");
 
         fps = new ArrayList<>();
         fpp = new FilterPostProcessor(assetManager);
@@ -232,9 +233,11 @@ public class GameRunningState extends AbstractAppState {
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setEnabled(false);
         bulletAppState.setDebugEnabled(false);
+        System.out.println("Game State PHYSICS");
 
         //CAMERA        
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
+        System.out.println("Game State Camera");
 
         //TERRAIN
         Texture heightMapImage = assetManager.loadTexture("Textures/Terrain/splat/mountains512.png");
@@ -258,6 +261,7 @@ public class GameRunningState extends AbstractAppState {
         bulletAppState.getPhysicsSpace().addAll(terrain);
         localRootNode.attachChild(terrain);
         rb.setFriction(1);
+        System.out.println("Game State Terrain");
 
         //FOV
         String xy = String.valueOf(viewPort.getCamera().getWidth()) + "x" + String.valueOf(viewPort.getCamera().getHeight());
@@ -291,6 +295,7 @@ public class GameRunningState extends AbstractAppState {
                 noWide = true;
                 break;
         }
+        System.out.println("Game State FOV");
 
         //PLAYER
         playerControl = new PlayerControl(app, bulletAppState, localRootNode, noWide);
@@ -298,6 +303,7 @@ public class GameRunningState extends AbstractAppState {
         Node player = new Node("playerNode");
         player.addControl(playerControl);
         localRootNode.attachChild(player);
+        System.out.println("Game State Player");
 
         //SUN
         Node sunNode = new Node("sunNode");
@@ -305,6 +311,7 @@ public class GameRunningState extends AbstractAppState {
         sunNode.addControl(glc);
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
+        System.out.println("Game State SUN");
 
         //SKY
         Texture west = assetManager.loadTexture("Textures/skybox/Night/FullMoonLeft2048.png");
@@ -376,6 +383,7 @@ public class GameRunningState extends AbstractAppState {
         evening.setCullHint(Spatial.CullHint.Always);
         morning.setCullHint(Spatial.CullHint.Always);
         night.setCullHint(Spatial.CullHint.Always);
+        System.out.println("Game State SKY");
 
         //LightScatter
         if (lightScatterEnabled) {
@@ -383,6 +391,7 @@ public class GameRunningState extends AbstractAppState {
             sunlight.setLightDensity(lightScatterFilterDensity);
             sunlight.setNbSamples(lightScatterFiltersamples);
             fpp.addFilter(sunlight);
+            System.out.println("Game State LightScatter");
         }
 
         //FOG
@@ -392,6 +401,7 @@ public class GameRunningState extends AbstractAppState {
             fog.setFogDistance(0);
             fog.setFogDensity(0);
             fpp.addFilter(fog);
+            System.out.println("Game State FOG");
         }
 
         //Weather
@@ -481,6 +491,7 @@ public class GameRunningState extends AbstractAppState {
             sun = new DirectionalLight();
             sun.setDirection((new Vector3f(0f, -0.5f, 0f)).normalizeLocal());
             sun.setColor(ColorRGBA.White);
+            System.out.println("Game State WEATHER");
         }
 
         //ANISOTROPY
@@ -508,18 +519,21 @@ public class GameRunningState extends AbstractAppState {
 
             };
             assetManager.addAssetEventListener(asl);
+            System.out.println("Game State ANISOTROPY");
         }
 
         //PosterizationFilter
         pf = new PosterizationFilter();
         pf.setNumColors(8);
         fpp.addFilter(pf);
+        System.out.println("Game State POSTER");
 
         //Depth of Field
         dofFilter = new DepthOfFieldFilter();
         dofFilter.setFocusRange(range);
         dofFilter.setBlurScale(scale);
         fpp.addFilter(dofFilter);
+        System.out.println("Game State DOF");
 
         //Bloom
         if (bloomEnabled) {
@@ -530,6 +544,7 @@ public class GameRunningState extends AbstractAppState {
             bloom.setBlurScale(blurScale);
             bloom.setExposurePower(exposurePower);
             fpp.addFilter(bloom);
+            System.out.println("Game State BLOOM");
         }
 
         //Screen Space Ambient Occlusion
@@ -537,6 +552,7 @@ public class GameRunningState extends AbstractAppState {
             ssaoFilter = new SSAOFilter(ssaoSampleRadius, ssaoIntensity, ssaoScale, ssaoBias);
             //ssaoFilter.setApproximateNormals(approximateNormals);
             fpp.addFilter(ssaoFilter);
+            System.out.println("Game State SSAO");
         }
 
         //Second Camera View
@@ -548,6 +564,8 @@ public class GameRunningState extends AbstractAppState {
         view2 = app.getRenderManager().createMainView("Bottom Left", cam2);
         view2.setClearFlags(true, true, true);
         view2.setEnabled(false);
+
+        System.out.println("Game State CAM2");
 
         //Audio
         lightRain = new AudioNode(assetManager, "audio/rain/light_rain.ogg", DataType.Stream);
@@ -571,10 +589,15 @@ public class GameRunningState extends AbstractAppState {
         amb2.setPositional(false);
         amb2.setVolume(ambienceVolume + 1.5f);
         localRootNode.attachChild(amb2);
+        System.out.println("Game State AUDIO");
 
+        //ENEMY
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
         limit = getRandomNumberInRange(15, 45);
+        System.out.println("Game State ENEMY");
 
+        //SCENE
+        /*                try {
         teapot = assetManager.loadModel("Models/alternativeScene.j3o");
         teapot.setName("scene");
         teapot.scale(5);
@@ -582,17 +605,20 @@ public class GameRunningState extends AbstractAppState {
         RigidBodyControl rb1 = new RigidBodyControl(0);
         teapot.addControl(rb1);
         rb1.setFriction(0.9f);
-
-        app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
-        app.getCamera().update();
-
+        } catch (OutOfMemoryError e) {
+        System.out.println(e.getLocalizedMessage());
+        }
+        System.out.println("Game State SCENE");*/
+        // app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
+        // app.getCamera().update();
+        //CROSSHAIR
         pic = new Picture("HUD Picture");
         pic.setImage(assetManager, "Textures/cross.png", true);
         pic.setName("crosshair");
         pic.setWidth(app.getContext().getSettings().getWidth() / 24);
         pic.setHeight(app.getContext().getSettings().getHeight() / 24);
         pic.setPosition(app.getContext().getSettings().getWidth() / 2, app.getContext().getSettings().getHeight() / 2);
-
+        System.out.println("Game State CROSSHAIR");
 
         /*        CartoonEdgeFilter toon = new CartoonEdgeFilter();
         toon.setEdgeWidth(0.5f);
@@ -799,27 +825,27 @@ public class GameRunningState extends AbstractAppState {
 
                 case "changeLevel":
                     if (value && isRunning) {
-                        if (!isTimeDemo) {
-                            if (localRootNode.getChild("scene") != null) {
-                                teapot.removeFromParent();
-                                bulletAppState.getPhysicsSpace().addAll(terrain);
-                                bulletAppState.getPhysicsSpace().removeAll(teapot);
-                                playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
-                                localRootNode.attachChild(terrain);
-                                enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
-                                localRootNode.addControl(enemyControl);
-                                enemyControl.setEnabled(true);
-                            } else if (localRootNode.hasChild(terrain)) {
-                                terrain.removeFromParent();
-                                localRootNode.attachChild(teapot);
-                                playerControl.getPhysicsCharacter().warp(new Vector3f(0, 6, 0));
-                                bulletAppState.getPhysicsSpace().addAll(teapot);
-                                bulletAppState.getPhysicsSpace().removeAll(terrain);
-                                enemyControl.remAllEnemys();
-                                enemyControl.setEnabled(false);
-                                localRootNode.removeControl(enemyControl);
-                            }
+                        /*                        if (!isTimeDemo) {
+                        if (localRootNode.getChild("scene") != null) {
+                        teapot.removeFromParent();
+                        bulletAppState.getPhysicsSpace().addAll(terrain);
+                        bulletAppState.getPhysicsSpace().removeAll(teapot);
+                        playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
+                        localRootNode.attachChild(terrain);
+                        enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
+                        localRootNode.addControl(enemyControl);
+                        enemyControl.setEnabled(true);
+                        } else if (localRootNode.hasChild(terrain)) {
+                        terrain.removeFromParent();
+                        localRootNode.attachChild(teapot);
+                        playerControl.getPhysicsCharacter().warp(new Vector3f(0, 6, 0));
+                        bulletAppState.getPhysicsSpace().addAll(teapot);
+                        bulletAppState.getPhysicsSpace().removeAll(terrain);
+                        enemyControl.remAllEnemys();
+                        enemyControl.setEnabled(false);
+                        localRootNode.removeControl(enemyControl);
                         }
+                        }*/
                     }
                     break;
 
@@ -923,17 +949,16 @@ public class GameRunningState extends AbstractAppState {
 
         playerControl.removeChaseCam();
 
-        if (teapot.getParent() != null) {
-            teapot.removeFromParent();
-            bulletAppState.getPhysicsSpace().removeAll(teapot);
-            bulletAppState.getPhysicsSpace().addAll(terrain);
-            playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
-            localRootNode.attachChild(terrain);
-            enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
-            localRootNode.addControl(enemyControl);
-            enemyControl.setEnabled(true);
-        }
-
+        /*        if (teapot.getParent() != null) {
+        teapot.removeFromParent();
+        bulletAppState.getPhysicsSpace().removeAll(teapot);
+        bulletAppState.getPhysicsSpace().addAll(terrain);
+        playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
+        localRootNode.attachChild(terrain);
+        enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
+        localRootNode.addControl(enemyControl);
+        enemyControl.setEnabled(true);
+        }*/
         try {
             try {
                 exporter.save(node, file);

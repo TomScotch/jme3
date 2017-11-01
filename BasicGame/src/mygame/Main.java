@@ -546,7 +546,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     }
 
     /**
-     * full deconstruction of the game state and fresh start of the game
+     * reset of the game state and fresh start of the game
      */
     public void doRestart() {
 
@@ -554,25 +554,8 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
 
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
-
-                inputEnabled = false;
-                stateManager.attach(startScreenState);
-                app.getStateManager().detach(gameRunningState.getBulletAppState());
-                stateManager.detach(gameRunningState);
-                gameRunningState = null;
-                deathCounter = 0;
-
-                viewPort.clearProcessors();
-                app.restart();
-
-                try {
-                    Thread.sleep(15);
-                    //switchGameState();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
                 switchGameState();
+                gameRunningState = null;
             }
         }
     }
