@@ -10,3 +10,9 @@ myServer/dist/
 myServer/nbproject/
 myServer/nbproject/* D
 myServer/nbproject/private D
+/Serenity/nbproject/private/
+/Test/nbproject/private/
+/Test/build/
+/Test/dist/
+/MyGame/build/
+/MyGame/dist/

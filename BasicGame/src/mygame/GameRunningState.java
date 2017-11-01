@@ -58,7 +58,6 @@ import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
 import com.jme3.util.SkyFactory;
-//import com.jme3.water.SimpleWaterProcessor;
 import com.jme3.water.WaterFilter;
 import de.lessvoid.nifty.controls.Console;
 import java.io.File;
@@ -184,7 +183,6 @@ public class GameRunningState extends AbstractAppState {
     private final float ssaoIntensity = 0.5f; // 1.2f 43.92f, 
     private final float ssaoScale = 0.2f;// 0.2f 0.33f, 
     private final float ssaoBias = 0.3f; // 0.1f 0.61f
-    // private final boolean approximateNormals = true;
     private SSAOFilter ssaoFilter;
     private boolean ssaoEnabled = false;
 
@@ -200,14 +198,9 @@ public class GameRunningState extends AbstractAppState {
     private final Material matEvening;
     private final Material matNight;
 
-    // public SimpleWaterProcessor waterProcessor;
-    // private final float waterSpeed = 0.015f;
-    // private final float waterStrength = 0.05f;
-    // private final int waterDepth = 75;
     private GlobalLightingControl glc;
     private final PlayerControl playerControl;
     private EnemyControl enemyControl;
-    // private Geometry waterGeom;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessingEnabled, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -711,37 +704,6 @@ public class GameRunningState extends AbstractAppState {
             }
         }
 
-        //WATER
-        /*        if (waterPostProcessing) {
-        water = new WaterFilter((Node) localRootNode, new Vector3f(0, 0, 0));
-        water.setWaterHeight(initialWaterHeight);
-        water.setUseSpecular(specular);
-        water.setUseHQShoreline(hqshore);
-        water.setUseCaustics(caustics);
-        water.setUseFoam(foam);
-        water.setUseRefraction(refraction);
-        water.setUseRipples(ripples);
-        fpp.addFilter(water);
-        } else {
-        waterProcessor = new SimpleWaterProcessor(app.getAssetManager());
-        waterProcessor.setReflectionScene(localRootNode);
-        waterProcessor.setWaterDepth(waterDepth);
-        waterProcessor.setWaterColor(ColorRGBA.Blue);
-        waterProcessor.setDistortionScale(waterStrength);
-        waterProcessor.setWaveSpeed(waterSpeed);
-        waterProcessor.setRenderSize(256, 256);
-        Vector3f waterLocation = new Vector3f(0, -4f, 0);
-        waterProcessor.setPlane(new Plane(Vector3f.UNIT_Y, waterLocation.dot(Vector3f.UNIT_Y)));
-        Quad quad = new Quad(4096, 4096);
-        quad.scaleTextureCoordinates(new Vector2f(6f, 6f));
-        waterGeom = new Geometry("water", quad);
-        waterGeom.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X));
-        waterGeom.setLocalTranslation(-1024, -4f, 1024);
-        waterGeom.setShadowMode(RenderQueue.ShadowMode.Off);
-        waterGeom.setMaterial(waterProcessor.getMaterial());
-        app.getViewPort().addProcessor(waterProcessor);
-        localRootNode.attachChild(waterGeom);
-        }*/
         playerControl.getPhysicsCharacter().setEnabled(true);
         amb.play();
         amb1.play();
@@ -978,20 +940,6 @@ public class GameRunningState extends AbstractAppState {
                 System.out.println("Succesfully saved " + node.getName() + " to " + file.getPath());
             } catch (OutOfMemoryError outOfMemoryError) {
                 System.out.println("run out of memory while saving root : " + outOfMemoryError.getLocalizedMessage());
-                /*
-                    for (Spatial kid : localRootNode.getChildren()) {
-                      try {
-                          Node childNode = (Node) kid;
-                           try {
-                            exporter.save(childNode, file);
-                               } catch (IOException ex) {
-                                 System.out.println("Failed to save : " + childNode.getName() + " < - > " + ex.getLocalizedMessage());
-                                }
-                            } catch (ClassCastException classCastException) {
-                          System.out.println(classCastException.getLocalizedMessage());
-                         }
-                    }
-                 */
             }
         } catch (IOException ex) {
             System.out.println("Failed to save Root : " + ex.getLocalizedMessage());
@@ -1528,18 +1476,6 @@ public class GameRunningState extends AbstractAppState {
 
         if (!viewPort.getProcessors().contains(fpp)) {
             viewPort.addProcessor(fpp);
-        }
-
-        /*        if (!waterPostProcessing) {
-        if (waterProcessor != null) {
-        localRootNode.attachChild(waterGeom);
-        viewPort.addProcessor(waterProcessor);
-        } else {
-        System.out.println("Water Processor is null");
-        }
-        }*/
-        if (waterPostProcessing) {
-            //fpp.addFilter(water);
         }
 
         attachLocalGuiNode();

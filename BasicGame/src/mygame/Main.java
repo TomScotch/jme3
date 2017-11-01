@@ -17,6 +17,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
+import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.Nifty;
@@ -45,8 +46,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
-//import com.jme3.opencl.*;
-import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.builder.EffectBuilder;
 import de.lessvoid.nifty.controls.Console;
 import de.lessvoid.nifty.controls.ConsoleExecuteCommandEvent;
@@ -54,8 +53,6 @@ import de.lessvoid.nifty.controls.console.builder.ConsoleBuilder;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.input.mapping.DefaultInputMapping;
 import de.lessvoid.nifty.screen.KeyInputHandler;
-//import java.util.Collections;
-//import java.util.List;
 
 /**
  * Application Main Method
@@ -118,12 +115,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private static boolean showFps = false;
     private boolean displayStatView = false;
     private boolean wireframe = false;
-    //private static Platform selectedPlatform;
     private Node settingsNode;
-
-    //private static final Object SYNC = new Object();
-    //private static List<? extends Device> availableDevices;
-    //private static int currentDeviceIndex;
     private BitmapText helloText;
     private float deathCounter = 0;
     private BitmapText deathText;
@@ -316,7 +308,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
         cfg = new AppSettings(false);
         cfg.setTitle("Serenity");
         app.setShowSettings(true);
-
+        cfg.setSettingsDialogImage("Textures/misc/gloemtoi.png");
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = sortModes(device.getDisplayModes());
 
