@@ -103,7 +103,7 @@ public class GameRunningState extends AbstractAppState {
     private boolean weatherEnabled;
     private float counter = 0;
     private float limit = 0;
-    //private Spatial teapot;
+    private Spatial teapot;
     private final Picture pic;
     private BitmapText hudText;
     protected boolean isTimeDemo = false;
@@ -200,7 +200,7 @@ public class GameRunningState extends AbstractAppState {
 
     private GlobalLightingControl glc;
     private final PlayerControl playerControl;
-    private final EnemyControl enemyControl;
+    private EnemyControl enemyControl;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessingEnabled, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -597,18 +597,19 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State ENEMY");
 
         //SCENE
-        /*                try {
-        teapot = assetManager.loadModel("Models/alternativeScene.j3o");
-        teapot.setName("scene");
-        teapot.scale(5);
-        teapot.setLocalTranslation(0, 2, 0);
-        RigidBodyControl rb1 = new RigidBodyControl(0);
-        teapot.addControl(rb1);
-        rb1.setFriction(0.9f);
+        try {
+            teapot = assetManager.loadModel("Models/alternativeScene.j3o");
+            teapot.setName("scene");
+            teapot.scale(5);
+            teapot.setLocalTranslation(0, 2, 0);
+            RigidBodyControl rb1 = new RigidBodyControl(0);
+            teapot.addControl(rb1);
+            rb1.setFriction(0.9f);
         } catch (OutOfMemoryError e) {
-        System.out.println(e.getLocalizedMessage());
+            System.out.println(e.getLocalizedMessage());
         }
-        System.out.println("Game State SCENE");*/
+        System.out.println("Game State SCENE");
+
         // app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
         // app.getCamera().update();
         //CROSSHAIR
@@ -825,27 +826,27 @@ public class GameRunningState extends AbstractAppState {
 
                 case "changeLevel":
                     if (value && isRunning) {
-                        /*                        if (!isTimeDemo) {
-                        if (localRootNode.getChild("scene") != null) {
-                        teapot.removeFromParent();
-                        bulletAppState.getPhysicsSpace().addAll(terrain);
-                        bulletAppState.getPhysicsSpace().removeAll(teapot);
-                        playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
-                        localRootNode.attachChild(terrain);
-                        enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
-                        localRootNode.addControl(enemyControl);
-                        enemyControl.setEnabled(true);
-                        } else if (localRootNode.hasChild(terrain)) {
-                        terrain.removeFromParent();
-                        localRootNode.attachChild(teapot);
-                        playerControl.getPhysicsCharacter().warp(new Vector3f(0, 6, 0));
-                        bulletAppState.getPhysicsSpace().addAll(teapot);
-                        bulletAppState.getPhysicsSpace().removeAll(terrain);
-                        enemyControl.remAllEnemys();
-                        enemyControl.setEnabled(false);
-                        localRootNode.removeControl(enemyControl);
+                        if (!isTimeDemo) {
+                            if (localRootNode.getChild("scene") != null) {
+                                teapot.removeFromParent();
+                                bulletAppState.getPhysicsSpace().addAll(terrain);
+                                bulletAppState.getPhysicsSpace().removeAll(teapot);
+                                playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
+                                localRootNode.attachChild(terrain);
+                                enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
+                                localRootNode.addControl(enemyControl);
+                                enemyControl.setEnabled(true);
+                            } else if (localRootNode.hasChild(terrain)) {
+                                terrain.removeFromParent();
+                                localRootNode.attachChild(teapot);
+                                playerControl.getPhysicsCharacter().warp(new Vector3f(0, 6, 0));
+                                bulletAppState.getPhysicsSpace().addAll(teapot);
+                                bulletAppState.getPhysicsSpace().removeAll(terrain);
+                                enemyControl.remAllEnemys();
+                                enemyControl.setEnabled(false);
+                                localRootNode.removeControl(enemyControl);
+                            }
                         }
-                        }*/
                     }
                     break;
 
@@ -949,16 +950,16 @@ public class GameRunningState extends AbstractAppState {
 
         playerControl.removeChaseCam();
 
-        /*        if (teapot.getParent() != null) {
-        teapot.removeFromParent();
-        bulletAppState.getPhysicsSpace().removeAll(teapot);
-        bulletAppState.getPhysicsSpace().addAll(terrain);
-        playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
-        localRootNode.attachChild(terrain);
-        enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
-        localRootNode.addControl(enemyControl);
-        enemyControl.setEnabled(true);
-        }*/
+        if (teapot.getParent() != null) {
+            teapot.removeFromParent();
+            bulletAppState.getPhysicsSpace().removeAll(teapot);
+            bulletAppState.getPhysicsSpace().addAll(terrain);
+            playerControl.getPhysicsCharacter().warp(new Vector3f(0, 3.5f, 0));
+            localRootNode.attachChild(terrain);
+            enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
+            localRootNode.addControl(enemyControl);
+            enemyControl.setEnabled(true);
+        }
         try {
             try {
                 exporter.save(node, file);
