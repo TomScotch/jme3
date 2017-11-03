@@ -555,7 +555,10 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
         if (stateManager.hasState(gameRunningState)) {
             if (loadFuture == null) {
                 switchGameState();
+                gameRunningState.cleanUp();
+                viewPort.clearProcessors();
                 gameRunningState = null;
+                System.gc();
             }
         }
     }

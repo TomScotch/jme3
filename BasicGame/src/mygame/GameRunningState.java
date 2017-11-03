@@ -597,17 +597,13 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State ENEMY");
 
         //SCENE
-        try {
-            teapot = assetManager.loadModel("Models/alternativeScene.j3o");
-            teapot.setName("scene");
-            teapot.scale(5);
-            teapot.setLocalTranslation(0, 2, 0);
-            RigidBodyControl rb1 = new RigidBodyControl(0);
-            teapot.addControl(rb1);
-            rb1.setFriction(0.9f);
-        } catch (OutOfMemoryError e) {
-            System.out.println(e.getLocalizedMessage());
-        }
+        teapot = assetManager.loadModel("Models/alternativeScene.j3o");
+        teapot.setName("scene");
+        teapot.scale(5);
+        teapot.setLocalTranslation(0, 2, 0);
+        RigidBodyControl rb1 = new RigidBodyControl(0);
+        teapot.addControl(rb1);
+        rb1.setFriction(0.9f);
         System.out.println("Game State SCENE");
 
         // app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
@@ -1522,6 +1518,14 @@ public class GameRunningState extends AbstractAppState {
         System.out.println("Game State is being detached");
         setIsRunning(false);
         stateDetach();
+    }
+
+    public void cleanUp() {
+
+        teapot = null;
+        for (Spatial spat : localRootNode.getChildren()) {
+            spat = null;
+        }
     }
 
     public void stateDetach() {
