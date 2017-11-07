@@ -2,6 +2,7 @@ package mygame;
 
 import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.VideoRecorderAppState;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.KeyInput;
@@ -19,7 +20,7 @@ import com.jme3.scene.shape.Sphere;
 public class Main extends SimpleApplication implements ActionListener {
 
     private BulletAppState bas;
-    private final int size = 5;
+    private final int size = 128;
     private Geometry core;
 
     public static void main(String[] args) {
@@ -27,6 +28,7 @@ public class Main extends SimpleApplication implements ActionListener {
         Main app = new Main();
         app.setDisplayStatView(false);
         app.setShowSettings(false);
+        app.setDisplayFps(true);
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.start();
     }
@@ -60,22 +62,19 @@ public class Main extends SimpleApplication implements ActionListener {
         MyPhysicsControl mpcA = new MyPhysicsControl();
         core.addControl(mpcA);
         core.move(size / 2, size / 2, size / 2);
+        core.center();
         rootNode.attachChild(core);
 
         for (int x = 0; x < size; x++) {
-
-            for (int y = 0; y < size; y++) {
-                for (int z = 0; z < size; z++) {
-                    Geometry geom = addBox(5);
-                    geom.move(x, y, z);
-                    rootNode.attachChild(geom);
-                }
-            }
+            Geometry geom = addBox(5);
+            geom.move(Vector3f.ZERO);
+            rootNode.attachChild(geom);
         }
 
         getFlyByCamera().setMoveSpeed(30);
         getCamera().getLocation().set(0, 0, 60);
         getCamera().lookAt(core.getLocalTranslation(), Vector3f.UNIT_XYZ);
+//        stateManager.attach(new VideoRecorderAppState(1.0f));
     }
 
     @Override
@@ -112,6 +111,11 @@ public class Main extends SimpleApplication implements ActionListener {
                 sp.removeFromParent();
                 sp = null;
             }
+
+            if (stateManager.getState(VideoRecorderAppState.class) != null) {
+                stateManager.detach(stateManager.getState(VideoRecorderAppState.class));
+            }
+
             inputManager.clearMappings();
             inputManager.removeListener(this);
             System.gc();
