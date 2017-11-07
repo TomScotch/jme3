@@ -3,6 +3,7 @@ package mygame;
 import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.VideoRecorderAppState;
+import com.jme3.bullet.BulletAppState;
 import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.export.binary.BinaryImporter;
@@ -558,7 +559,10 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
                 gameRunningState.cleanUp();
                 viewPort.clearProcessors();
                 gameRunningState = null;
+                stateManager.getState(BulletAppState.class).cleanup();
+                stateManager.detach(stateManager.getState(BulletAppState.class));
                 System.gc();
+                this.restart();
             }
         }
     }

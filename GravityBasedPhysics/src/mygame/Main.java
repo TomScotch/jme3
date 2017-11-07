@@ -4,18 +4,26 @@ import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 
-public class Main extends SimpleApplication {
+public class Main extends SimpleApplication implements ActionListener {
+
+    private BulletAppState bas;
+    private final int size = 5;
+    private Geometry core;
 
     public static void main(String[] args) {
-        
+
         Main app = new Main();
         app.setDisplayStatView(false);
         app.setShowSettings(false);
@@ -23,13 +31,16 @@ public class Main extends SimpleApplication {
         app.start();
     }
 
-    private BulletAppState bas;
-    private final int size = 5;
-    private Geometry core;
-
     @Override
     public void simpleInitApp() {
 
+        doInit();
+    }
+
+    private void doInit() {
+
+        inputManager.addMapping("restart", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addListener(this, "restart");
         inputManager.setCursorVisible(false);
 
         bas = new BulletAppState();
@@ -89,5 +100,24 @@ public class Main extends SimpleApplication {
         MyPhysicsControl mpcA = new MyPhysicsControl();
         geomA.addControl(mpcA);
         return geomA;
+    }
+
+    @Override
+    @SuppressWarnings("null")
+    public void onAction(String name, boolean isPressed, float tpf) {
+        if (name.equals("restart")) {
+            bas.setEnabled(false);
+            for (Spatial sp : rootNode.getChildren()) {
+                sp.removeControl(MyPhysicsControl.class);
+                sp.removeFromParent();
+                sp = null;
+            }
+            inputManager.clearMappings();
+            inputManager.removeListener(this);
+            System.gc();
+            this.restart();
+            doInit();
+            this.restart();
+        }
     }
 }

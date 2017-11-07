@@ -13,6 +13,7 @@ import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
+import com.jme3.audio.AudioRenderer;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.collision.CollisionResult;
@@ -201,6 +202,7 @@ public class GameRunningState extends AbstractAppState {
     private GlobalLightingControl glc;
     private final PlayerControl playerControl;
     private EnemyControl enemyControl;
+    private final AudioRenderer audioRenderer;
 
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessingEnabled, Boolean shadows, Boolean globalLightningEnabled) {
 
@@ -216,6 +218,7 @@ public class GameRunningState extends AbstractAppState {
         this.shadows = shadows;
         this.weatherEnabled = true;
         this.stateManager = app.getStateManager();
+        this.audioRenderer = app.getAudioRenderer();
 
         //CONSTRUKTOR
         this.rootNode = app.getRootNode();
@@ -230,6 +233,8 @@ public class GameRunningState extends AbstractAppState {
 
         //PHYSICS STATE
         bulletAppState = new BulletAppState();
+        bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
+        bulletAppState.initialize(stateManager, app);
         app.getStateManager().attach(bulletAppState);
         bulletAppState.setEnabled(false);
         bulletAppState.setDebugEnabled(false);
@@ -1481,6 +1486,8 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateAttach() {
 
+       // audioRenderer.resumeAll();
+
         setupHudText();
         glc.setEnabled(true);
         playerControl.setEnabled(true);
@@ -1529,6 +1536,8 @@ public class GameRunningState extends AbstractAppState {
     }
 
     public void stateDetach() {
+
+        //audioRenderer.pauseAll();
 
         dettachLocalRootNode();
         detachLocalGuiNode();
