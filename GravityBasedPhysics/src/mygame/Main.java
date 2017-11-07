@@ -10,10 +10,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
+import com.jme3.scene.shape.Sphere;
 
 public class Main extends SimpleApplication {
 
     public static void main(String[] args) {
+        
         Main app = new Main();
         app.setDisplayStatView(false);
         app.setShowSettings(false);
@@ -22,7 +24,7 @@ public class Main extends SimpleApplication {
     }
 
     private BulletAppState bas;
-    private final int size = 7;
+    private final int size = 5;
     private Geometry core;
 
     @Override
@@ -31,11 +33,21 @@ public class Main extends SimpleApplication {
         inputManager.setCursorVisible(false);
 
         bas = new BulletAppState();
+        bas.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
         bas.initialize(stateManager, this);
         stateManager.attach(bas);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
 
-        core = addBox(50000);
+        Sphere a = new Sphere(32, 32, 12);
+        core = new Geometry("Box", a);
+        Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        matA.setColor("Color", ColorRGBA.randomColor());
+        core.setMaterial(matA);
+        RigidBodyControl rbcA = new RigidBodyControl(999999);
+        core.addControl(rbcA);
+        bas.getPhysicsSpace().add(core);
+        MyPhysicsControl mpcA = new MyPhysicsControl();
+        core.addControl(mpcA);
         core.move(size / 2, size / 2, size / 2);
         rootNode.attachChild(core);
 
@@ -50,7 +62,8 @@ public class Main extends SimpleApplication {
             }
         }
 
-        getCamera().getLocation().set(0, 0, 50);
+        getFlyByCamera().setMoveSpeed(30);
+        getCamera().getLocation().set(0, 0, 60);
         getCamera().lookAt(core.getLocalTranslation(), Vector3f.UNIT_XYZ);
     }
 
@@ -77,5 +90,4 @@ public class Main extends SimpleApplication {
         geomA.addControl(mpcA);
         return geomA;
     }
-
 }

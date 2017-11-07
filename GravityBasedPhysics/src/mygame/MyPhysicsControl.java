@@ -19,7 +19,6 @@ public class MyPhysicsControl extends AbstractControl {
                 if (!children.contains(child)) {
                     children.add(child);
                 }
-
             }
         }
 
