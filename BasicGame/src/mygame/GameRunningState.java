@@ -609,6 +609,7 @@ public class GameRunningState extends AbstractAppState {
         RigidBodyControl rb1 = new RigidBodyControl(0);
         teapot.addControl(rb1);
         rb1.setFriction(0.9f);
+        teapot.setShadowMode(RenderQueue.ShadowMode.Receive);
         System.out.println("Game State SCENE");
 
         // app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
@@ -1018,9 +1019,8 @@ public class GameRunningState extends AbstractAppState {
             if (waterPostProcessing) {
                 if (dynamicLighting) {
                     if (!glc.isNight()) {
-                        water.setDeepWaterColor(glc.getBackgroundColor());
-                        water.setWaterColor(ColorRGBA.Blue);
-                        water.setLightColor(glc.getSun().getColor());
+                        water.setDeepWaterColor(ColorRGBA.Black);
+                        water.setLightColor(viewPort.getBackgroundColor());
                         water.getLightDirection().set(glc.getSunDirection());
                     } else {
                         water.setDeepWaterColor(ColorRGBA.Black);
@@ -1033,11 +1033,6 @@ public class GameRunningState extends AbstractAppState {
                     water.setWaterHeight(initialWaterHeight + waterHeight);
                 }
             }
-            /*            else {
-            waterProcessor.setWaterDepth(waterDepth);
-            waterProcessor.setDistortionScale(waterStrength);
-            waterProcessor.setWaveSpeed(waterSpeed);
-            }*/
 
             if (lightScatterEnabled) {
                 if (!glc.isNight()) {
@@ -1486,8 +1481,7 @@ public class GameRunningState extends AbstractAppState {
 
     public void stateAttach() {
 
-       // audioRenderer.resumeAll();
-
+        // audioRenderer.resumeAll();
         setupHudText();
         glc.setEnabled(true);
         playerControl.setEnabled(true);
@@ -1538,7 +1532,6 @@ public class GameRunningState extends AbstractAppState {
     public void stateDetach() {
 
         //audioRenderer.pauseAll();
-
         dettachLocalRootNode();
         detachLocalGuiNode();
 

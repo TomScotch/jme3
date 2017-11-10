@@ -26,8 +26,8 @@ public class Main extends SimpleApplication implements ActionListener {
     public static void main(String[] args) {
 
         Main app = new Main();
-        app.setDisplayStatView(false);
-        app.setShowSettings(false);
+        app.setDisplayStatView(true);
+        app.setShowSettings(true);
         app.setDisplayFps(true);
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.start();
