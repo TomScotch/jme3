@@ -40,6 +40,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
+import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.post.filters.DepthOfFieldFilter;
 import com.jme3.post.filters.FogFilter;
 import com.jme3.post.filters.LightScatteringFilter;
@@ -204,10 +205,14 @@ public class GameRunningState extends AbstractAppState {
     private EnemyControl enemyControl;
     private final AudioRenderer audioRenderer;
 
+    private int percentLoading = 0;
+    private boolean cartoonEdgeFilterEnabled = false;
+
     public GameRunningState(SimpleApplication app, Boolean fogEnabled, Boolean bloomEnabled, Boolean lightScatterEnabled, Boolean anisotropyEnabled, Boolean waterPostProcessingEnabled, Boolean shadows, Boolean globalLightningEnabled) {
 
         System.out.println("Game State is being constructed");
 
+        //CONSTRUKTOR
         this.console = mygame.Main.getConsole();
         this.fogEnabled = fogEnabled;
         this.bloomEnabled = bloomEnabled;
@@ -219,8 +224,6 @@ public class GameRunningState extends AbstractAppState {
         this.weatherEnabled = true;
         this.stateManager = app.getStateManager();
         this.audioRenderer = app.getAudioRenderer();
-
-        //CONSTRUKTOR
         this.rootNode = app.getRootNode();
         this.viewPort = app.getViewPort();
         this.guiNode = app.getGuiNode();
@@ -231,6 +234,9 @@ public class GameRunningState extends AbstractAppState {
         fps = new ArrayList<>();
         fpp = new FilterPostProcessor(assetManager);
 
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
+
         //PHYSICS STATE
         bulletAppState = new BulletAppState();
         bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
@@ -239,10 +245,14 @@ public class GameRunningState extends AbstractAppState {
         bulletAppState.setEnabled(false);
         bulletAppState.setDebugEnabled(false);
         System.out.println("Game State PHYSICS");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //CAMERA        
         this.viewPort.getCamera().setLocation(new Vector3f(0, 8, -10));
         System.out.println("Game State Camera");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //TERRAIN
         Texture heightMapImage = assetManager.loadTexture("Textures/Terrain/splat/mountains512.png");
@@ -267,6 +277,8 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(terrain);
         rb.setFriction(1);
         System.out.println("Game State Terrain");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //FOV
         String xy = String.valueOf(viewPort.getCamera().getWidth()) + "x" + String.valueOf(viewPort.getCamera().getHeight());
@@ -301,6 +313,8 @@ public class GameRunningState extends AbstractAppState {
                 break;
         }
         System.out.println("Game State FOV");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //PLAYER
         playerControl = new PlayerControl(app, bulletAppState, localRootNode, noWide);
@@ -309,6 +323,8 @@ public class GameRunningState extends AbstractAppState {
         player.addControl(playerControl);
         localRootNode.attachChild(player);
         System.out.println("Game State Player");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //SUN
         Node sunNode = new Node("sunNode");
@@ -317,6 +333,8 @@ public class GameRunningState extends AbstractAppState {
         localRootNode.attachChild(sunNode);
         glc.setGlobalLightning(this.globalLightningEnabled);
         System.out.println("Game State SUN");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //SKY
         Texture west = assetManager.loadTexture("Textures/skybox/Night/FullMoonLeft2048.png");
@@ -389,6 +407,8 @@ public class GameRunningState extends AbstractAppState {
         morning.setCullHint(Spatial.CullHint.Always);
         night.setCullHint(Spatial.CullHint.Always);
         System.out.println("Game State SKY");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //LightScatter
         if (lightScatterEnabled) {
@@ -398,6 +418,8 @@ public class GameRunningState extends AbstractAppState {
             fpp.addFilter(sunlight);
             System.out.println("Game State LightScatter");
         }
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //FOG
         if (fogEnabled) {
@@ -408,6 +430,8 @@ public class GameRunningState extends AbstractAppState {
             fpp.addFilter(fog);
             System.out.println("Game State FOG");
         }
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //Weather
         if (weatherEnabled) {
@@ -498,6 +522,8 @@ public class GameRunningState extends AbstractAppState {
             sun.setColor(ColorRGBA.White);
             System.out.println("Game State WEATHER");
         }
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //ANISOTROPY
         if (anisotropyEnabled) {
@@ -526,12 +552,16 @@ public class GameRunningState extends AbstractAppState {
             assetManager.addAssetEventListener(asl);
             System.out.println("Game State ANISOTROPY");
         }
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //PosterizationFilter
         pf = new PosterizationFilter();
         pf.setNumColors(8);
         fpp.addFilter(pf);
         System.out.println("Game State POSTER");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //Depth of Field
         dofFilter = new DepthOfFieldFilter();
@@ -539,6 +569,8 @@ public class GameRunningState extends AbstractAppState {
         dofFilter.setBlurScale(scale);
         fpp.addFilter(dofFilter);
         System.out.println("Game State DOF");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //Bloom
         if (bloomEnabled) {
@@ -551,6 +583,8 @@ public class GameRunningState extends AbstractAppState {
             fpp.addFilter(bloom);
             System.out.println("Game State BLOOM");
         }
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //Screen Space Ambient Occlusion
         if (ssaoEnabled) {
@@ -559,6 +593,8 @@ public class GameRunningState extends AbstractAppState {
             fpp.addFilter(ssaoFilter);
             System.out.println("Game State SSAO");
         }
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //Second Camera View
         cam2 = app.getCamera().clone();
@@ -571,6 +607,8 @@ public class GameRunningState extends AbstractAppState {
         view2.setEnabled(false);
 
         System.out.println("Game State CAM2");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //Audio
         lightRain = new AudioNode(assetManager, "audio/rain/light_rain.ogg", DataType.Stream);
@@ -595,11 +633,15 @@ public class GameRunningState extends AbstractAppState {
         amb2.setVolume(ambienceVolume + 1.5f);
         localRootNode.attachChild(amb2);
         System.out.println("Game State AUDIO");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //ENEMY
         enemyControl = new EnemyControl(glc, assetManager, localRootNode, bulletAppState, playerControl);
         limit = getRandomNumberInRange(15, 45);
         System.out.println("Game State ENEMY");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
         //SCENE
         teapot = assetManager.loadModel("Models/alternativeScene.j3o");
@@ -611,9 +653,9 @@ public class GameRunningState extends AbstractAppState {
         rb1.setFriction(0.9f);
         teapot.setShadowMode(RenderQueue.ShadowMode.Receive);
         System.out.println("Game State SCENE");
+        percentLoading += 5;
+        app.getStateManager().getState(StartScreenState.class).getText().setText(String.valueOf(percentLoading));
 
-        // app.getCamera().setFrustum(app.getCamera().getFrustumNear(), app.getCamera().getFrustumFar() * 2, app.getCamera().getFrustumLeft(), app.getCamera().getFrustumRight(), app.getCamera().getFrustumTop(), app.getCamera().getFrustumBottom());
-        // app.getCamera().update();
         //CROSSHAIR
         pic = new Picture("HUD Picture");
         pic.setImage(assetManager, "Textures/cross.png", true);
@@ -623,11 +665,13 @@ public class GameRunningState extends AbstractAppState {
         pic.setPosition(app.getContext().getSettings().getWidth() / 2, app.getContext().getSettings().getHeight() / 2);
         System.out.println("Game State CROSSHAIR");
 
-        /*        CartoonEdgeFilter toon = new CartoonEdgeFilter();
-        toon.setEdgeWidth(0.5f);
-        toon.setEdgeIntensity(1.0f);
-        toon.setNormalThreshold(0.8f);
-        fpp.addFilter(toon);*/
+        if (cartoonEdgeFilterEnabled) {
+            CartoonEdgeFilter toon = new CartoonEdgeFilter();
+            toon.setEdgeWidth(0.5f);
+            toon.setEdgeIntensity(1.0f);
+            toon.setNormalThreshold(0.8f);
+            fpp.addFilter(toon);
+        }
     }
 
     private void setupHudText() {
@@ -652,7 +696,7 @@ public class GameRunningState extends AbstractAppState {
         Integer i = (int) playerControl.getHealth();
         healthText.setText(i.toString());
         healthText.setLocalTranslation(healthText.getSize(), viewPort.getCamera().getHeight() - healthText.getHeight(), 0);
-        guiNode.attachChild(healthText);
+        localGuiNode.attachChild(healthText);
         healthText.setCullHint(Spatial.CullHint.Never);
     }
 
@@ -734,8 +778,8 @@ public class GameRunningState extends AbstractAppState {
         }
 
         playerControl.getPhysicsCharacter().setEnabled(true);
-        amb.play();
-        amb1.play();
+        // amb.play();
+        //  amb1.play();
         amb2.play();
     }
 
@@ -1326,8 +1370,10 @@ public class GameRunningState extends AbstractAppState {
                     }
 
                     if (playerControl.isRotating()) {
+                        guiNode.detachChild(localGuiNode);
                         localGuiNode.setCullHint(Spatial.CullHint.Always);
                     } else {
+                        guiNode.attachChild(localGuiNode);
                         localGuiNode.setCullHint(Spatial.CullHint.Never);
                     }
 
@@ -1935,5 +1981,9 @@ public class GameRunningState extends AbstractAppState {
 
     public void setHealth(float health) {
         this.health = health;
+    }
+
+    public int getPercentLoading() {
+        return percentLoading;
     }
 };

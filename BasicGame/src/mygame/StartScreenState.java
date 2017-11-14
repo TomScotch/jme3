@@ -4,6 +4,8 @@ import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
@@ -17,6 +19,8 @@ import com.jme3.texture.Texture;
 public class StartScreenState extends AbstractAppState {
 
     private final Geometry geo;
+    private final BitmapFont guiFont;
+    private final BitmapText helloText;
 
     public Geometry getBoxGeo() {
         return boxGeo;
@@ -31,9 +35,18 @@ public class StartScreenState extends AbstractAppState {
     private final Geometry boxGeo;
 
     public StartScreenState(SimpleApplication app) {
+
         this.rootNode = app.getRootNode();
         this.viewPort = app.getViewPort();
         this.guiNode = app.getGuiNode();
+
+        guiNode.detachAllChildren();
+        guiFont = app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
+        helloText = new BitmapText(guiFont, false);
+        helloText.setSize(guiFont.getCharSet().getRenderedSize());
+        helloText.setLocalTranslation(app.getCamera().getWidth() / 2, helloText.getLineHeight(), 0);
+        helloText.setColor(ColorRGBA.Blue);
+
         Box boxMesh = new Box(1, 1, 1);
         boxGeo = new Geometry("Box", boxMesh);
         Material boxMat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -53,20 +66,6 @@ public class StartScreenState extends AbstractAppState {
         localRootNode.attachChild(geo);
     }
 
-    public void attachBox() {
-        if (!localRootNode.hasChild(boxGeo)) {
-            localRootNode.detachChild(geo);
-            localRootNode.attachChild(boxGeo);
-        }
-    }
-
-    public void detachBox() {
-        if (localRootNode.hasChild(boxGeo)) {
-            boxGeo.removeFromParent();
-            localRootNode.attachChild(geo);
-        }
-    }
-
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -83,6 +82,26 @@ public class StartScreenState extends AbstractAppState {
         if (localRootNode.hasChild(geo)) {
             viewPort.getCamera().setLocation(new Vector3f(0, 0, -5.5f));
             viewPort.getCamera().lookAt(geo.getLocalTranslation(), Vector3f.UNIT_Y);
+        }
+    }
+
+    public BitmapText getText() {
+        return helloText;
+    }
+
+    public void attachBox() {
+        localGuiNode.attachChild(helloText);
+        if (!localRootNode.hasChild(boxGeo)) {
+            localRootNode.detachChild(geo);
+            localRootNode.attachChild(boxGeo);
+        }
+    }
+
+    public void detachBox() {
+        localGuiNode.detachChild(helloText);
+        if (localRootNode.hasChild(boxGeo)) {
+            boxGeo.removeFromParent();
+            localRootNode.attachChild(geo);
         }
     }
 
