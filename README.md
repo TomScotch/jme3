@@ -2,7 +2,7 @@
 			     \                          
 			      \\                        Download can be found here.
 			       \\                       
-			        >\/7                    https://4864a12a7a63b2a58922cece3c4f7e60.resindevice.io/myGame.zip
+			        >\/7                    https://4864a12a7a63b2a58922cece3c4f7e60.resindevice.io
 			    _.-(6'  \                   
 			   (=___._/` \                  Use : " java -jar MyGame.jar" after unzipping, to start Game
 			        )  \ |

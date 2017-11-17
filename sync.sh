@@ -1,1 +1,1 @@
-resin sync --source ../simple-server-node/data/ --destination /opt
+resin sync --source ~/jme3/BasicGame/dist/ --destination /opt
