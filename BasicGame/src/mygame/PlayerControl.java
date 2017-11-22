@@ -7,6 +7,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioNode;
+import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.SphereCollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
@@ -556,6 +557,8 @@ public class PlayerControl extends AbstractControl {
             addControl(rigidBody);
             addControl(new ArrowFacingControl());
             addControl(new ArrowLifeTimeControl(10));
+//            BoundingBox bbox = new BoundingBox(new Vector3f(5, 0, 0), 1, 1, 1);
+//            setModelBound(bbox);
 
             ParticleEmitter fireEffect = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 30);
             Material fireMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
@@ -599,6 +602,13 @@ public class PlayerControl extends AbstractControl {
 
         @Override
         protected void controlUpdate(float tpf) {
+
+            Ray r = new Ray(spatial.getLocalTranslation(), Vector3f.UNIT_X);
+            CollisionResults res = new CollisionResults();
+            localRootNode.collideWith(r, res);
+            for (int i = 0; i < res.size(); i++) {
+                System.out.println("--- Collision #" + i + " ---");
+            }
             counter += tpf;
             if (counter > lifetime) {
                 this.spatial.removeFromParent();
