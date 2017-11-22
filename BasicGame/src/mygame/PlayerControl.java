@@ -8,8 +8,12 @@ import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.shapes.SphereCollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
+import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.collision.CollisionResults;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -36,6 +40,7 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.control.LightControl;
+import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Quad;
 import com.jme3.system.JmeContext;
 
@@ -103,6 +108,7 @@ public class PlayerControl extends AbstractControl {
     private final float sprintModifier = 1.75f;
     private boolean isSprinting = false;
     private final float stamina_Recover_Value = 25;
+    private boolean firingArrow = false;
 
     public PlayerControl(SimpleApplication app, BulletAppState bulletState, Node localRootNode, boolean noWide) {
 
@@ -238,6 +244,9 @@ public class PlayerControl extends AbstractControl {
                     if (attacking) {
                         attack();
                     }
+                    if (firingArrow) {
+                        fireArrow();
+                    }
                 }
                 if (health <= 0) {
 
@@ -246,6 +255,7 @@ public class PlayerControl extends AbstractControl {
                 if (hitAnimationDelay > 0) {
                     hitAnimationDelay -= tpf;
                 }
+
                 if (attackTimer > 0) {
                     attackTimer -= tpf;
                 }
@@ -391,7 +401,14 @@ public class PlayerControl extends AbstractControl {
         public void onAction(String binding, boolean value, float tpf) {
             idleCounter = 0;
             switch (binding) {
-
+                case "fire":
+//                    if (chaseEnabled) {
+                    //         if (getChaseCam().getDistanceToTarget() <= getChaseCam().getMinDistance()) {
+                    System.out.println("firing projectile");
+                    firingArrow = value;
+                    //       }
+                    //                  }
+                    break;
                 case "sprint":
                     sprint = value;
                     break;
@@ -416,7 +433,6 @@ public class PlayerControl extends AbstractControl {
                     break;
                 case "Shoot":
                     attacking = value;
-
                     break;
                 case "Strafe Left":
                     leftStrafe = value;
@@ -516,6 +532,105 @@ public class PlayerControl extends AbstractControl {
         }
     }
 
+    private void fireArrow() {
+        if (attackTimer <= 0) {
+            attackTimer = attackTime;
+            Arrow arrow = new Arrow(model.getWorldTranslation(), physicsCharacter.getViewDirection().mult(120));
+            localRootNode.attachChild(arrow);
+            bulletAppState.getPhysicsSpace().add(arrow);
+        }
+    }
+
+    public class Arrow extends Node {
+
+        public Arrow(Vector3f location, Vector3f velocity) {
+            Geometry geometry = new Geometry("bullet", new Box(0.3f, 4f, 0.3f));
+            geometry.setLocalTranslation(0, -4f, 0);
+            this.setLocalTranslation(location);
+            //this.setLocalRotation(model.getLocalRotation());
+            SphereCollisionShape arrowHeadCollision = new SphereCollisionShape(0.5f);
+            RigidBodyControl rigidBody = new RigidBodyControl(arrowHeadCollision, 1f);
+            //this.lookAt(model.getWorldTranslation().add(0, 0, 1), Vector3f.UNIT_Y);
+            // rigidBody.setPhysicsRotation(model.getLocalRotation());
+            rigidBody.setLinearVelocity(velocity);
+            addControl(rigidBody);
+            addControl(new ArrowFacingControl());
+            addControl(new ArrowLifeTimeControl(10));
+
+            ParticleEmitter fireEffect = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 30);
+            Material fireMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+            fireEffect.setMaterial(fireMat);
+            fireEffect.setImagesX(2);
+            fireEffect.setImagesY(2); // 2x2 texture animation
+            fireEffect.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f));   // red
+            fireEffect.setStartColor(new ColorRGBA(1f, 1f, 0f, 0.5f)); // yellow
+            fireEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 2, 0));
+            fireEffect.setStartSize(0.6f);
+            fireEffect.setEndSize(0.1f);
+            fireEffect.setGravity(0f, 0f, 0f);
+            fireEffect.setLowLife(0.5f);
+            fireEffect.setHighLife(3f);
+            fireEffect.getParticleInfluencer().setVelocityVariation(0.3f);
+            attachChild(fireEffect);
+
+            /*            ParticleEmitter debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 10);
+            Material debrisMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+            debrisMat.setTexture("Texture", assetManager.loadTexture("Effects/Explosion/Debris.png"));
+            debrisEffect.setMaterial(debrisMat);
+            debrisEffect.setImagesX(3);
+            debrisEffect.setImagesY(3); // 3x3 texture animation
+            debrisEffect.setRotateSpeed(4);
+            debrisEffect.setSelectRandomImage(true);
+            debrisEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 4, 0));
+            debrisEffect.setStartColor(new ColorRGBA(1f, 1f, 1f, 1f));
+            debrisEffect.setGravity(0f, 6f, 0f);
+            debrisEffect.getParticleInfluencer().setVelocityVariation(.60f);*/
+        }
+    }
+
+    public class ArrowLifeTimeControl extends AbstractControl {
+
+        float counter = 0;
+        float lifetime;
+
+        public ArrowLifeTimeControl(float time) {
+            this.lifetime = time;
+        }
+
+        @Override
+        protected void controlUpdate(float tpf) {
+            counter += tpf;
+            if (counter > lifetime) {
+                this.spatial.removeFromParent();
+                bulletAppState.getPhysicsSpace().remove(this.spatial);
+                this.spatial.removeControl(ArrowFacingControl.class);
+                this.spatial.removeControl(this);
+            }
+        }
+
+        @Override
+        protected void controlRender(RenderManager rm, ViewPort vp) {
+            //  throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+    }
+
+    public class ArrowFacingControl extends AbstractControl {
+
+        Vector3f directions;
+
+        @Override
+        protected void controlUpdate(float tpf) {
+            directions = spatial.getControl(RigidBodyControl.class).getLinearVelocity().normalize();
+            spatial.rotateUpTo(directions);
+        }
+
+        @Override
+        protected void controlRender(RenderManager rm, ViewPort vp) {
+            //
+        }
+    }
+
     public ChaseCamera getChaseCam() {
         return chaseCam;
     }
@@ -539,6 +654,7 @@ public class PlayerControl extends AbstractControl {
         inputManager.addListener(actionListener, "changeFPS");
         inputManager.addListener(actionListener, "changeFOV");
         inputManager.addListener(actionListener, "Jump", "Shoot", "flashlight");
+        inputManager.addListener(actionListener, "fire");
     }
 
     public void removeListeners() {
@@ -546,6 +662,7 @@ public class PlayerControl extends AbstractControl {
     }
 
     public void removeMappings() {
+        inputManager.deleteMapping("fire");
         inputManager.deleteMapping("flashlight");
         inputManager.deleteMapping("leftRotate");
         inputManager.deleteMapping("rightRotate");
@@ -562,6 +679,8 @@ public class PlayerControl extends AbstractControl {
     }
 
     public void setupMappings() {
+        inputManager.addMapping("fire",
+                new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addMapping("sprint",
                 new KeyTrigger(KeyInput.KEY_LSHIFT));
         inputManager.addMapping("showHealthBar",
