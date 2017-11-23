@@ -7,7 +7,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioNode;
-import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.SphereCollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
@@ -405,7 +404,7 @@ public class PlayerControl extends AbstractControl {
                 case "fire":
 //                    if (chaseEnabled) {
                     //         if (getChaseCam().getDistanceToTarget() <= getChaseCam().getMinDistance()) {
-                    System.out.println("firing projectile");
+
                     firingArrow = value;
                     //       }
                     //                  }
@@ -536,7 +535,7 @@ public class PlayerControl extends AbstractControl {
     private void fireArrow() {
         if (attackTimer <= 0) {
             attackTimer = attackTime;
-            Arrow arrow = new Arrow(model.getWorldTranslation(), physicsCharacter.getViewDirection().mult(120));
+            Arrow arrow = new Arrow(model.getWorldTranslation(), camNode.getCamera().getDirection().mult(120));
             localRootNode.attachChild(arrow);
             bulletAppState.getPhysicsSpace().add(arrow);
         }
@@ -567,16 +566,16 @@ public class PlayerControl extends AbstractControl {
             fireEffect.setImagesY(2); // 2x2 texture animation
             fireEffect.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f));   // red
             fireEffect.setStartColor(new ColorRGBA(1f, 1f, 0f, 0.5f)); // yellow
-            fireEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 2, 0));
-            fireEffect.setStartSize(0.6f);
-            fireEffect.setEndSize(0.1f);
-            fireEffect.setGravity(0f, 0f, 0f);
+            //  fireEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 2, 0));
+            fireEffect.setStartSize(0.1f);
+            fireEffect.setEndSize(0.01f);
+            // fireEffect.setGravity(0f, 0f, 0f);
             fireEffect.setLowLife(0.5f);
             fireEffect.setHighLife(3f);
-            fireEffect.getParticleInfluencer().setVelocityVariation(0.3f);
+            //fireEffect.getParticleInfluencer().setVelocityVariation(0.3f);
             attachChild(fireEffect);
 
-            /*            ParticleEmitter debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 10);
+            ParticleEmitter debrisEffect = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 10);
             Material debrisMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
             debrisMat.setTexture("Texture", assetManager.loadTexture("Effects/Explosion/Debris.png"));
             debrisEffect.setMaterial(debrisMat);
@@ -587,7 +586,11 @@ public class PlayerControl extends AbstractControl {
             debrisEffect.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 4, 0));
             debrisEffect.setStartColor(new ColorRGBA(1f, 1f, 1f, 1f));
             debrisEffect.setGravity(0f, 6f, 0f);
-            debrisEffect.getParticleInfluencer().setVelocityVariation(.60f);*/
+            debrisEffect.getParticleInfluencer().setVelocityVariation(.60f);
+            debrisEffect.setParticlesPerSec(0);
+            debrisEffect.setNumParticles(100);
+            attachChild(debrisEffect);
+            debrisEffect.emitAllParticles();
         }
     }
 
@@ -595,6 +598,8 @@ public class PlayerControl extends AbstractControl {
 
         float counter = 0;
         float lifetime;
+        float removealCounter = 0;
+        private boolean waitforremoval = false;
 
         public ArrowLifeTimeControl(float time) {
             this.lifetime = time;
@@ -605,17 +610,55 @@ public class PlayerControl extends AbstractControl {
 
             Ray r = new Ray(spatial.getLocalTranslation(), Vector3f.UNIT_X);
             CollisionResults res = new CollisionResults();
-            localRootNode.collideWith(r, res);
-            for (int i = 0; i < res.size(); i++) {
-                System.out.println("--- Collision #" + i + " ---");
+            localRootNode.getParent().collideWith(r, res);
+            if (res.size() > 1) {
+                emitSmoke();
+                Geometry g = res.getCollision(1).getGeometry();
+                if (g != null) {
+                    String target = g.getName();
+                    if (target != null) {
+                        if (!target.equals("")) {
+                            if (target.equals("spider") | target.equals("forestmonster")) {
+                                if (!waitforremoval) {
+                                    System.out.println(target);
+                                    emitSmoke();
+                                    attack(target);
+                                    waitforremoval = true;
+                                    System.out.println("firing projectile and hit " + target);
+                                    spatial.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
+            if (waitforremoval) {
+                removealCounter += tpf;
+                if (removealCounter > lifetime) {
+                    removeArrow();
+                }
+            }
+
             counter += tpf;
             if (counter > lifetime) {
-                this.spatial.removeFromParent();
-                bulletAppState.getPhysicsSpace().remove(this.spatial);
-                this.spatial.removeControl(ArrowFacingControl.class);
-                this.spatial.removeControl(this);
+                waitforremoval = true;
             }
+        }
+
+        private void emitSmoke() {
+
+            Node n = (Node) spatial;
+            ParticleEmitter p = (ParticleEmitter) n.getChild("Debris");
+            p.setParticlesPerSec(40);
+        }
+
+        private void removeArrow() {
+            this.spatial.removeFromParent();
+            bulletAppState.getPhysicsSpace().remove(this.spatial);
+            this.spatial.removeControl(RigidBodyControl.class);
+            this.spatial.removeControl(ArrowFacingControl.class);
+            this.spatial.removeControl(this);
         }
 
         @Override
@@ -631,8 +674,12 @@ public class PlayerControl extends AbstractControl {
 
         @Override
         protected void controlUpdate(float tpf) {
-            directions = spatial.getControl(RigidBodyControl.class).getLinearVelocity().normalize();
-            spatial.rotateUpTo(directions);
+
+            if (spatial.getControl(RigidBodyControl.class) != null) {
+                directions = spatial.getControl(RigidBodyControl.class).getLinearVelocity().normalize();
+                spatial.rotateUpTo(directions);
+            }
+
         }
 
         @Override
