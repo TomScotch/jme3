@@ -35,7 +35,7 @@ public class MyPhysicsControl extends AbstractControl {
         }
 
         if (children.size() > 0) {
-            this.spatial.getControl(RigidBodyControl.class).setGravity(this.spatial.getLocalTranslation().subtract(children.get(0).getLocalTranslation()).negate().normalize().mult(200));
+            this.spatial.getControl(RigidBodyControl.class).setGravity(this.spatial.getLocalTranslation().subtract(children.get(0).getLocalTranslation()).negate().normalize().mult(10 * 14));
         }
     }
 

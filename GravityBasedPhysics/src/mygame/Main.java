@@ -44,7 +44,7 @@ public class Main extends SimpleApplication implements ActionListener {
         stateManager.attach(bas);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
 
-        Sphere a = new Sphere(32, 32, 12);
+        Sphere a = new Sphere(64, 64, 14);
         core = new Geometry("Box", a);
         Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         matA.setColor("Color", ColorRGBA.randomColor());
@@ -56,14 +56,8 @@ public class Main extends SimpleApplication implements ActionListener {
 
         rootNode.attachChild(core);
 
-        for (int x = 0; x < 16; x++) {
-            Geometry geom = addBox(1);
-            rootNode.attachChild(geom);
-        }
-
-        for (int x = 0; x < 16; x++) {
-            Geometry geom = addBox(10);
-            rootNode.attachChild(geom);
+        for (int x = 0; x < 8; x++) {
+            rootNode.attachChild(addBox(100));
         }
 
         getFlyByCamera().setMoveSpeed(50);
@@ -72,7 +66,8 @@ public class Main extends SimpleApplication implements ActionListener {
 
     @Override
     public void simpleUpdate(float tpf) {
-        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.75f, 0));
+        core.getControl(RigidBodyControl.class).applyCentralForce(new Vector3f(0, core.getControl(RigidBodyControl.class).getLinearVelocity().getY(), 0));
+        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.1f, 0));
     }
 
     @Override
@@ -91,6 +86,7 @@ public class Main extends SimpleApplication implements ActionListener {
         geomA.addControl(rbcA);
         bas.getPhysicsSpace().add(geomA);
         rbcA.setGravity(Vector3f.ZERO);
+        rbcA.setAngularDamping(0);
         MyPhysicsControl mpcA = new MyPhysicsControl();
         geomA.addControl(mpcA);
         return geomA;
