@@ -1,8 +1,6 @@
 package mygame;
 
-import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.VideoRecorderAppState;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.KeyInput;
@@ -19,28 +17,20 @@ import com.jme3.scene.shape.Sphere;
 public class Main extends SimpleApplication implements ActionListener {
 
     private BulletAppState bas;
-    private final int size = 32;
     private Geometry core;
 
     public static void main(String[] args) {
 
         Main app = new Main();
-        app.setDisplayStatView(true);
-        app.setShowSettings(true);
+        app.setShowSettings(false);
+        app.setDisplayStatView(false);
         app.setDisplayFps(true);
-        app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.start();
     }
 
     @Override
     public void simpleInitApp() {
 
-        doInit();
-    }
-
-    private void doInit() {
-        inputManager.addMapping("record", new KeyTrigger(KeyInput.KEY_F6));
-        inputManager.addListener(this, "record");
         inputManager.addMapping("restart", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addListener(this, "restart");
         inputManager.addMapping("debug", new KeyTrigger(KeyInput.KEY_F1));
@@ -53,36 +43,36 @@ public class Main extends SimpleApplication implements ActionListener {
         bas.initialize(stateManager, this);
         stateManager.attach(bas);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
-        bas.setDebugEnabled(true);
 
         Sphere a = new Sphere(32, 32, 12);
         core = new Geometry("Box", a);
         Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         matA.setColor("Color", ColorRGBA.randomColor());
         core.setMaterial(matA);
-        RigidBodyControl rbcA = new RigidBodyControl(9999999);
+
+        RigidBodyControl rbcA = new RigidBodyControl(999999999);
         core.addControl(rbcA);
         bas.getPhysicsSpace().add(core);
-        rbcA.setFriction(999);
-        core.move(size / 2, size / 2, size / 2);
-        core.center();
+
         rootNode.attachChild(core);
 
-        for (int x = 0; x < size; x++) {
-            Geometry geom = addBox(5);
-            geom.move(Vector3f.ZERO);
+        for (int x = 0; x < 16; x++) {
+            Geometry geom = addBox(1);
             rootNode.attachChild(geom);
         }
 
-        getFlyByCamera().setMoveSpeed(30);
-        getCamera().getLocation().set(0, 0, 60);
-        getCamera().lookAt(core.getLocalTranslation(), Vector3f.UNIT_XYZ);
+        for (int x = 0; x < 16; x++) {
+            Geometry geom = addBox(10);
+            rootNode.attachChild(geom);
+        }
 
+        getFlyByCamera().setMoveSpeed(50);
+        getCamera().getLocation().set(0, 0, 60);
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(tpf * 100, 0, 0));
+        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.75f, 0));
     }
 
     @Override
@@ -90,15 +80,17 @@ public class Main extends SimpleApplication implements ActionListener {
         //
     }
 
-    private Geometry addBox(int mass) {
+    private Geometry addBox(float mass) {
         Box a = new Box(1, 1, 1);
         Geometry geomA = new Geometry("Box", a);
+        geomA.move(new Vector3f(0, 12, 0));
         Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         matA.setColor("Color", ColorRGBA.randomColor());
         geomA.setMaterial(matA);
         RigidBodyControl rbcA = new RigidBodyControl(mass);
         geomA.addControl(rbcA);
         bas.getPhysicsSpace().add(geomA);
+        rbcA.setGravity(Vector3f.ZERO);
         MyPhysicsControl mpcA = new MyPhysicsControl();
         geomA.addControl(mpcA);
         return geomA;
@@ -114,27 +106,6 @@ public class Main extends SimpleApplication implements ActionListener {
             } else {
                 bas.setDebugEnabled(true);
             }
-        }
-
-        if (name.equals("record") && !isPressed) {
-            if (stateManager.hasState(stateManager.getState(VideoRecorderAppState.class))) {
-                stateManager.detach(stateManager.getState(VideoRecorderAppState.class));
-            } else {
-                stateManager.attach(new VideoRecorderAppState(1, 30));
-            }
-        }
-
-        if (name.equals("restart") && !isPressed) {
-            bas.setEnabled(false);
-            bas.cleanup();
-            rootNode.detachAllChildren();
-            if (stateManager.getState(VideoRecorderAppState.class) != null) {
-                stateManager.detach(stateManager.getState(VideoRecorderAppState.class));
-            }
-            inputManager.removeListener(this);
-            System.gc();
-            this.restart();
-            doInit();
         }
     }
 }
