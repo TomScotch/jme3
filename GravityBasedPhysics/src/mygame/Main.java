@@ -20,7 +20,7 @@ import com.jme3.scene.shape.Sphere;
 public class Main extends SimpleApplication implements ActionListener {
 
     private BulletAppState bas;
-    private final int size = 128;
+    private final int size = 32;
     private Geometry core;
 
     public static void main(String[] args) {
@@ -50,17 +50,17 @@ public class Main extends SimpleApplication implements ActionListener {
         bas.initialize(stateManager, this);
         stateManager.attach(bas);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
+        bas.setDebugEnabled(true);
 
         Sphere a = new Sphere(32, 32, 12);
         core = new Geometry("Box", a);
         Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         matA.setColor("Color", ColorRGBA.randomColor());
         core.setMaterial(matA);
-        RigidBodyControl rbcA = new RigidBodyControl(999999);
+        RigidBodyControl rbcA = new RigidBodyControl(999);
         core.addControl(rbcA);
         bas.getPhysicsSpace().add(core);
-        MyPhysicsControl mpcA = new MyPhysicsControl();
-        core.addControl(mpcA);
+        rbcA.setDamping(999, 0);
         core.move(size / 2, size / 2, size / 2);
         core.center();
         rootNode.attachChild(core);
@@ -79,7 +79,7 @@ public class Main extends SimpleApplication implements ActionListener {
 
     @Override
     public void simpleUpdate(float tpf) {
-        //
+        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(tpf * 60, 0, 0));
     }
 
     @Override
@@ -106,12 +106,13 @@ public class Main extends SimpleApplication implements ActionListener {
     public void onAction(String name, boolean isPressed, float tpf) {
         if (name.equals("restart")) {
             bas.setEnabled(false);
+            bas.cleanup();
             for (Spatial sp : rootNode.getChildren()) {
                 sp.removeControl(MyPhysicsControl.class);
                 sp.removeFromParent();
                 sp = null;
             }
-
+            
             if (stateManager.getState(VideoRecorderAppState.class) != null) {
                 stateManager.detach(stateManager.getState(VideoRecorderAppState.class));
             }
