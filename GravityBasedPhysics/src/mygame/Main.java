@@ -42,32 +42,32 @@ public class Main extends SimpleApplication implements ActionListener {
         bas.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
         bas.initialize(stateManager, this);
         stateManager.attach(bas);
+        bas.setSpeed(speed * 5);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
 
-        Sphere a = new Sphere(64, 64, 14);
+        Sphere a = new Sphere(24, 24, 12);
         core = new Geometry("Box", a);
         Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         matA.setColor("Color", ColorRGBA.randomColor());
         core.setMaterial(matA);
-
         RigidBodyControl rbcA = new RigidBodyControl(999999999);
         core.addControl(rbcA);
         bas.getPhysicsSpace().add(core);
-
+        rbcA.setGravity(Vector3f.ZERO);
         rootNode.attachChild(core);
 
-        for (int x = 0; x < 8; x++) {
-            rootNode.attachChild(addBox(100));
+        for (int x = 0; x < 18; x++) {
+            rootNode.attachChild(addBox(200));
         }
 
         getFlyByCamera().setMoveSpeed(50);
-        getCamera().getLocation().set(0, 0, 60);
+        getCamera().getLocation().set(0, 0, 50);
     }
 
     @Override
     public void simpleUpdate(float tpf) {
         core.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
-        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.25f, 0));
+        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.05f, 0));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Main extends SimpleApplication implements ActionListener {
     private Geometry addBox(float mass) {
         Box a = new Box(1, 1, 1);
         Geometry geomA = new Geometry("Box", a);
-        geomA.move(new Vector3f(0, 12, 0));
+        geomA.move(new Vector3f(0, -10, 0));
         Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         matA.setColor("Color", ColorRGBA.randomColor());
         geomA.setMaterial(matA);
@@ -86,7 +86,7 @@ public class Main extends SimpleApplication implements ActionListener {
         geomA.addControl(rbcA);
         bas.getPhysicsSpace().add(geomA);
         rbcA.setGravity(Vector3f.ZERO);
-        rbcA.setAngularDamping(0);
+        rbcA.setAngularDamping(200);
         MyPhysicsControl mpcA = new MyPhysicsControl();
         geomA.addControl(mpcA);
         return geomA;
