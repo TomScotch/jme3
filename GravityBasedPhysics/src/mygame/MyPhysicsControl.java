@@ -15,7 +15,7 @@ public class MyPhysicsControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
 
         for (Spatial child : this.spatial.getParent().getChildren()) {
-            if (this.spatial.getControl(RigidBodyControl.class).getMass() < child.getControl(RigidBodyControl.class).getMass()) {
+            if (this.spatial.getControl(RigidBodyControl.class).getMass() < child.getControl(RigidBodyControl.class).getMass() | child.getControl(RigidBodyControl.class).getMass() == 0) {
                 if (!children.contains(child)) {
                     children.add(child);
                 }
@@ -26,7 +26,7 @@ public class MyPhysicsControl extends AbstractControl {
             for (int cB = 0; cB < children.size(); cB++) {
                 Float massA = children.get(cA).getControl(RigidBodyControl.class).getMass();
                 Float massB = children.get(cB).getControl(RigidBodyControl.class).getMass();
-                if (massA > massB) {
+                if (massA > massB | massA == 0) {
                     Spatial temp = children.get(cA);
                     children.set(children.indexOf(children.get(cA)), children.get(cB));
                     children.set(children.indexOf(children.get(cB)), temp);
@@ -35,6 +35,8 @@ public class MyPhysicsControl extends AbstractControl {
         }
 
         if (children.size() > 0) {
+            this.spatial.getControl(RigidBodyControl.class).setFriction(999);
+            this.spatial.getControl(RigidBodyControl.class).setAngularDamping(children.get(0).getControl(RigidBodyControl.class).getMass());
             this.spatial.getControl(RigidBodyControl.class).setLinearVelocity(this.spatial.getLocalTranslation().subtract(children.get(0).getLocalTranslation()).negate());
         }
     }

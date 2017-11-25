@@ -13,7 +13,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 
@@ -40,9 +39,13 @@ public class Main extends SimpleApplication implements ActionListener {
     }
 
     private void doInit() {
-
+        inputManager.addMapping("record", new KeyTrigger(KeyInput.KEY_F6));
+        inputManager.addListener(this, "record");
         inputManager.addMapping("restart", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addListener(this, "restart");
+        inputManager.addMapping("debug", new KeyTrigger(KeyInput.KEY_F1));
+        inputManager.addListener(this, "debug");
+
         inputManager.setCursorVisible(false);
 
         bas = new BulletAppState();
@@ -57,10 +60,10 @@ public class Main extends SimpleApplication implements ActionListener {
         Material matA = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         matA.setColor("Color", ColorRGBA.randomColor());
         core.setMaterial(matA);
-        RigidBodyControl rbcA = new RigidBodyControl(999);
+        RigidBodyControl rbcA = new RigidBodyControl(9999999);
         core.addControl(rbcA);
         bas.getPhysicsSpace().add(core);
-        rbcA.setDamping(999, 0);
+        rbcA.setFriction(999);
         core.move(size / 2, size / 2, size / 2);
         core.center();
         rootNode.attachChild(core);
@@ -74,12 +77,12 @@ public class Main extends SimpleApplication implements ActionListener {
         getFlyByCamera().setMoveSpeed(30);
         getCamera().getLocation().set(0, 0, 60);
         getCamera().lookAt(core.getLocalTranslation(), Vector3f.UNIT_XYZ);
-//        stateManager.attach(new VideoRecorderAppState(1.0f));
+
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(tpf * 60, 0, 0));
+        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(tpf * 100, 0, 0));
     }
 
     @Override
@@ -104,25 +107,34 @@ public class Main extends SimpleApplication implements ActionListener {
     @Override
     @SuppressWarnings("null")
     public void onAction(String name, boolean isPressed, float tpf) {
-        if (name.equals("restart")) {
+
+        if (name.equals("debug") && !isPressed) {
+            if (bas.isDebugEnabled()) {
+                bas.setDebugEnabled(false);
+            } else {
+                bas.setDebugEnabled(true);
+            }
+        }
+
+        if (name.equals("record") && !isPressed) {
+            if (stateManager.hasState(stateManager.getState(VideoRecorderAppState.class))) {
+                stateManager.detach(stateManager.getState(VideoRecorderAppState.class));
+            } else {
+                stateManager.attach(new VideoRecorderAppState(1, 30));
+            }
+        }
+
+        if (name.equals("restart") && !isPressed) {
             bas.setEnabled(false);
             bas.cleanup();
-            for (Spatial sp : rootNode.getChildren()) {
-                sp.removeControl(MyPhysicsControl.class);
-                sp.removeFromParent();
-                sp = null;
-            }
-            
+            rootNode.detachAllChildren();
             if (stateManager.getState(VideoRecorderAppState.class) != null) {
                 stateManager.detach(stateManager.getState(VideoRecorderAppState.class));
             }
-
-            inputManager.clearMappings();
             inputManager.removeListener(this);
             System.gc();
             this.restart();
             doInit();
-            this.restart();
         }
     }
 }
