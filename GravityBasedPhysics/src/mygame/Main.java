@@ -66,8 +66,8 @@ public class Main extends SimpleApplication implements ActionListener {
 
     @Override
     public void simpleUpdate(float tpf) {
-        core.getControl(RigidBodyControl.class).applyCentralForce(new Vector3f(0, core.getControl(RigidBodyControl.class).getLinearVelocity().getY(), 0));
-        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.1f, 0));
+        core.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
+        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.25f, 0));
     }
 
     @Override
