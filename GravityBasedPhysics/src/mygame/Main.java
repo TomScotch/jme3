@@ -31,8 +31,6 @@ public class Main extends SimpleApplication implements ActionListener {
     @Override
     public void simpleInitApp() {
 
-        inputManager.addMapping("restart", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addListener(this, "restart");
         inputManager.addMapping("debug", new KeyTrigger(KeyInput.KEY_F1));
         inputManager.addListener(this, "debug");
 
@@ -42,7 +40,6 @@ public class Main extends SimpleApplication implements ActionListener {
         bas.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
         bas.initialize(stateManager, this);
         stateManager.attach(bas);
-        bas.setSpeed(speed * 5);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
 
         Sphere a = new Sphere(24, 24, 12);
