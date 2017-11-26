@@ -13,7 +13,7 @@ public class MyPhysicsControl extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-
+        
         for (Spatial child : this.spatial.getParent().getChildren()) {
             if (this.spatial.getControl(RigidBodyControl.class).getMass() < child.getControl(RigidBodyControl.class).getMass() | child.getControl(RigidBodyControl.class).getMass() == 0) {
                 if (!children.contains(child)) {
@@ -35,12 +35,12 @@ public class MyPhysicsControl extends AbstractControl {
         }
 
         if (children.size() > 0) {
-            this.spatial.getControl(RigidBodyControl.class).setGravity(children.get(0).getWorldTranslation().subtract(this.spatial.getWorldTranslation()).mult(20));
+            this.spatial.getControl(RigidBodyControl.class).setGravity(children.get(0).getWorldTranslation().subtract(this.spatial.getWorldTranslation()).mult(25));
         }
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //Only needed for rendering-related operations
+        //
     }
 }
