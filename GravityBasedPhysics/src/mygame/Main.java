@@ -19,6 +19,7 @@ import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
@@ -36,6 +37,8 @@ public class Main extends SimpleApplication implements ActionListener {
     private PointLight sun;
     private Spatial night;
     private ParticleEmitter fire;
+    private Geometry moonGeom;
+    private Node moonNode;
 
     public static void main(String[] args) {
 
@@ -72,7 +75,6 @@ public class Main extends SimpleApplication implements ActionListener {
 
         Material matA = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         matA.setBoolean("UseMaterialColors", true);
-        matA.setColor("Ambient", ColorRGBA.randomColor());
         matA.setColor("Diffuse", ColorRGBA.randomColor());
         core.setMaterial(matA);
         rootNode.attachChild(core);
@@ -116,6 +118,17 @@ public class Main extends SimpleApplication implements ActionListener {
         sunGeom.setShadowMode(RenderQueue.ShadowMode.Off);
         rootNode.attachChild(sunGeom);
 
+        moonNode = new Node("MoonNode");
+        rootNode.attachChild(moonNode);
+        moonGeom = new Geometry("Sun", new Sphere(24, 24, 2));
+        Material moonMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        moonMat.setBoolean("UseMaterialColors", true);
+        moonMat.setColor("Diffuse", ColorRGBA.White);
+        moonGeom.setMaterial(moonMat);
+        moonGeom.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        moonNode.attachChild(moonGeom);
+        moonGeom.setLocalTranslation(15, 0, 15);
+
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
         material.setTexture("Texture", assetManager.loadTexture("Effects/Explosion/flame.png"));
         material.setFloat("Softness", 3f);
@@ -149,9 +162,12 @@ public class Main extends SimpleApplication implements ActionListener {
     @Override
     public void simpleUpdate(float tpf) {
 
+        moonNode.setLocalTranslation(core.getLocalTranslation());
+        moonNode.rotate(0, 0.003f, 0);
+        moonGeom.rotate(0, 0.03f, 0);
         core.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
         core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.075f, 0));
-        cycle += 0.0001f % FastMath.TWO_PI;
+        cycle += 0.000125f % FastMath.TWO_PI;
         core.setLocalTranslation(new Vector3f(FastMath.sin(cycle) * 100, 0, FastMath.cos(cycle) * 100));
         core.getControl(RigidBodyControl.class).setPhysicsLocation(core.getLocalTranslation());
     }
