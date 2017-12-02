@@ -12,9 +12,8 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState.BlendMode;
-import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
@@ -25,7 +24,6 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
 import com.jme3.shadow.EdgeFilteringMode;
-import com.jme3.shadow.PointLightShadowFilter;
 import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
@@ -90,7 +88,7 @@ public class Main extends SimpleApplication implements ActionListener {
         sun = new PointLight();
         sun.setPosition(Vector3f.ZERO);
         sun.setColor(ColorRGBA.White);
-        sun.setRadius(99999);
+        sun.setRadius(999);
         rootNode.addLight(sun);
 
         PointLightShadowRenderer dlsr = new PointLightShadowRenderer(assetManager, 2048);
@@ -140,18 +138,22 @@ public class Main extends SimpleApplication implements ActionListener {
         fire.setQueueBucket(RenderQueue.Bucket.Transparent);
         rootNode.attachChild(fire);
 
-        for (int x = 0; x < 15; x++) {
-            rootNode.attachChild(addBox(250));
+        for (int x = 0; x < 6; x++) {
+            rootNode.attachChild(addBox(250));//250
         }
 
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
     }
+    float cycle = 0;
 
     @Override
     public void simpleUpdate(float tpf) {
 
         core.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
-        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.01f, 0));
+        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.075f, 0));
+        cycle += 0.0001f % FastMath.TWO_PI;
+        core.setLocalTranslation(new Vector3f(FastMath.sin(cycle) * 100, 0, FastMath.cos(cycle) * 100));
+        core.getControl(RigidBodyControl.class).setPhysicsLocation(core.getLocalTranslation());
     }
 
     @Override
@@ -167,7 +169,6 @@ public class Main extends SimpleApplication implements ActionListener {
 
         Material matA = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         matA.setBoolean("UseMaterialColors", true);
-        matA.setColor("Ambient", ColorRGBA.randomColor());
         matA.setColor("Diffuse", ColorRGBA.randomColor());
         geomA.setMaterial(matA);
 
@@ -175,7 +176,8 @@ public class Main extends SimpleApplication implements ActionListener {
         geomA.addControl(rbcA);
         bas.getPhysicsSpace().add(geomA);
         rbcA.setGravity(Vector3f.ZERO);
-        rbcA.setAngularDamping(999);
+        rbcA.setAngularDamping(9999);
+        rbcA.setLinearDamping(9999);
 
         MyPhysicsControl mpcA = new MyPhysicsControl();
         geomA.addControl(mpcA);
