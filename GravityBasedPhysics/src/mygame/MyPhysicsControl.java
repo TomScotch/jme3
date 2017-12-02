@@ -13,12 +13,15 @@ public class MyPhysicsControl extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        
+
         for (Spatial child : this.spatial.getParent().getChildren()) {
-            if (this.spatial.getControl(RigidBodyControl.class).getMass() < child.getControl(RigidBodyControl.class).getMass() | child.getControl(RigidBodyControl.class).getMass() == 0) {
-                if (!children.contains(child)) {
-                    children.add(child);
+            try {
+                if (this.spatial.getControl(RigidBodyControl.class).getMass() < child.getControl(RigidBodyControl.class).getMass() | child.getControl(RigidBodyControl.class).getMass() == 0) {
+                    if (!children.contains(child)) {
+                        children.add(child);
+                    }
                 }
+            } catch (Exception e) {
             }
         }
 
