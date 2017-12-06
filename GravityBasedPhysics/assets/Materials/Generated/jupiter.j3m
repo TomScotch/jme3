@@ -4,10 +4,13 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         UseMaterialColors : true
         ParallaxHeight : 0.05
         Ambient : 1.0 1.0 1.0 1.0
-        BackfaceShadows : false
+        BackfaceShadows : true
         Specular : 0.5 0.5 0.5 1.0
-        Shininess : 50.0
+        Shininess : 75.0
         DiffuseMap : Textures/jupiter.jpeg
+        VertexLighting : true
+        SteepParallax : true
+        HardwareShadows : true
     }
     AdditionalRenderState {
       PointSprite On
