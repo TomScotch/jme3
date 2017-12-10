@@ -4,6 +4,7 @@ import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
+import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
@@ -21,6 +22,7 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
@@ -65,6 +67,7 @@ public class Main extends SimpleApplication implements ActionListener {
         app.setSettings(settings);
         app.start();
     }
+    private Spatial ship;
 
     @Override
     public void simpleInitApp() {
@@ -172,6 +175,19 @@ public class Main extends SimpleApplication implements ActionListener {
             rootNode.attachChild(addBox(250));//250
         }
 
+        ship = assetManager.loadModel("Models/starship/4206d04471674c3ca70b1ab40e1d2b45.fbx.j3o");
+        ship.scale(0.25f);
+        ship.rotate(180, -270, 90);
+        BetterCharacterControl bcc = new BetterCharacterControl(25, 10, 100);
+        ship.setLocalTranslation(getCamera().getLocation());
+        ship.addControl(bcc);
+        bcc.setSpatial(ship);
+        CameraControl cc = new CameraControl(cam);
+        cc.setControlDir(CameraControl.ControlDirection.CameraToSpatial);
+        ship.setLocalTranslation(0, 0, -5);
+        ship.addControl(cc);
+        rootNode.attachChild(ship);
+        PhysicsSpace.getPhysicsSpace().add(ship);
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
     }
     float cycle = 0;
@@ -183,6 +199,8 @@ public class Main extends SimpleApplication implements ActionListener {
         app.enqueue(new Callable() {
             @Override
             public Object call() throws Exception {
+
+                ship.setLocalTranslation(getCamera().getLocation().mult(3));
 
                 moonNode.setLocalTranslation(core.getLocalTranslation());
                 moonNode.rotate(0, 0.003f, 0);
