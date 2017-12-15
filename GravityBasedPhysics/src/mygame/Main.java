@@ -39,15 +39,17 @@ import java.util.prefs.BackingStoreException;
 public class Main extends SimpleApplication implements ActionListener {
 
     private static Main app;
-
+    private float cycle = 0;
+    private float cycle2 = 0;
     private BulletAppState bas;
     private Geometry core;
     private PointLight sun;
     private Spatial night;
     private ParticleEmitter fire;
     private Geometry moonGeom;
-    private Node moonNode;
+    private Node moon;
     private Spatial jupiter;
+    private Spatial ship;
 
     public static void main(String[] args) {
 
@@ -62,12 +64,11 @@ public class Main extends SimpleApplication implements ActionListener {
         }
 
         app.setDisplayStatView(false);
-        app.setDisplayFps(true);
+        app.setDisplayFps(false);
         app.setLostFocusBehavior(LostFocusBehavior.Disabled);
         app.setSettings(settings);
         app.start();
     }
-    private Spatial ship;
 
     @Override
     public void simpleInitApp() {
@@ -79,7 +80,6 @@ public class Main extends SimpleApplication implements ActionListener {
 
         bas = new BulletAppState();
         bas.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
-//        bas.setSpeed(1);
         bas.initialize(stateManager, this);
         stateManager.attach(bas);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
@@ -87,20 +87,18 @@ public class Main extends SimpleApplication implements ActionListener {
         Sphere a = new Sphere(64, 64, 12);
         core = new Geometry("Box", a);
         core.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-
         Material matA = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         matA.setBoolean("UseMaterialColors", true);
         matA.setColor("Diffuse", ColorRGBA.randomColor());
         core.setMaterial(matA);
         rootNode.attachChild(core);
         core.setLocalTranslation(0, 0, 100);
+
         RigidBodyControl rbcA = new RigidBodyControl(999);
         core.addControl(rbcA);
         bas.getPhysicsSpace().add(core);
         rbcA.setGravity(Vector3f.ZERO);
-        //   rbcA.setFriction(0);
 
-        //rbcA.setRestitution(0);
         getFlyByCamera().setMoveSpeed(50);
         getCamera().getLocation().set(0, 25, 125);
 
@@ -113,11 +111,9 @@ public class Main extends SimpleApplication implements ActionListener {
         PointLightShadowRenderer dlsr = new PointLightShadowRenderer(assetManager, 1024);
         dlsr.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
         dlsr.setShadowCompareMode(CompareMode.Software);
-        //dlsr.setEdgesThickness(5);
         dlsr.setLight(sun);
         viewPort.addProcessor(dlsr);
 
-        //viewPort.addProcessor((FilterPostProcessor) assetManager.loadAsset("Filters/MyFilter.j3f"));
         Texture west = assetManager.loadTexture("Textures/left(uity right).png");
         Texture east = assetManager.loadTexture("Textures/right(unity left).png");
         Texture north = assetManager.loadTexture("Textures/back.png");
@@ -134,15 +130,15 @@ public class Main extends SimpleApplication implements ActionListener {
         sunGeom.setShadowMode(RenderQueue.ShadowMode.Off);
         rootNode.attachChild(sunGeom);
 
-        moonNode = new Node("MoonNode");
-        rootNode.attachChild(moonNode);
+        moon = new Node("MoonNode");
+        rootNode.attachChild(moon);
         moonGeom = new Geometry("Sun", new Sphere(24, 24, 2));
         Material moonMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         moonMat.setBoolean("UseMaterialColors", true);
         moonMat.setColor("Diffuse", ColorRGBA.White);
         moonGeom.setMaterial(moonMat);
         moonGeom.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        moonNode.attachChild(moonGeom);
+        moon.attachChild(moonGeom);
         moonGeom.setLocalTranslation(15, 0, 15);
 
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
@@ -184,14 +180,38 @@ public class Main extends SimpleApplication implements ActionListener {
         bcc.setSpatial(ship);
         CameraControl cc = new CameraControl(cam);
         cc.setControlDir(CameraControl.ControlDirection.CameraToSpatial);
-        ship.setLocalTranslation(0, 0, -5);
         ship.addControl(cc);
         rootNode.attachChild(ship);
         PhysicsSpace.getPhysicsSpace().add(ship);
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
     }
-    float cycle = 0;
-    float cycle2 = 0;
+
+    public enum Res {
+
+        A(640),
+        B(800),
+        C(1024),
+        D(1360),
+        E(1920);
+
+        private int res;
+
+        private Res() {
+            this.res = 640;
+        }
+
+        private Res(int res) {
+            this.res = res;
+        }
+
+        public void setRes(int res) {
+            this.res = res;
+        }
+
+        public int getRes() {
+            return res;
+        }
+    }
 
     @Override
     public void simpleUpdate(float tpf) {
@@ -202,8 +222,8 @@ public class Main extends SimpleApplication implements ActionListener {
 
                 ship.setLocalTranslation(getCamera().getLocation().mult(3));
 
-                moonNode.setLocalTranslation(core.getLocalTranslation());
-                moonNode.rotate(0, 0.003f, 0);
+                moon.setLocalTranslation(core.getLocalTranslation());
+                moon.rotate(0, 0.003f, 0);
                 moonGeom.rotate(0, 0.03f, 0);
 
                 jupiter.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
