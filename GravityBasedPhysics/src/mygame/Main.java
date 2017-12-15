@@ -3,6 +3,8 @@ package mygame;
 import com.jme3.app.LostFocusBehavior;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.PhysicsSpace;
+import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
@@ -15,12 +17,12 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.CompareMode;
@@ -29,8 +31,14 @@ import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 public class Main extends SimpleApplication implements ActionListener {
+
+    private static Main app;
 
     private BulletAppState bas;
     private Geometry core;
@@ -39,21 +47,27 @@ public class Main extends SimpleApplication implements ActionListener {
     private ParticleEmitter fire;
     private Geometry moonGeom;
     private Node moonNode;
+    private Spatial jupiter;
 
     public static void main(String[] args) {
 
-        Main app = new Main();
+        app = new Main();
         AppSettings settings = new AppSettings(true);
-        settings.setFullscreen(true);
-        settings.setResolution(1280, 1024);
-        settings.setGammaCorrection(true);
-        app.setShowSettings(false);
+
+        try {
+            settings.load("settings");
+            app.setShowSettings(false);
+        } catch (BackingStoreException ex) {
+            app.setShowSettings(true);
+        }
+
         app.setDisplayStatView(false);
         app.setDisplayFps(true);
         app.setLostFocusBehavior(LostFocusBehavior.Disabled);
         app.setSettings(settings);
         app.start();
     }
+    private Spatial ship;
 
     @Override
     public void simpleInitApp() {
@@ -65,11 +79,12 @@ public class Main extends SimpleApplication implements ActionListener {
 
         bas = new BulletAppState();
         bas.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
+//        bas.setSpeed(1);
         bas.initialize(stateManager, this);
         stateManager.attach(bas);
         bas.getPhysicsSpace().setGravity(Vector3f.ZERO);
 
-        Sphere a = new Sphere(24, 24, 12);
+        Sphere a = new Sphere(64, 64, 12);
         core = new Geometry("Box", a);
         core.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
 
@@ -79,29 +94,30 @@ public class Main extends SimpleApplication implements ActionListener {
         core.setMaterial(matA);
         rootNode.attachChild(core);
         core.setLocalTranslation(0, 0, 100);
-        RigidBodyControl rbcA = new RigidBodyControl(999999999);
+        RigidBodyControl rbcA = new RigidBodyControl(999);
         core.addControl(rbcA);
         bas.getPhysicsSpace().add(core);
         rbcA.setGravity(Vector3f.ZERO);
+        //   rbcA.setFriction(0);
 
+        //rbcA.setRestitution(0);
         getFlyByCamera().setMoveSpeed(50);
         getCamera().getLocation().set(0, 25, 125);
 
         sun = new PointLight();
         sun.setPosition(Vector3f.ZERO);
         sun.setColor(ColorRGBA.White);
-        sun.setRadius(999);
+        sun.setRadius(888);
         rootNode.addLight(sun);
 
-        PointLightShadowRenderer dlsr = new PointLightShadowRenderer(assetManager, 2048);
-        dlsr.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
-        dlsr.setShadowCompareMode(CompareMode.Hardware);
-        dlsr.setEdgesThickness(5);
+        PointLightShadowRenderer dlsr = new PointLightShadowRenderer(assetManager, 1024);
+        dlsr.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
+        dlsr.setShadowCompareMode(CompareMode.Software);
+        //dlsr.setEdgesThickness(5);
         dlsr.setLight(sun);
         viewPort.addProcessor(dlsr);
 
-        viewPort.addProcessor((FilterPostProcessor) assetManager.loadAsset("Filters/MyFilter.j3f"));
-
+        //viewPort.addProcessor((FilterPostProcessor) assetManager.loadAsset("Filters/MyFilter.j3f"));
         Texture west = assetManager.loadTexture("Textures/left(uity right).png");
         Texture east = assetManager.loadTexture("Textures/right(unity left).png");
         Texture north = assetManager.loadTexture("Textures/back.png");
@@ -151,25 +167,63 @@ public class Main extends SimpleApplication implements ActionListener {
         fire.setQueueBucket(RenderQueue.Bucket.Transparent);
         rootNode.attachChild(fire);
 
-        for (int x = 0; x < 6; x++) {
+        jupiter = assetManager.loadModel("Models/jupiter.blend.j3o");
+        rootNode.attachChild(jupiter);
+        PhysicsSpace.getPhysicsSpace().add(jupiter);
+
+        for (int x = 0; x < 1; x++) {
             rootNode.attachChild(addBox(250));//250
         }
 
+        ship = assetManager.loadModel("Models/starship/4206d04471674c3ca70b1ab40e1d2b45.fbx.j3o");
+        ship.scale(0.25f);
+        ship.rotate(180, -270, 90);
+        BetterCharacterControl bcc = new BetterCharacterControl(25, 10, 100);
+        ship.setLocalTranslation(getCamera().getLocation());
+        ship.addControl(bcc);
+        bcc.setSpatial(ship);
+        CameraControl cc = new CameraControl(cam);
+        cc.setControlDir(CameraControl.ControlDirection.CameraToSpatial);
+        ship.setLocalTranslation(0, 0, -5);
+        ship.addControl(cc);
+        rootNode.attachChild(ship);
+        PhysicsSpace.getPhysicsSpace().add(ship);
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
     }
     float cycle = 0;
+    float cycle2 = 0;
 
     @Override
     public void simpleUpdate(float tpf) {
 
-        moonNode.setLocalTranslation(core.getLocalTranslation());
-        moonNode.rotate(0, 0.003f, 0);
-        moonGeom.rotate(0, 0.03f, 0);
-        core.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
-        core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.075f, 0));
-        cycle += 0.000125f % FastMath.TWO_PI;
-        core.setLocalTranslation(new Vector3f(FastMath.sin(cycle) * 100, 0, FastMath.cos(cycle) * 100));
-        core.getControl(RigidBodyControl.class).setPhysicsLocation(core.getLocalTranslation());
+        app.enqueue(new Callable() {
+            @Override
+            public Object call() throws Exception {
+
+                ship.setLocalTranslation(getCamera().getLocation().mult(3));
+
+                moonNode.setLocalTranslation(core.getLocalTranslation());
+                moonNode.rotate(0, 0.003f, 0);
+                moonGeom.rotate(0, 0.03f, 0);
+
+                jupiter.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
+                jupiter.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.00002f, 0));
+
+                core.getControl(RigidBodyControl.class).setLinearVelocity(Vector3f.ZERO);
+                core.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.075f, 0));
+
+                cycle += 0.000125f % FastMath.TWO_PI;
+                cycle2 += 0.00001f % FastMath.TWO_PI;
+
+                core.setLocalTranslation(new Vector3f(FastMath.sin(cycle) * 100, 0, FastMath.cos(cycle) * 100));
+                jupiter.setLocalTranslation(new Vector3f((FastMath.sin(cycle2) * 500), 0, FastMath.cos(cycle2) * 550).negate());
+
+                core.getControl(RigidBodyControl.class).setPhysicsLocation(core.getLocalTranslation());
+                jupiter.getControl(RigidBodyControl.class).setPhysicsLocation(jupiter.getLocalTranslation());
+
+                return null;
+            }
+        });
     }
 
     @Override
@@ -188,18 +242,33 @@ public class Main extends SimpleApplication implements ActionListener {
         matA.setColor("Diffuse", ColorRGBA.randomColor());
         geomA.setMaterial(matA);
 
+        geomA.setLocalTranslation(jupiter.getLocalTranslation());
+
         RigidBodyControl rbcA = new RigidBodyControl(mass);
         geomA.addControl(rbcA);
         bas.getPhysicsSpace().add(geomA);
         rbcA.setGravity(Vector3f.ZERO);
-        rbcA.setAngularDamping(9999);
-        rbcA.setLinearDamping(9999);
+//        rbcA.setAngularDamping(99);
+        rbcA.setLinearDamping(250);
+//        rbcA.setFriction(0);
+        rbcA.setAngularFactor(0);
+//        rbcA.setRestitution(0);
 
         MyPhysicsControl mpcA = new MyPhysicsControl();
         geomA.addControl(mpcA);
 
         geomA.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         return geomA;
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        try {
+            app.getContext().getSettings().save("settings");
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

@@ -1,15 +1,10 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        Diffuse : 0.4704 0.4704 0.4704 1.0
-        UseMaterialColors : true
-        ParallaxHeight : 0.05
-        Ambient : 1.0 1.0 1.0 1.0
         BackfaceShadows : false
-        Specular : 0.0 0.0 0.0 1.0
-        Shininess : 11.0
-        DiffuseMap : Flip Repeat Models/starship/textures/Luminaris_Diffuse.tga.png
-        NormalMap : Flip Repeat Models/starship/textures/Luminaris_Normal.tga.png
-        SpecularMap : Flip Repeat Models/starship/textures/Luminaris_Specular.tga.png
+        NormalMap : Models/starship/textures/Luminaris_Normal.tga.png
+        SpecularMap : Models/starship/textures/Luminaris_Specular.tga.png
+        DiffuseMap : Models/starship/textures/Luminaris_Diffuse.tga.png
+        LightMap : Models/starship/textures/Luminaris_Diffuse.tga.png
     }
     AdditionalRenderState {
       PointSprite On
