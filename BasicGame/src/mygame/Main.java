@@ -80,9 +80,6 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private static AppSettings cfg;
     private static Main app;
 
-    private static final boolean OPENAL = true;
-
-    // private VideoRecorderAppState videoRecorderAppState;
     private static DisplayMode[] modes;
 
     private final Trigger rain_trigger = new KeyTrigger(KeyInput.KEY_R);
@@ -95,6 +92,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     private final Trigger statsViewTrigger = new KeyTrigger(KeyInput.KEY_F3);
     private final Trigger helpTrigger = new KeyTrigger(KeyInput.KEY_H);
     private final Trigger consoleTrigger = new KeyTrigger(KeyInput.KEY_F4);
+
     private GameRunningState gameRunningState;
     private StartScreenState startScreenState;
     private SettingsScreenState settingsScreenState;
@@ -305,60 +303,31 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
     public static void main(String[] args) throws BackingStoreException {
 
         app = new Main();
-        cfg = new AppSettings(false);
-        cfg.setTitle("Serenity");
-        app.setShowSettings(true);
+
+        cfg = new AppSettings(true);
+
+        try {
+            cfg.load("settings");
+            app.setShowSettings(false);
+        } catch (BackingStoreException ex) {
+            app.setShowSettings(true);
+        }
+
         cfg.setSettingsDialogImage("Textures/misc/gloemtoi.png");
+        cfg.setTitle("Serenity");
+
         GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         modes = sortModes(device.getDisplayModes());
 
         cfg.setRenderer(AppSettings.LWJGL_OPENGL2);
-        //   cfg.setResolution(modes[0].getWidth(), modes[0].getHeight());
-        //   cfg.setFullscreen(device.isFullScreenSupported());
-        //   cfg.setVSync(false);
-        //   cfg.setSamples(0);
-        //   cfg.setDepthBits(-1);
-        //   cfg.setFrameRate(60);
-        //   cfg.setFrequency(cfg.getFrameRate());
         app.setDisplayFps(showFps);
         app.setDisplayStatView(false);
 
-        //    cfg.load(cfg.getTitle());
-
-        /*   
-        if (cfg.getRenderer().equals(AppSettings.LWJGL_OPENGL3)) {
-            cfg.setGammaCorrection(true);
-        } else {
-            cfg.setGammaCorrection(false);
-        }
-         
-         */
-        //System.out.println("isGamaCorrection : " + cfg.isGammaCorrection());
-        if (OPENAL) {
-            cfg.setAudioRenderer(AppSettings.LWJGL_OPENAL);
-        }
-
-        /*        if (OPENCL) {
-        cfg.setOpenCLSupport(true);
-        cfg.setOpenCLPlatformChooser(CustomPlatformChooser.class);
-        }*/
         app.setLostFocusBehavior(LostFocusBehavior.PauseOnLostFocus);
         app.setPauseOnLostFocus(true);
 
         app.setSettings(cfg);
         app.start();
-
-        /*
-        Serializer.registerClass(ServerCommunication.PingMessage.class);
-        Serializer.registerClass(ServerCommunication.PongMessage.class);
-        try {
-            Client client = Network.connectToServer("192.168.0.24", 5110);
-            client.start();
-                        client.addMessageListener(new ClientPingResponder(), ServerCommunication.PongMessage.class);
-            client.send(new ServerCommunication.PingMessage());
-        } catch (IOException ex) {
-              System.out.println(ex.getCause().getLocalizedMessage());
-        }*/
     }
 
     /**
@@ -366,22 +335,20 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
      */
     @Override
     public void stop() {
-
-        exec.shutdown();
+        super.stop();
 
         try {
-            cfg.save(cfg.getTitle());
+            cfg.save("settings");
         } catch (BackingStoreException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getLocalizedMessage());
         }
 
         try {
             saveNode(settingsNode);
         } catch (Exception ex) {
-            // Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getLocalizedMessage());
         }
-
-        super.stop();
+        exec.shutdown();
     }
     protected String s;
 
@@ -418,7 +385,6 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
         inputManager.setCursorVisible(false);
         flyCam.setEnabled(false);
 
-        // videoRecorderAppState = new VideoRecorderAppState();
         startScreenState = new StartScreenState(this);
         settingsScreenState = new SettingsScreenState(this);
 

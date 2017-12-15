@@ -14,7 +14,6 @@ import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
 import com.jme3.audio.AudioRenderer;
-import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.collision.CollisionResult;
@@ -1151,33 +1150,12 @@ public class GameRunningState extends AbstractAppState {
                 if (rain.getNumVisibleParticles() > 0) {
 
                     debrisEffect.setNumParticles((int) rain.getParticlesPerSec());
-
                     for (int c = rain.getParticles().length / 2; c >= 0; c--) {
-                        CollisionResults res = new CollisionResults();
-                        BoundingBox bbox = new BoundingBox(new Vector3f(5, 0, 0), 1, 1, 1);
-                        Node sp = new Node();
-                        sp.setModelBound(bbox);
-                        sp.setLocalTranslation(rain.getParticles()[c].position);
-                        localRootNode.collideWith(sp, res);
-                        if (res.size() > 1) {
-                            Geometry g = res.getCollision(1).getGeometry();
-                            if (g != null) {
-                                String target = g.getName();
-                                if (target != null) {
-                                    if (!target.equals("")) {
-                                        if (target.equals("terrain")) {
-                                            Vector3f position = rain.getParticles()[c].position;
-                                            debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
-                                            debrisEffect.emitParticles(1);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
+                        Vector3f position = rain.getParticles()[c].position;
+                        debrisEffect.getWorldTranslation().set(position.getX(), position.getY(), position.getZ()); //
+                        debrisEffect.emitParticles(3);
                     }
                 }
-
             } else {
 
                 debrisEffect.setParticlesPerSec(0);
