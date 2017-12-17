@@ -87,7 +87,7 @@ public class Main extends SimpleApplication implements ActionListener {
         createInput();
 
         getFlyByCamera().setMoveSpeed(300);
-        viewPort.getCamera().setFrustumFar(5000);
+        viewPort.getCamera().setFrustumFar(9999);
         viewPort.getCamera().onFrameChange();
     }
 
@@ -199,19 +199,19 @@ public class Main extends SimpleApplication implements ActionListener {
         cycle4 += 0.0018f % FastMath.TWO_PI;
 
         jupiter.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle2) * 1200), 0, FastMath.cos(cycle2) * 1200).negate());
-        jupiter.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.01f, 0));
+        jupiter.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, -0.0168f, 0));
 
         mars.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle3) * 700), 0, FastMath.cos(cycle3) * 800));
-        mars.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.005f, 0));
+        mars.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.005545f, 0));
 
         mercurius.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle4) * 600), 0, FastMath.cos(cycle4) * 500));
         mercurius.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.075f, 0));
 
         earth.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle1) * 300, 0, FastMath.cos(cycle1) * 300).negate());
-        earth.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.5f, 0));
+        earth.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, -0.09f, 0));
 
-        moon.rotate(0, 0.000125f, 0);
-        moonGeom.rotate(0, 0.03f, 0);
+        moon.rotate(0, 0.000225f, 0);
+        moonGeom.rotate(0, 0.07f, 0);
     }
 
     @Override
