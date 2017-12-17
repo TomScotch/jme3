@@ -446,7 +446,7 @@ public class Main extends SimpleApplication implements ScreenController, KeyInpu
         deathText.setLocalTranslation((cam.getWidth()) - (cam.getWidth() / 2), (cam.getHeight()) - (cam.getHeight() / 2), 0);
         guiNode.attachChild(deathText);
         deathText.setCullHint(Spatial.CullHint.Always);
-        app.getRenderManager().setAlphaToCoverage(true);
+//        app.getRenderManager().setAlphaToCoverage(true);
     }
 
     /**

@@ -672,6 +672,9 @@ public class GameRunningState extends AbstractAppState {
             toon.setNormalThreshold(0.8f);
             fpp.addFilter(toon);
         }
+
+        viewPort.getCamera().setFrustumFar(5000);
+        viewPort.getCamera().onFrameChange();
     }
 
     private void setupHudText() {
