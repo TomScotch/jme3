@@ -51,46 +51,57 @@ public class Main extends SimpleApplication implements ActionListener {
     private Spatial saturn;
     private Spatial uranus;
     private Spatial venus;
-    //
+
+    float Sun_Durchmesser = 1300000;
+    float Sun_Masse = 1.9884f;
+
     float Merkur_Orbitalgeschwindigkeit = 47.8725f;
-    float Merkur_Volumen = 0.0608272f;
+    float Merkur_Durchmesser = 4879;
     float Merkur_Masse = 0.33022f;
     float Merkur_Rotationsgeschwindigkeit = 4.25f;
+    float Merkur_abstand = 58;
 
     float Venus_Orbitalgeschwindigkeit = 35.0214f;
-    float Venus_Volumen = 0.92840f;
+    float Venus_Durchmesser = 12104;
     float Venus_Masse = 4.8685f;
     float Venus_Rotationsgeschwindigkeit = -10.36f;
+    float Venus_abstand = 108;
 
     float Erde_Orbitalgeschwindigkeit = 29.7859f;
-    float Erde_Volumen = 1.0832f;
+    float Erde_Durchmesser = 12742;
     float Erde_Masse = 5.9737f;
     float Erde_Rotationsgeschwindigkeit = 11.18f;
+    float Erde_abstand = 150;
 
     float Mars_Orbitalgeschwindigkeit = 24.1309f;
-    float Mars_Volumen = 0.16314f;
+    float Mars_Durchmesser = 6779;
     float Mars_Masse = 0.64185f;
     float Mars_Rotationsgeschwindigkeit = 5.02f;
+    float Mars_abstand = 228;
 
     float Jupiter_Orbitalgeschwindigkeit = 13.0697f;
-    float Jupiter_Volumen = 1425.5f;
+    float Jupiter_Durchmesser = 139822;
     float Jupiter_Masse = 1898.7f;
     float Jupiter_Rotationsgeschwindigkeit = 59.54f;
+    float Jupiter_abstand = 778;
 
     float Saturn_Orbitalgeschwindigkeit = 9.6724f;
-    float Saturn_Volumen = 827.13f;
+    float Saturn_Durchmesser = 116464;
     float Saturn_Masse = 568.51f;
     float Saturn_Rotationsgeschwindigkeit = 35.49f;
+    float Saturn_abstand = 1427;
 
     float Uranus_Orbitalgeschwindigkeit = 6.8352f;
-    float Uranus_Volumen = 69.142f;
+    float Uranus_Durchmesser = 50724;
     float Uranus_Masse = 86.849f;
     float Uranus_Rotationsgeschwindigkeit = -21.29f;
+    float Uranus_abstand = 2884;
 
     float Neptun_Orbitalgeschwindigkeit = 5.4778f;
-    float Neptun_Volumen = 62.526f;
+    float Neptun_Durchmesser = 49244;
     float Neptun_Masse = 102.44f;
     float Neptun_Rotationsgeschwindigkeit = 23.71f;
+    float Neptun_abstand = 4509;
 
     //
     public static void main(String[] args) {

@@ -7,7 +7,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         BackfaceShadows : false
         Specular : 0.5 0.5 0.5 1.0
         Shininess : 75.0
-        DiffuseMap : Flip Textures/ear1ccc2.jpg
+        DiffuseMap : Flip Textures/planets/moonmap2k.jpg
         VertexLighting : false
         SteepParallax : false
         HardwareShadows : false
