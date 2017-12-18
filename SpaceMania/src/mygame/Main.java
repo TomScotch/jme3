@@ -33,13 +33,11 @@ import com.jme3.system.AppSettings;
 public class Main extends SimpleApplication implements ActionListener {
 
     private static Main app;
-    private float cycle1 = 0;
-    private float cycle2 = 0;
-    private float cycle3 = 0;
-    private float cycle4 = 0;
+
     private BulletAppState bas;
     private PointLight sunLight;
     private CameraControl cc;
+
     private Spatial jupiter;
     private Spatial ship;
     private Spatial earth;
@@ -51,6 +49,15 @@ public class Main extends SimpleApplication implements ActionListener {
     private Spatial saturn;
     private Spatial uranus;
     private Spatial venus;
+
+    private float cycle1 = 0;
+    private float cycle2 = 0;
+    private float cycle3 = 0;
+    private float cycle4 = 0;
+    private float cycle5 = 0;
+    private float cycle6 = 0;
+    private float cycle7 = 0;
+    private float cycle8 = 0;
 
     float Sun_Durchmesser = 1300000;
     float Sun_Masse = 1.9884f;
@@ -103,7 +110,6 @@ public class Main extends SimpleApplication implements ActionListener {
     float Neptun_Rotationsgeschwindigkeit = 23.71f;
     float Neptun_abstand = 4509;
 
-    //
     public static void main(String[] args) {
 
         app = new Main();
@@ -170,6 +176,22 @@ public class Main extends SimpleApplication implements ActionListener {
     }
 
     private void createStars() {
+
+        neptune = assetManager.loadModel("Models/neptune.j3o");
+        rootNode.attachChild(neptune);
+        PhysicsSpace.getPhysicsSpace().add(neptune);
+
+        saturn = assetManager.loadModel("Models/saturn.j3o");
+        rootNode.attachChild(saturn);
+        PhysicsSpace.getPhysicsSpace().add(saturn);
+
+        uranus = assetManager.loadModel("Models/uranus.j3o");
+        rootNode.attachChild(uranus);
+        PhysicsSpace.getPhysicsSpace().add(uranus);
+
+        venus = assetManager.loadModel("Models/venus.j3o");
+        rootNode.attachChild(venus);
+        PhysicsSpace.getPhysicsSpace().add(venus);
 
         earth = assetManager.loadModel("Models/earth.j3o");
         rootNode.attachChild(earth);
@@ -250,22 +272,37 @@ public class Main extends SimpleApplication implements ActionListener {
     @Override
     public void simpleUpdate(float tpf) {
 
-        cycle1 += 0.0027f % FastMath.TWO_PI;
         cycle2 += 0.0045f % FastMath.TWO_PI;
-        cycle3 += 0.0036f % FastMath.TWO_PI;
-        cycle4 += 0.0018f % FastMath.TWO_PI;
-
         jupiter.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle2) * 1200), 0, FastMath.cos(cycle2) * 1200).negate());
-        jupiter.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, -0.0168f, 0));
+        jupiter.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Jupiter_Rotationsgeschwindigkeit, 0));
 
+        cycle3 += 0.0036f % FastMath.TWO_PI;
         mars.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle3) * 700), 0, FastMath.cos(cycle3) * 800));
-        mars.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.005545f, 0));
+        mars.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Mars_Rotationsgeschwindigkeit, 0));
 
+        cycle4 += 0.0018f % FastMath.TWO_PI;
         mercurius.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle4) * 600), 0, FastMath.cos(cycle4) * 500));
-        mercurius.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, 0.075f, 0));
+        mercurius.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Merkur_Rotationsgeschwindigkeit, 0));
 
+        cycle1 += 0.0027f % FastMath.TWO_PI;
         earth.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle1) * 300, 0, FastMath.cos(cycle1) * 300).negate());
-        earth.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, -0.09f, 0));
+        earth.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Erde_Rotationsgeschwindigkeit, 0));
+
+        cycle5 += 0.0027f % FastMath.TWO_PI;
+        venus.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle5) * 300, 0, FastMath.cos(cycle5) * 300).negate());
+        venus.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Venus_Rotationsgeschwindigkeit, 0));
+
+        cycle6 += 0.0045f % FastMath.TWO_PI;
+        uranus.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle6) * 300, 0, FastMath.cos(cycle6) * 300).negate());
+        uranus.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Uranus_Rotationsgeschwindigkeit, 0));
+
+        cycle7 += 0.0036f % FastMath.TWO_PI;
+        neptune.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle7) * 300, 0, FastMath.cos(cycle7) * 300).negate());
+        neptune.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Neptun_Rotationsgeschwindigkeit, 0));
+
+        cycle8 += 0.0018f % FastMath.TWO_PI;
+        saturn.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle8) * 300, 0, FastMath.cos(cycle8) * 300).negate());
+        saturn.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Saturn_Rotationsgeschwindigkeit, 0));
 
         moon.rotate(0, 0.003f, 0);
         moonGeom.rotate(0, 0.07f, 0);
