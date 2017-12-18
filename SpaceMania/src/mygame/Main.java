@@ -62,53 +62,56 @@ public class Main extends SimpleApplication implements ActionListener {
     float Sun_Durchmesser = 1300000;
     float Sun_Masse = 1.9884f;
 
+    //Durchmesser
+    //Masse
+    
     float Merkur_Orbitalgeschwindigkeit = 47.8725f;
     float Merkur_Durchmesser = 4879;
     float Merkur_Masse = 0.33022f;
     float Merkur_Rotationsgeschwindigkeit = 4.25f;
-    float Merkur_abstand = 58;
+    float Merkur_Abstand = 58;
 
     float Venus_Orbitalgeschwindigkeit = 35.0214f;
     float Venus_Durchmesser = 12104;
     float Venus_Masse = 4.8685f;
     float Venus_Rotationsgeschwindigkeit = -10.36f;
-    float Venus_abstand = 108;
+    float Venus_Abstand = 108;
 
     float Erde_Orbitalgeschwindigkeit = 29.7859f;
     float Erde_Durchmesser = 12742;
     float Erde_Masse = 5.9737f;
     float Erde_Rotationsgeschwindigkeit = 11.18f;
-    float Erde_abstand = 150;
+    float Erde_Abstand = 150;
 
     float Mars_Orbitalgeschwindigkeit = 24.1309f;
     float Mars_Durchmesser = 6779;
     float Mars_Masse = 0.64185f;
     float Mars_Rotationsgeschwindigkeit = 5.02f;
-    float Mars_abstand = 228;
+    float Mars_Abstand = 228;
 
     float Jupiter_Orbitalgeschwindigkeit = 13.0697f;
     float Jupiter_Durchmesser = 139822;
     float Jupiter_Masse = 1898.7f;
     float Jupiter_Rotationsgeschwindigkeit = 59.54f;
-    float Jupiter_abstand = 778;
+    float Jupiter_Abstand = 778;
 
     float Saturn_Orbitalgeschwindigkeit = 9.6724f;
     float Saturn_Durchmesser = 116464;
     float Saturn_Masse = 568.51f;
     float Saturn_Rotationsgeschwindigkeit = 35.49f;
-    float Saturn_abstand = 1427;
+    float Saturn_Abstand = 1427;
 
     float Uranus_Orbitalgeschwindigkeit = 6.8352f;
     float Uranus_Durchmesser = 50724;
     float Uranus_Masse = 86.849f;
     float Uranus_Rotationsgeschwindigkeit = -21.29f;
-    float Uranus_abstand = 2884;
+    float Uranus_Abstand = 2884;
 
     float Neptun_Orbitalgeschwindigkeit = 5.4778f;
     float Neptun_Durchmesser = 49244;
     float Neptun_Masse = 102.44f;
     float Neptun_Rotationsgeschwindigkeit = 23.71f;
-    float Neptun_abstand = 4509;
+    float Neptun_Abstand = 4509;
 
     public static void main(String[] args) {
 
@@ -272,36 +275,36 @@ public class Main extends SimpleApplication implements ActionListener {
     @Override
     public void simpleUpdate(float tpf) {
 
-        cycle2 += 0.0045f % FastMath.TWO_PI;
-        jupiter.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle2) * 1200), 0, FastMath.cos(cycle2) * 1200).negate());
+        cycle2 += Jupiter_Orbitalgeschwindigkeit % FastMath.TWO_PI;
+        jupiter.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle2) * 1200), 0, FastMath.cos(cycle2) * 1200));
         jupiter.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Jupiter_Rotationsgeschwindigkeit, 0));
 
-        cycle3 += 0.0036f % FastMath.TWO_PI;
+        cycle3 += Mars_Orbitalgeschwindigkeit % FastMath.TWO_PI;
         mars.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle3) * 700), 0, FastMath.cos(cycle3) * 800));
         mars.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Mars_Rotationsgeschwindigkeit, 0));
 
-        cycle4 += 0.0018f % FastMath.TWO_PI;
-        mercurius.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle4) * 600), 0, FastMath.cos(cycle4) * 500));
+        cycle4 += Merkur_Orbitalgeschwindigkeit % FastMath.TWO_PI;
+        mercurius.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f((FastMath.sin(cycle4) * Merkur_Abstand), 0, FastMath.cos(cycle4) * Merkur_Abstand));
         mercurius.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Merkur_Rotationsgeschwindigkeit, 0));
 
-        cycle1 += 0.0027f % FastMath.TWO_PI;
-        earth.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle1) * 300, 0, FastMath.cos(cycle1) * 300).negate());
+        cycle1 += Erde_Orbitalgeschwindigkeit % FastMath.TWO_PI;
+        earth.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle1) * Erde_Abstand, 0, FastMath.cos(cycle1) * Erde_Abstand));
         earth.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Erde_Rotationsgeschwindigkeit, 0));
 
-        cycle5 += 0.0027f % FastMath.TWO_PI;
-        venus.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle5) * 300, 0, FastMath.cos(cycle5) * 300).negate());
+        cycle5 += Venus_Orbitalgeschwindigkeit % FastMath.TWO_PI;
+        venus.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle5) * Venus_Abstand, 0, FastMath.cos(cycle5) * Venus_Abstand));
         venus.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Venus_Rotationsgeschwindigkeit, 0));
 
-        cycle6 += 0.0045f % FastMath.TWO_PI;
-        uranus.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle6) * 300, 0, FastMath.cos(cycle6) * 300).negate());
+        cycle6 += Uranus_Orbitalgeschwindigkeit % FastMath.TWO_PI;
+        uranus.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle6) * Uranus_Abstand, 0, FastMath.cos(cycle6) * Uranus_Abstand));
         uranus.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Uranus_Rotationsgeschwindigkeit, 0));
 
-        cycle7 += 0.0036f % FastMath.TWO_PI;
-        neptune.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle7) * 300, 0, FastMath.cos(cycle7) * 300).negate());
+        cycle7 += Neptun_Orbitalgeschwindigkeit % FastMath.TWO_PI;
+        neptune.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle7) * Neptun_Abstand, 0, FastMath.cos(cycle7) * Neptun_Abstand));
         neptune.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Neptun_Rotationsgeschwindigkeit, 0));
 
-        cycle8 += 0.0018f % FastMath.TWO_PI;
-        saturn.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle8) * 300, 0, FastMath.cos(cycle8) * 300).negate());
+        cycle8 += Saturn_Orbitalgeschwindigkeit % FastMath.TWO_PI;
+        saturn.getControl(RigidBodyControl.class).setPhysicsLocation(new Vector3f(FastMath.sin(cycle8) * Saturn_Abstand, 0, FastMath.cos(cycle8) * Saturn_Abstand));
         saturn.getControl(RigidBodyControl.class).setAngularVelocity(new Vector3f(0, Saturn_Rotationsgeschwindigkeit, 0));
 
         moon.rotate(0, 0.003f, 0);
