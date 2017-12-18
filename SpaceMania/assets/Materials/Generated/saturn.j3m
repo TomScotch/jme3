@@ -7,7 +7,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         BackfaceShadows : false
         Specular : 0.5 0.5 0.5 1.0
         Shininess : 75.0
-        DiffuseMap : Textures/planets/2k_mars.jpg
+        DiffuseMap : Textures/planets/2k_saturn.jpg
         VertexLighting : false
         SteepParallax : false
         HardwareShadows : false

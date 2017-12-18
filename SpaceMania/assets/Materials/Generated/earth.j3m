@@ -7,7 +7,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         BackfaceShadows : false
         Specular : 0.5 0.5 0.5 1.0
         Shininess : 75.0
-        DiffuseMap : Textures/World-satellite-map.png
+        DiffuseMap : Textures/planets/earth.jpg
         VertexLighting : false
         SteepParallax : false
         HardwareShadows : false

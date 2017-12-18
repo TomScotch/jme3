@@ -47,7 +47,52 @@ public class Main extends SimpleApplication implements ActionListener {
     private Spatial moonGeom;
     private Spatial mercurius;
     private Spatial mars;
+    private Spatial neptune;
+    private Spatial saturn;
+    private Spatial uranus;
+    private Spatial venus;
+    //
+    float Merkur_Orbitalgeschwindigkeit = 47.8725f;
+    float Merkur_Volumen = 0.0608272f;
+    float Merkur_Masse = 0.33022f;
+    float Merkur_Rotationsgeschwindigkeit = 4.25f;
 
+    float Venus_Orbitalgeschwindigkeit = 35.0214f;
+    float Venus_Volumen = 0.92840f;
+    float Venus_Masse = 4.8685f;
+    float Venus_Rotationsgeschwindigkeit = -10.36f;
+
+    float Erde_Orbitalgeschwindigkeit = 29.7859f;
+    float Erde_Volumen = 1.0832f;
+    float Erde_Masse = 5.9737f;
+    float Erde_Rotationsgeschwindigkeit = 11.18f;
+
+    float Mars_Orbitalgeschwindigkeit = 24.1309f;
+    float Mars_Volumen = 0.16314f;
+    float Mars_Masse = 0.64185f;
+    float Mars_Rotationsgeschwindigkeit = 5.02f;
+
+    float Jupiter_Orbitalgeschwindigkeit = 13.0697f;
+    float Jupiter_Volumen = 1425.5f;
+    float Jupiter_Masse = 1898.7f;
+    float Jupiter_Rotationsgeschwindigkeit = 59.54f;
+
+    float Saturn_Orbitalgeschwindigkeit = 9.6724f;
+    float Saturn_Volumen = 827.13f;
+    float Saturn_Masse = 568.51f;
+    float Saturn_Rotationsgeschwindigkeit = 35.49f;
+
+    float Uranus_Orbitalgeschwindigkeit = 6.8352f;
+    float Uranus_Volumen = 69.142f;
+    float Uranus_Masse = 86.849f;
+    float Uranus_Rotationsgeschwindigkeit = -21.29f;
+
+    float Neptun_Orbitalgeschwindigkeit = 5.4778f;
+    float Neptun_Volumen = 62.526f;
+    float Neptun_Masse = 102.44f;
+    float Neptun_Rotationsgeschwindigkeit = 23.71f;
+
+    //
     public static void main(String[] args) {
 
         app = new Main();
@@ -81,8 +126,6 @@ public class Main extends SimpleApplication implements ActionListener {
 
     private void createViewPort() {
 
-        app.guiViewPort.clearProcessors();
-        app.guiViewPort.clearScenes();
         viewPort.getCamera().setFrustumFar(9999);
         viewPort.getCamera().onFrameChange();
     }
@@ -144,12 +187,12 @@ public class Main extends SimpleApplication implements ActionListener {
 
     private void createSpace() {
 
-        Texture west = assetManager.loadTexture("Textures/left(uity right).png");
-        Texture east = assetManager.loadTexture("Textures/right(unity left).png");
-        Texture north = assetManager.loadTexture("Textures/back.png");
-        Texture south = assetManager.loadTexture("Textures/middle.png");
-        Texture up = assetManager.loadTexture("Textures/up.png");
-        Texture down = assetManager.loadTexture("Textures/down.png");
+        Texture west = assetManager.loadTexture("Textures/space/left(uity right).png");
+        Texture east = assetManager.loadTexture("Textures/space/right(unity left).png");
+        Texture north = assetManager.loadTexture("Textures/space/back.png");
+        Texture south = assetManager.loadTexture("Textures/space/middle.png");
+        Texture up = assetManager.loadTexture("Textures/space/up.png");
+        Texture down = assetManager.loadTexture("Textures/space/down.png");
         Spatial space = SkyFactory.createSky(assetManager, west, east, north, south, up, down);
         space.setQueueBucket(RenderQueue.Bucket.Sky);
         rootNode.attachChild(space);

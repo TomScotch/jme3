@@ -7,7 +7,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         BackfaceShadows : false
         Specular : 0.5 0.5 0.5 1.0
         Shininess : 75.0
-        DiffuseMap : Textures/jupiter.jpeg
+        DiffuseMap : Textures/planets/2k_jupiter.jpg
         VertexLighting : false
         SteepParallax : false
         HardwareShadows : false
