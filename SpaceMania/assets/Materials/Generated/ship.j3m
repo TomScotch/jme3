@@ -1,7 +1,7 @@
 Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
         BackfaceShadows : false
-        DiffuseMap : Flip Textures/Luminaris_Diffuse.tga.png
+        DiffuseMap : Flip Textures/ship/Luminaris_Diffuse.tga.png
     }
     AdditionalRenderState {
       PointSprite On
